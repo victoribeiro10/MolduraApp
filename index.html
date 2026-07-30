@@ -12,11 +12,16 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
         body {
             font-family: 'Arial', sans-serif;
             background: #000;
             color: white;
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -25,8 +30,8 @@
 
         h1 {
             text-align: center;
-            margin: 10px 0;
-            font-size: 20px;
+            margin: 8px 0;
+            font-size: 18px;
             color: #ff9ec7;
         }
 
@@ -34,11 +39,13 @@
             position: relative;
             width: 100%;
             max-width: 400px;
+            flex: 1;
+            max-height: calc(100vh - 140px);
             aspect-ratio: 9 / 16;
             background: #111;
             border-radius: 12px;
             overflow: hidden;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         video, #canvasResultado {
@@ -64,24 +71,25 @@
 
         .botoes {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
             justify-content: center;
             width: 100%;
             max-width: 400px;
+            padding: 5px 0;
         }
 
         button {
             background: #ff9ec7;
             color: white;
             border: none;
-            padding: 14px 20px;
-            font-size: 15px;
+            padding: 12px 16px;
+            font-size: 14px;
             font-weight: bold;
             border-radius: 30px;
             cursor: pointer;
             flex: 1;
-            min-width: 120px;
+            min-width: 100px;
             transition: 0.2s;
         }
 
@@ -95,20 +103,21 @@
         }
 
         #mensagem {
-            padding: 10px;
+            padding: 5px;
             text-align: center;
             color: #ff9ec7;
-            font-size: 14px;
+            font-size: 12px;
+            min-height: 20px;
         }
     </style>
 </head>
 <body>
     <h1>📸 Cecília - 1 Aninho</h1>
-    <div id="mensagem">Carregando câmera...</div>
+    <div id="mensagem">Iniciando...</div>
 
     <div class="container" id="areaCamera">
         <video id="video" autoplay playsinline muted></video>
-        <img id="molduraImg" class="moldura-overlay" alt="Moldura">
+        <img id="molduraImg" class="moldura-overlay" src="./Molduras/cecilia.png" alt="Moldura">
     </div>
 
     <div class="container hidden" id="areaResultado">
@@ -117,7 +126,7 @@
 
     <div class="botoes">
         <button id="btnTirarFoto">📷 Tirar Foto</button>
-        <button id="btnVirarCamera">🔄 Virar Câmera</button>
+        <button id="btnVirarCamera">🔄 Virar</button>
         <button id="btnRefazer" class="hidden">↩️ Refazer</button>
         <button id="btnBaixar" class="hidden">⬇️ Baixar</button>
     </div>
@@ -135,13 +144,18 @@
         const btnBaixar = document.getElementById('btnBaixar');
         const mensagem = document.getElementById('mensagem');
 
-        const MOLDURA_URL = './Molduras/cecilia.png';
-        
-        molduraImg.src = MOLDURA_URL;
-        
+        // Carrega a moldura para usar no canvas
         const moldura = new Image();
-        moldura.crossOrigin = 'anonymous';
-        moldura.src = MOLDURA_URL;
+        moldura.src = './Molduras/cecilia.png';
+        
+        moldura.onload = () => {
+            mensagem.textContent = '✅ Moldura carregada!';
+            setTimeout(() => { mensagem.textContent = ''; }, 1500);
+        };
+        
+        moldura.onerror = () => {
+            mensagem.textContent = '⚠️ Moldura não encontrada';
+        };
 
         let cameraAtual = 'environment';
         let streamAtual = null;
@@ -152,13 +166,13 @@
                 
                 if (streamAtual) {
                     streamAtual.getTracks().forEach(track => track.stop());
+                    streamAtual = null;
                 }
 
+                // Configuração SIMPLES - sem forçar resolução (evita zoom maluco)
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: { 
-                        facingMode: cameraAtual,
-                        width: { ideal: 1080 },
-                        height: { ideal: 1920 }
+                        facingMode: cameraAtual
                     },
                     audio: false
                 });
@@ -174,7 +188,6 @@
             } catch (err) {
                 mensagem.textContent = '❌ Erro: ' + err.message;
                 console.error(err);
-                alert('Erro ao acessar a câmera: ' + err.message);
             }
         }
 
@@ -185,13 +198,14 @@
 
         btnTirarFoto.addEventListener('click', () => {
             if (!video.videoWidth) {
-                alert('Câmera ainda não está pronta. Aguarde um momento.');
+                alert('Câmera ainda não está pronta. Aguarde 1 segundo.');
                 return;
             }
 
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
 
+            // Se for câmera frontal, espelha
             if (cameraAtual === 'user') {
                 ctx.translate(canvas.width, 0);
                 ctx.scale(-1, 1);
@@ -200,8 +214,11 @@
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             ctx.setTransform(1, 0, 0, 1, 0, 0);
 
+            // Desenha a moldura por cima
             if (moldura.complete && moldura.naturalWidth > 0) {
                 ctx.drawImage(moldura, 0, 0, canvas.width, canvas.height);
+            } else {
+                alert('⚠️ Moldura não carregou. Foto será salva sem moldura.');
             }
 
             areaCamera.classList.add('hidden');
