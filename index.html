@@ -2,13 +2,14 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>MolduraApp - Cecília 1 Aninho</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -19,14 +20,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             padding: 10px;
         }
 
         h1 {
             text-align: center;
-            margin-bottom: 20px;
-            font-size: 24px;
+            margin: 10px 0;
+            font-size: 20px;
             color: #ff9ec7;
         }
 
@@ -38,15 +38,17 @@
             background: #111;
             border-radius: 12px;
             overflow: hidden;
+            margin-bottom: 15px;
         }
 
-        video, canvas, img {
+        video, #canvasResultado {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
         }
 
         .moldura-overlay {
@@ -57,56 +59,57 @@
             height: 100%;
             pointer-events: none;
             z-index: 10;
+            object-fit: cover;
         }
 
         .botoes {
             display: flex;
             gap: 10px;
-            margin-top: 20px;
             flex-wrap: wrap;
             justify-content: center;
+            width: 100%;
+            max-width: 400px;
         }
 
         button {
             background: #ff9ec7;
             color: white;
             border: none;
-            padding: 12px 24px;
-            font-size: 16px;
+            padding: 14px 20px;
+            font-size: 15px;
             font-weight: bold;
             border-radius: 30px;
             cursor: pointer;
-            transition: 0.3s;
+            flex: 1;
+            min-width: 120px;
+            transition: 0.2s;
         }
 
-        button:hover {
+        button:active {
+            transform: scale(0.95);
             background: #ff7eb0;
-            transform: scale(1.05);
-        }
-
-        button:disabled {
-            background: #555;
-            cursor: not-allowed;
         }
 
         .hidden {
             display: none !important;
         }
 
-        #canvasResultado {
-            position: static;
-            width: 100%;
-            border-radius: 12px;
+        #mensagem {
+            padding: 10px;
+            text-align: center;
+            color: #ff9ec7;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
     <h1>📸 Cecília - 1 Aninho</h1>
+    <div id="mensagem">Carregando câmera...</div>
 
     <!-- Área da câmera ao vivo -->
     <div class="container" id="areaCamera">
-        <video id="video" autoplay playsinline></video>
-        <img src="molduras/cecilia.png" class="moldura-overlay" alt="Moldura">
+        <video id="video" autoplay playsinline muted></video>
+        <img id="molduraImg" class="moldura-overlay" alt="Moldura">
     </div>
 
     <!-- Área do resultado -->
@@ -117,52 +120,112 @@
     <!-- Botões -->
     <div class="botoes">
         <button id="btnTirarFoto">📷 Tirar Foto</button>
-        <button id="btnRefazer" class="hidden">🔄 Refazer</button>
-        <button id="btnBaixar" class="hidden">⬇️ Baixar Foto</button>
+        <button id="btnVirarCamera">🔄 Virar Câmera</button>
+        <button id="btnRefazer" class="hidden">↩️ Refazer</button>
+        <button id="btnBaixar" class="hidden">⬇️ Baixar</button>
     </div>
 
     <script>
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvasResultado');
         const ctx = canvas.getContext('2d');
+        const molduraImg = document.getElementById('molduraImg');
         const areaCamera = document.getElementById('areaCamera');
         const areaResultado = document.getElementById('areaResultado');
         const btnTirarFoto = document.getElementById('btnTirarFoto');
+        const btnVirarCamera = document.getElementById('btnVirarCamera');
         const btnRefazer = document.getElementById('btnRefazer');
         const btnBaixar = document.getElementById('btnBaixar');
+        const mensagem = document.getElementById('mensagem');
 
+        // Caminho da moldura - configurável
+        const MOLDURA_URL = './molduras/cecilia.png';
+        
+        // Define a moldura
+        molduraImg.src = MOLDURA_URL;
+        
+        // Objeto Image pra usar no canvas
         const moldura = new Image();
-        moldura.src = 'molduras/cecilia.png';
+        moldura.crossOrigin = 'anonymous';
+        moldura.src = MOLDURA_URL;
+
+        // Variável pra alternar câmera
+        let cameraAtual = 'environment'; // 'environment' = traseira, 'user' = frontal
+        let streamAtual = null;
 
         // Inicia a câmera
         async function iniciarCamera() {
             try {
+                mensagem.textContent = 'Iniciando câmera...';
+                
+                // Para o stream anterior se existir
+                if (streamAtual) {
+                    streamAtual.getTracks().forEach(track => track.stop());
+                }
+
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment' } // câmera traseira no celular
+                    video: { 
+                        facingMode: cameraAtual,
+                        width: { ideal: 1080 },
+                        height: { ideal: 1920 }
+                    },
+                    audio: false
                 });
+                
+                streamAtual = stream;
                 video.srcObject = stream;
+                
+                video.onloadedmetadata = () => {
+                    video.play();
+                    mensagem.textContent = '';
+                };
+                
             } catch (err) {
-                alert('Erro ao acessar a câmera: ' + err.message);
+                mensagem.textContent = '❌ Erro: ' + err.message;
                 console.error(err);
+                alert('Erro ao acessar a câmera: ' + err.message + '\n\nVerifique as permissões do navegador.');
             }
         }
 
+        // Virar câmera (frontal/traseira)
+        btnVirarCamera.addEventListener('click', () => {
+            cameraAtual = cameraAtual === 'environment' ? 'user' : 'environment';
+            iniciarCamera();
+        });
+
         // Tira a foto
         btnTirarFoto.addEventListener('click', () => {
-            // Define o tamanho do canvas igual ao vídeo
+            if (!video.videoWidth) {
+                alert('Câmera ainda não está pronta. Aguarde um momento.');
+                return;
+            }
+
+            // Define o tamanho do canvas
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
 
-            // Desenha o frame atual do vídeo no canvas
+            // Se for câmera frontal, espelha a imagem
+            if (cameraAtual === 'user') {
+                ctx.translate(canvas.width, 0);
+                ctx.scale(-1, 1);
+            }
+
+            // Desenha o vídeo
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Reseta a transformação
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
 
             // Desenha a moldura por cima
-            ctx.drawImage(moldura, 0, 0, canvas.width, canvas.height);
+            if (moldura.complete && moldura.naturalWidth > 0) {
+                ctx.drawImage(moldura, 0, 0, canvas.width, canvas.height);
+            }
 
-            // Mostra o resultado, esconde a câmera
+            // Alterna as áreas
             areaCamera.classList.add('hidden');
             areaResultado.classList.remove('hidden');
             btnTirarFoto.classList.add('hidden');
+            btnVirarCamera.classList.add('hidden');
             btnRefazer.classList.remove('hidden');
             btnBaixar.classList.remove('hidden');
         });
@@ -172,6 +235,7 @@
             areaCamera.classList.remove('hidden');
             areaResultado.classList.add('hidden');
             btnTirarFoto.classList.remove('hidden');
+            btnVirarCamera.classList.remove('hidden');
             btnRefazer.classList.add('hidden');
             btnBaixar.classList.add('hidden');
         });
@@ -184,8 +248,8 @@
             link.click();
         });
 
-        // Inicia tudo
+        // Inicia
         iniciarCamera();
     </script>
 </body>
-</html>
+</html>>
