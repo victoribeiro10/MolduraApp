@@ -106,18 +106,15 @@
     <h1>📸 Cecília - 1 Aninho</h1>
     <div id="mensagem">Carregando câmera...</div>
 
-    <!-- Área da câmera ao vivo -->
     <div class="container" id="areaCamera">
         <video id="video" autoplay playsinline muted></video>
         <img id="molduraImg" class="moldura-overlay" alt="Moldura">
     </div>
 
-    <!-- Área do resultado -->
     <div class="container hidden" id="areaResultado">
         <canvas id="canvasResultado"></canvas>
     </div>
 
-    <!-- Botões -->
     <div class="botoes">
         <button id="btnTirarFoto">📷 Tirar Foto</button>
         <button id="btnVirarCamera">🔄 Virar Câmera</button>
@@ -138,27 +135,21 @@
         const btnBaixar = document.getElementById('btnBaixar');
         const mensagem = document.getElementById('mensagem');
 
-        // Caminho da moldura - configurável
-        const MOLDURA_URL = './molduras/cecilia.png';
+        const MOLDURA_URL = './Molduras/cecilia.png';
         
-        // Define a moldura
         molduraImg.src = MOLDURA_URL;
         
-        // Objeto Image pra usar no canvas
         const moldura = new Image();
         moldura.crossOrigin = 'anonymous';
         moldura.src = MOLDURA_URL;
 
-        // Variável pra alternar câmera
-        let cameraAtual = 'environment'; // 'environment' = traseira, 'user' = frontal
+        let cameraAtual = 'environment';
         let streamAtual = null;
 
-        // Inicia a câmera
         async function iniciarCamera() {
             try {
                 mensagem.textContent = 'Iniciando câmera...';
                 
-                // Para o stream anterior se existir
                 if (streamAtual) {
                     streamAtual.getTracks().forEach(track => track.stop());
                 }
@@ -183,45 +174,36 @@
             } catch (err) {
                 mensagem.textContent = '❌ Erro: ' + err.message;
                 console.error(err);
-                alert('Erro ao acessar a câmera: ' + err.message + '\n\nVerifique as permissões do navegador.');
+                alert('Erro ao acessar a câmera: ' + err.message);
             }
         }
 
-        // Virar câmera (frontal/traseira)
         btnVirarCamera.addEventListener('click', () => {
             cameraAtual = cameraAtual === 'environment' ? 'user' : 'environment';
             iniciarCamera();
         });
 
-        // Tira a foto
         btnTirarFoto.addEventListener('click', () => {
             if (!video.videoWidth) {
                 alert('Câmera ainda não está pronta. Aguarde um momento.');
                 return;
             }
 
-            // Define o tamanho do canvas
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
 
-            // Se for câmera frontal, espelha a imagem
             if (cameraAtual === 'user') {
                 ctx.translate(canvas.width, 0);
                 ctx.scale(-1, 1);
             }
 
-            // Desenha o vídeo
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            
-            // Reseta a transformação
             ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-            // Desenha a moldura por cima
             if (moldura.complete && moldura.naturalWidth > 0) {
                 ctx.drawImage(moldura, 0, 0, canvas.width, canvas.height);
             }
 
-            // Alterna as áreas
             areaCamera.classList.add('hidden');
             areaResultado.classList.remove('hidden');
             btnTirarFoto.classList.add('hidden');
@@ -230,7 +212,6 @@
             btnBaixar.classList.remove('hidden');
         });
 
-        // Refazer a foto
         btnRefazer.addEventListener('click', () => {
             areaCamera.classList.remove('hidden');
             areaResultado.classList.add('hidden');
@@ -240,7 +221,6 @@
             btnBaixar.classList.add('hidden');
         });
 
-        // Baixar a foto
         btnBaixar.addEventListener('click', () => {
             const link = document.createElement('a');
             link.download = 'foto-cecilia-' + Date.now() + '.png';
@@ -248,8 +228,7 @@
             link.click();
         });
 
-        // Inicia
         iniciarCamera();
     </script>
 </body>
-</html>>
+</html>
