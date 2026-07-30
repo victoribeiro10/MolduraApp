@@ -10,6 +10,7 @@
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
 
         html, body {
@@ -31,11 +32,62 @@
         h1 {
             text-align: center;
             margin: 8px 0;
-            font-size: 18px;
+            font-size: 20px;
             color: #ff9ec7;
         }
 
-        /* Container mantém a proporção EXATA da moldura: 2000x2666 = 3:4 */
+        .subtitulo {
+            text-align: center;
+            color: #ff9ec7;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        /* TELA INICIAL */
+        .tela-escolha {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex: 1;
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+
+        .btn-escolha {
+            width: 100%;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #ff9ec7, #ff7eb0);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-escolha:active {
+            transform: scale(0.97);
+        }
+
+        .btn-escolha .icone {
+            font-size: 40px;
+        }
+
+        .btn-escolha .descricao {
+            font-size: 12px;
+            font-weight: normal;
+            opacity: 0.9;
+        }
+
+        /* CONTAINER PRINCIPAL - Proporção da moldura */
         .container {
             position: relative;
             width: 100%;
@@ -47,8 +99,7 @@
             margin-bottom: 10px;
         }
 
-        /* O vídeo fica posicionado exatamente na área da janela transparente */
-        /* Janela: X=200/2000=10%, Y=87/2666=3.26%, W=1600/2000=80%, H=1936/2666=72.62% */
+        /* CÂMERA */
         #video {
             position: absolute;
             top: 3.26%;
@@ -59,6 +110,11 @@
             display: block;
         }
 
+        video.espelhado {
+            transform: scaleX(-1);
+        }
+
+        /* RESULTADO */
         #canvasResultado {
             position: absolute;
             top: 0;
@@ -69,10 +125,31 @@
             display: block;
         }
 
-        video.espelhado {
-            transform: scaleX(-1);
+        /* AJUSTE - Área da foto (janela) */
+        .area-ajuste {
+            position: absolute;
+            top: 3.26%;
+            left: 10%;
+            width: 80%;
+            height: 72.62%;
+            overflow: hidden;
+            background: #333;
+            touch-action: none;
+            cursor: grab;
         }
 
+        .area-ajuste:active {
+            cursor: grabbing;
+        }
+
+        #fotoAjuste {
+            position: absolute;
+            transform-origin: 0 0;
+            will-change: transform;
+            pointer-events: none;
+        }
+
+        /* MOLDURA POR CIMA */
         .moldura-overlay {
             position: absolute;
             top: 0;
@@ -83,6 +160,7 @@
             z-index: 10;
         }
 
+        /* BOTÕES */
         .botoes {
             display: flex;
             gap: 8px;
@@ -112,6 +190,26 @@
             background: #ff7eb0;
         }
 
+        .btn-voltar {
+            background: #444;
+            flex: 0 0 auto;
+            min-width: 80px;
+        }
+
+        .btn-reset {
+            background: #666;
+            flex: 0 0 auto;
+            min-width: 80px;
+        }
+
+        .btn-confirmar {
+            background: #4CAF50;
+        }
+
+        .btn-confirmar:active {
+            background: #45a049;
+        }
+
         .hidden {
             display: none !important;
         }
@@ -123,57 +221,128 @@
             font-size: 12px;
             min-height: 20px;
         }
+
+        #inputFoto {
+            display: none;
+        }
+
+        .dica-ajuste {
+            text-align: center;
+            color: #888;
+            font-size: 11px;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
     <h1>📸 Cecília - 1 Aninho</h1>
-    <div id="mensagem">Iniciando...</div>
 
-    <!-- Área da câmera -->
-    <div class="container" id="areaCamera">
-        <video id="video" autoplay playsinline muted></video>
-        <img id="molduraImg" class="moldura-overlay" src="./Molduras/cecilia.png" alt="Moldura">
+    <!-- TELA 1: ESCOLHA -->
+    <div class="tela-escolha" id="telaEscolha">
+        <div class="subtitulo">Como quer criar sua foto?</div>
+        
+        <button class="btn-escolha" id="btnAbrirCamera">
+            <span class="icone">📷</span>
+            <span>TIRAR FOTO</span>
+            <span class="descricao">Usar câmera do celular</span>
+        </button>
+
+        <button class="btn-escolha" id="btnAbrirGaleria">
+            <span class="icone">🖼️</span>
+            <span>ENVIAR FOTO</span>
+            <span class="descricao">Escolher da galeria</span>
+        </button>
+
+        <input type="file" id="inputFoto" accept="image/*">
     </div>
 
-    <!-- Área do resultado -->
+    <!-- TELA 2: CÂMERA -->
+    <div class="container hidden" id="areaCamera">
+        <video id="video" autoplay playsinline muted></video>
+        <img class="moldura-overlay" src="./Molduras/cecilia.png" alt="Moldura">
+    </div>
+
+    <!-- TELA 3: AJUSTE DA FOTO -->
+    <div class="container hidden" id="areaAjuste">
+        <div class="area-ajuste" id="areaFoto">
+            <img id="fotoAjuste" alt="Sua foto">
+        </div>
+        <img class="moldura-overlay" src="./Molduras/cecilia.png" alt="Moldura">
+    </div>
+
+    <!-- TELA 4: RESULTADO -->
     <div class="container hidden" id="areaResultado">
         <canvas id="canvasResultado"></canvas>
     </div>
 
-    <div class="botoes">
+    <div id="mensagem"></div>
+
+    <!-- Botões da câmera -->
+    <div class="botoes hidden" id="botoesCamera">
+        <button class="btn-voltar" id="btnVoltarCamera">← Voltar</button>
         <button id="btnTirarFoto">📷 Tirar Foto</button>
         <button id="btnVirarCamera">🔄 Virar</button>
-        <button id="btnRefazer" class="hidden">↩️ Refazer</button>
-        <button id="btnBaixar" class="hidden">⬇️ Baixar</button>
+    </div>
+
+    <!-- Botões do ajuste -->
+    <div class="botoes hidden" id="botoesAjuste">
+        <button class="btn-voltar" id="btnVoltarAjuste">← Voltar</button>
+        <button class="btn-reset" id="btnResetAjuste">🔄 Resetar</button>
+        <button class="btn-confirmar" id="btnConfirmarAjuste">✅ Confirmar</button>
+    </div>
+    <div class="dica-ajuste hidden" id="dicaAjuste">
+        👆 Arraste a foto • 🤏 Use 2 dedos pra zoom
+    </div>
+
+    <!-- Botões do resultado -->
+    <div class="botoes hidden" id="botoesResultado">
+        <button class="btn-voltar" id="btnRefazer">↩️ Refazer</button>
+        <button id="btnBaixar">⬇️ Baixar Foto</button>
     </div>
 
     <script>
         // ============================================
-        // CONFIGURAÇÕES DA MOLDURA (Cecília)
+        // CONFIGURAÇÕES DA MOLDURA
         // ============================================
         const MOLDURA = {
-            larguraTotal: 2000,   // largura total da moldura em px
-            alturaTotal: 2666,    // altura total da moldura em px
-            janelaX: 200,         // posição X onde começa a janela
-            janelaY: 87,          // posição Y onde começa a janela  
-            janelaLargura: 1600,  // largura da janela transparente
-            janelaAltura: 1936,   // altura da janela transparente
+            larguraTotal: 2000,
+            alturaTotal: 2666,
+            janelaX: 200,
+            janelaY: 87,
+            janelaLargura: 1600,
+            janelaAltura: 1936,
             arquivo: './Molduras/cecilia.png'
         };
 
         // ============================================
-        // ELEMENTOS DA PÁGINA
+        // ELEMENTOS
         // ============================================
+        const telaEscolha = document.getElementById('telaEscolha');
+        const areaCamera = document.getElementById('areaCamera');
+        const areaAjuste = document.getElementById('areaAjuste');
+        const areaResultado = document.getElementById('areaResultado');
+        const botoesCamera = document.getElementById('botoesCamera');
+        const botoesAjuste = document.getElementById('botoesAjuste');
+        const botoesResultado = document.getElementById('botoesResultado');
+        const dicaAjuste = document.getElementById('dicaAjuste');
+        
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvasResultado');
         const ctx = canvas.getContext('2d');
-        const molduraImg = document.getElementById('molduraImg');
-        const areaCamera = document.getElementById('areaCamera');
-        const areaResultado = document.getElementById('areaResultado');
+        const areaFoto = document.getElementById('areaFoto');
+        const fotoAjuste = document.getElementById('fotoAjuste');
+        
+        const btnAbrirCamera = document.getElementById('btnAbrirCamera');
+        const btnAbrirGaleria = document.getElementById('btnAbrirGaleria');
+        const btnVoltarCamera = document.getElementById('btnVoltarCamera');
         const btnTirarFoto = document.getElementById('btnTirarFoto');
         const btnVirarCamera = document.getElementById('btnVirarCamera');
+        const btnVoltarAjuste = document.getElementById('btnVoltarAjuste');
+        const btnResetAjuste = document.getElementById('btnResetAjuste');
+        const btnConfirmarAjuste = document.getElementById('btnConfirmarAjuste');
         const btnRefazer = document.getElementById('btnRefazer');
         const btnBaixar = document.getElementById('btnBaixar');
+        const inputFoto = document.getElementById('inputFoto');
         const mensagem = document.getElementById('mensagem');
 
         // ============================================
@@ -181,21 +350,296 @@
         // ============================================
         const moldura = new Image();
         moldura.src = MOLDURA.arquivo;
-        
-        moldura.onload = () => {
-            mensagem.textContent = '✅ Pronto!';
-            setTimeout(() => { mensagem.textContent = ''; }, 1500);
-        };
-        
-        moldura.onerror = () => {
-            mensagem.textContent = '⚠️ Moldura não encontrada';
-        };
 
         let cameraAtual = 'environment';
         let streamAtual = null;
 
+        // Variáveis do ajuste
+        let imagemOriginal = null; // Image object da foto enviada
+        let ajuste = {
+            x: 0,           // deslocamento X
+            y: 0,           // deslocamento Y
+            scale: 1,       // zoom
+            initialScale: 1 // zoom inicial (cover)
+        };
+
         // ============================================
-        // INICIA A CÂMERA
+        // NAVEGAÇÃO ENTRE TELAS
+        // ============================================
+        function mostrarTela(tela) {
+            telaEscolha.classList.add('hidden');
+            areaCamera.classList.add('hidden');
+            areaAjuste.classList.add('hidden');
+            areaResultado.classList.add('hidden');
+            botoesCamera.classList.add('hidden');
+            botoesAjuste.classList.add('hidden');
+            botoesResultado.classList.add('hidden');
+            dicaAjuste.classList.add('hidden');
+
+            if (tela === 'escolha') {
+                telaEscolha.classList.remove('hidden');
+                pararCamera();
+            } else if (tela === 'camera') {
+                areaCamera.classList.remove('hidden');
+                botoesCamera.classList.remove('hidden');
+            } else if (tela === 'ajuste') {
+                areaAjuste.classList.remove('hidden');
+                botoesAjuste.classList.remove('hidden');
+                dicaAjuste.classList.remove('hidden');
+                pararCamera();
+            } else if (tela === 'resultado') {
+                areaResultado.classList.remove('hidden');
+                botoesResultado.classList.remove('hidden');
+                pararCamera();
+            }
+        }
+
+        // ============================================
+        // ABRIR CÂMERA
+        // ============================================
+        btnAbrirCamera.addEventListener('click', () => {
+            mostrarTela('camera');
+            iniciarCamera();
+        });
+
+        // ============================================
+        // ABRIR GALERIA
+        // ============================================
+        btnAbrirGaleria.addEventListener('click', () => {
+            inputFoto.click();
+        });
+
+        inputFoto.addEventListener('change', (e) => {
+            const arquivo = e.target.files[0];
+            if (!arquivo) return;
+
+            mensagem.textContent = 'Carregando foto...';
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    imagemOriginal = img;
+                    iniciarAjuste();
+                    mensagem.textContent = '';
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(arquivo);
+        });
+
+        // ============================================
+        // INICIAR AJUSTE MANUAL
+        // ============================================
+        function iniciarAjuste() {
+            // Define a imagem no elemento visual
+            fotoAjuste.src = imagemOriginal.src;
+            fotoAjuste.style.width = imagemOriginal.width + 'px';
+            fotoAjuste.style.height = imagemOriginal.height + 'px';
+
+            // Calcula o "scale cover" inicial (menor scale que cobre toda a janela)
+            const rectArea = areaFoto.getBoundingClientRect();
+            const scaleX = rectArea.width / imagemOriginal.width;
+            const scaleY = rectArea.height / imagemOriginal.height;
+            const scaleCover = Math.max(scaleX, scaleY);
+
+            ajuste.scale = scaleCover;
+            ajuste.initialScale = scaleCover;
+
+            // Centraliza
+            ajuste.x = (rectArea.width - imagemOriginal.width * scaleCover) / 2;
+            ajuste.y = (rectArea.height - imagemOriginal.height * scaleCover) / 2;
+
+            aplicarTransform();
+            mostrarTela('ajuste');
+        }
+
+        function aplicarTransform() {
+            fotoAjuste.style.transform = 
+                `translate(${ajuste.x}px, ${ajuste.y}px) scale(${ajuste.scale})`;
+        }
+
+        // ============================================
+        // GESTOS DE TOQUE (ARRASTAR + ZOOM)
+        // ============================================
+        let toqueInicial = null;
+        let distanciaInicial = 0;
+        let scaleInicial = 1;
+        let ajusteInicial = { x: 0, y: 0 };
+
+        function getDistancia(touches) {
+            const dx = touches[0].clientX - touches[1].clientX;
+            const dy = touches[0].clientY - touches[1].clientY;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        function getCentro(touches) {
+            return {
+                x: (touches[0].clientX + touches[1].clientX) / 2,
+                y: (touches[0].clientY + touches[1].clientY) / 2
+            };
+        }
+
+        areaFoto.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (e.touches.length === 1) {
+                // Um dedo: preparar arrastar
+                toqueInicial = {
+                    x: e.touches[0].clientX,
+                    y: e.touches[0].clientY
+                };
+                ajusteInicial = { x: ajuste.x, y: ajuste.y };
+            } else if (e.touches.length === 2) {
+                // Dois dedos: preparar zoom
+                distanciaInicial = getDistancia(e.touches);
+                scaleInicial = ajuste.scale;
+                toqueInicial = getCentro(e.touches);
+                ajusteInicial = { x: ajuste.x, y: ajuste.y };
+            }
+        }, { passive: false });
+
+        areaFoto.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (e.touches.length === 1 && toqueInicial) {
+                // Arrastar
+                const dx = e.touches[0].clientX - toqueInicial.x;
+                const dy = e.touches[0].clientY - toqueInicial.y;
+                ajuste.x = ajusteInicial.x + dx;
+                ajuste.y = ajusteInicial.y + dy;
+                aplicarTransform();
+            } else if (e.touches.length === 2 && distanciaInicial > 0) {
+                // Zoom
+                const novaDistancia = getDistancia(e.touches);
+                const escalaFator = novaDistancia / distanciaInicial;
+                const novoScale = Math.max(
+                    ajuste.initialScale * 0.5,
+                    Math.min(scaleInicial * escalaFator, ajuste.initialScale * 5)
+                );
+                
+                // Ajusta posição pra dar zoom no centro dos dedos
+                const centroAtual = getCentro(e.touches);
+                const rectArea = areaFoto.getBoundingClientRect();
+                const cx = centroAtual.x - rectArea.left;
+                const cy = centroAtual.y - rectArea.top;
+                
+                const scaleDiff = novoScale / scaleInicial;
+                ajuste.x = cx - (cx - ajusteInicial.x) * scaleDiff;
+                ajuste.y = cy - (cy - ajusteInicial.y) * scaleDiff;
+                ajuste.scale = novoScale;
+                
+                aplicarTransform();
+            }
+        }, { passive: false });
+
+        areaFoto.addEventListener('touchend', (e) => {
+            if (e.touches.length === 0) {
+                toqueInicial = null;
+                distanciaInicial = 0;
+            }
+        });
+
+        // ============================================
+        // SUPORTE A MOUSE (pra testar no computador)
+        // ============================================
+        let mouseDown = false;
+        
+        areaFoto.addEventListener('mousedown', (e) => {
+            mouseDown = true;
+            toqueInicial = { x: e.clientX, y: e.clientY };
+            ajusteInicial = { x: ajuste.x, y: ajuste.y };
+        });
+
+        areaFoto.addEventListener('mousemove', (e) => {
+            if (!mouseDown) return;
+            const dx = e.clientX - toqueInicial.x;
+            const dy = e.clientY - toqueInicial.y;
+            ajuste.x = ajusteInicial.x + dx;
+            ajuste.y = ajusteInicial.y + dy;
+            aplicarTransform();
+        });
+
+        areaFoto.addEventListener('mouseup', () => { mouseDown = false; });
+        areaFoto.addEventListener('mouseleave', () => { mouseDown = false; });
+
+        areaFoto.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            const novoScale = Math.max(
+                ajuste.initialScale * 0.5,
+                Math.min(ajuste.scale * delta, ajuste.initialScale * 5)
+            );
+            
+            const rectArea = areaFoto.getBoundingClientRect();
+            const cx = e.clientX - rectArea.left;
+            const cy = e.clientY - rectArea.top;
+            
+            const scaleDiff = novoScale / ajuste.scale;
+            ajuste.x = cx - (cx - ajuste.x) * scaleDiff;
+            ajuste.y = cy - (cy - ajuste.y) * scaleDiff;
+            ajuste.scale = novoScale;
+            
+            aplicarTransform();
+        }, { passive: false });
+
+        // ============================================
+        // BOTÕES DO AJUSTE
+        // ============================================
+        btnVoltarAjuste.addEventListener('click', () => {
+            inputFoto.value = '';
+            mostrarTela('escolha');
+        });
+
+        btnResetAjuste.addEventListener('click', () => {
+            iniciarAjuste();
+        });
+
+        btnConfirmarAjuste.addEventListener('click', () => {
+            aplicarAjusteNoCanvas();
+        });
+
+        // ============================================
+        // APLICAR O AJUSTE FEITO NO CANVAS FINAL
+        // ============================================
+        function aplicarAjusteNoCanvas() {
+            canvas.width = MOLDURA.larguraTotal;
+            canvas.height = MOLDURA.alturaTotal;
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Calcula a proporção entre a área de ajuste visual e a janela real
+            const rectArea = areaFoto.getBoundingClientRect();
+            const proporcaoLargura = MOLDURA.janelaLargura / rectArea.width;
+            const proporcaoAltura = MOLDURA.janelaAltura / rectArea.height;
+
+            // Salva o estado do contexto
+            ctx.save();
+            
+            // Cria uma "área de recorte" na janela da moldura
+            ctx.beginPath();
+            ctx.rect(MOLDURA.janelaX, MOLDURA.janelaY, MOLDURA.janelaLargura, MOLDURA.janelaAltura);
+            ctx.clip();
+
+            // Aplica as transformações escaladas pro tamanho real
+            ctx.translate(MOLDURA.janelaX, MOLDURA.janelaY);
+            ctx.translate(ajuste.x * proporcaoLargura, ajuste.y * proporcaoAltura);
+            ctx.scale(ajuste.scale * proporcaoLargura, ajuste.scale * proporcaoAltura);
+
+            // Desenha a imagem original
+            ctx.drawImage(imagemOriginal, 0, 0);
+
+            ctx.restore();
+
+            // Aplica a moldura por cima
+            if (moldura.complete && moldura.naturalWidth > 0) {
+                ctx.drawImage(moldura, 0, 0, MOLDURA.larguraTotal, MOLDURA.alturaTotal);
+            }
+
+            mostrarTela('resultado');
+        }
+
+        // ============================================
+        // CÂMERA
         // ============================================
         async function iniciarCamera() {
             try {
@@ -206,12 +650,11 @@
                     streamAtual = null;
                 }
 
-                // Pede alta resolução com proporção da JANELA (1600/1936 ≈ 0.826)
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: { 
                         facingMode: cameraAtual,
                         width: { ideal: 1920 },
-                        height: { ideal: 2322 } // mantém proporção da janela
+                        height: { ideal: 2322 }
                     },
                     audio: false
                 });
@@ -219,7 +662,6 @@
                 streamAtual = stream;
                 video.srcObject = stream;
                 
-                // Espelha apenas o preview da câmera frontal
                 if (cameraAtual === 'user') {
                     video.classList.add('espelhado');
                 } else {
@@ -229,7 +671,6 @@
                 video.onloadedmetadata = () => {
                     video.play();
                     mensagem.textContent = '';
-                    console.log('Resolução câmera:', video.videoWidth, 'x', video.videoHeight);
                 };
                 
             } catch (err) {
@@ -238,93 +679,73 @@
             }
         }
 
-        // ============================================
-        // BOTÃO: VIRAR CÂMERA
-        // ============================================
+        function pararCamera() {
+            if (streamAtual) {
+                streamAtual.getTracks().forEach(track => track.stop());
+                streamAtual = null;
+            }
+        }
+
+        btnVoltarCamera.addEventListener('click', () => {
+            mostrarTela('escolha');
+        });
+
         btnVirarCamera.addEventListener('click', () => {
             cameraAtual = cameraAtual === 'environment' ? 'user' : 'environment';
             iniciarCamera();
         });
 
-        // ============================================
-        // BOTÃO: TIRAR FOTO
-        // Essa é a parte principal: monta a foto final em alta qualidade
-        // ============================================
         btnTirarFoto.addEventListener('click', () => {
             if (!video.videoWidth) {
                 alert('Câmera ainda não está pronta. Aguarde 1 segundo.');
                 return;
             }
 
-            // Define o canvas com o TAMANHO EXATO da moldura (2000x2666)
             canvas.width = MOLDURA.larguraTotal;
             canvas.height = MOLDURA.alturaTotal;
 
-            // Fundo branco (caso a moldura tenha transparência em algum lugar)
             ctx.fillStyle = '#FFFFFF';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Calcula o crop da câmera pra caber exatamente na janela
-            // Proporção da janela: 1600/1936 = 0.826
             const proporcaoJanela = MOLDURA.janelaLargura / MOLDURA.janelaAltura;
             const proporcaoCamera = video.videoWidth / video.videoHeight;
 
             let sx, sy, sWidth, sHeight;
 
             if (proporcaoCamera > proporcaoJanela) {
-                // Câmera mais LARGA que a janela: corta as laterais
                 sHeight = video.videoHeight;
                 sWidth = video.videoHeight * proporcaoJanela;
                 sx = (video.videoWidth - sWidth) / 2;
                 sy = 0;
             } else {
-                // Câmera mais ALTA que a janela: corta topo/baixo
                 sWidth = video.videoWidth;
                 sHeight = video.videoWidth / proporcaoJanela;
                 sx = 0;
                 sy = (video.videoHeight - sHeight) / 2;
             }
 
-            // Se for câmera frontal, salva a foto NORMAL (não espelhada)
-            // (o preview é espelhado, mas a foto final sai correta)
-            
-            // Desenha a câmera EXATAMENTE dentro da janela da moldura
             ctx.drawImage(
                 video,
-                sx, sy, sWidth, sHeight,           // origem (crop da câmera)
-                MOLDURA.janelaX, MOLDURA.janelaY,  // destino no canvas
+                sx, sy, sWidth, sHeight,
+                MOLDURA.janelaX, MOLDURA.janelaY,
                 MOLDURA.janelaLargura, MOLDURA.janelaAltura
             );
 
-            // Desenha a moldura POR CIMA (cobre tudo, exceto a janela transparente)
             if (moldura.complete && moldura.naturalWidth > 0) {
                 ctx.drawImage(moldura, 0, 0, MOLDURA.larguraTotal, MOLDURA.alturaTotal);
             }
 
-            // Mostra o resultado
-            areaCamera.classList.add('hidden');
-            areaResultado.classList.remove('hidden');
-            btnTirarFoto.classList.add('hidden');
-            btnVirarCamera.classList.add('hidden');
-            btnRefazer.classList.remove('hidden');
-            btnBaixar.classList.remove('hidden');
+            mostrarTela('resultado');
         });
 
         // ============================================
-        // BOTÃO: REFAZER FOTO
+        // RESULTADO
         // ============================================
         btnRefazer.addEventListener('click', () => {
-            areaCamera.classList.remove('hidden');
-            areaResultado.classList.add('hidden');
-            btnTirarFoto.classList.remove('hidden');
-            btnVirarCamera.classList.remove('hidden');
-            btnRefazer.classList.add('hidden');
-            btnBaixar.classList.add('hidden');
+            inputFoto.value = '';
+            mostrarTela('escolha');
         });
 
-        // ============================================
-        // BOTÃO: BAIXAR FOTO
-        // ============================================
         btnBaixar.addEventListener('click', () => {
             const link = document.createElement('a');
             link.download = 'cecilia-' + Date.now() + '.jpg';
@@ -332,8 +753,10 @@
             link.click();
         });
 
-        // Inicia
-        iniciarCamera();
+        // ============================================
+        // INÍCIO
+        // ============================================
+        mostrarTela('escolha');
     </script>
 </body>
 </html>
