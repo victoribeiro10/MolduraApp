@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>MolduraApp</title>
+    <title>Eternize esse momento</title>
     <style>
         * {
             margin: 0;
@@ -72,14 +72,8 @@
             gap: 8px;
         }
 
-        .btn-escolha:active {
-            transform: scale(0.97);
-        }
-
-        .btn-escolha .icone {
-            font-size: 40px;
-        }
-
+        .btn-escolha:active { transform: scale(0.97); }
+        .btn-escolha .icone { font-size: 40px; }
         .btn-escolha .descricao {
             font-size: 12px;
             font-weight: normal;
@@ -107,9 +101,7 @@
             display: block;
         }
 
-        video.espelhado {
-            transform: scaleX(-1);
-        }
+        video.espelhado { transform: scaleX(-1); }
 
         #canvasResultado {
             position: absolute;
@@ -213,8 +205,8 @@
     </style>
 </head>
 <body>
-    <!-- ⭐ TÍTULO DO EVENTO - TROCAR AQUI PRA CADA EVENTO NOVO -->
-    <h1 id="tituloEvento">📸 Cecília - 1 Aninho</h1>
+    <!-- TÍTULO GENÉRICO - vale pra qualquer evento -->
+    <h1>✨ Eternize esse momento</h1>
 
     <div class="tela-escolha" id="telaEscolha">
         <div class="subtitulo">Como quer criar sua foto?</div>
@@ -275,17 +267,8 @@
 
     <script>
         // ============================================
-        // ⭐ CONFIGURAÇÕES DO EVENTO
-        // TROQUE AQUI PRA CADA EVENTO NOVO:
-        // ============================================
-        const EVENTO = {
-            titulo: '📸 Cecília - 1 Aninho',  // ← título mostrado no topo
-            nomeArquivo: 'cecilia-1-aninho'    // ← nome usado ao baixar/compartilhar
-        };
-
-        // ============================================
         // CONFIGURAÇÕES DA MOLDURA
-        // (só mexer se mudar as medidas da polaroide)
+        // (só troca o arquivo moldura.png quando for evento novo)
         // ============================================
         const MOLDURA = {
             larguraTotal: 2000,
@@ -294,12 +277,8 @@
             janelaY: 87,
             janelaLargura: 1600,
             janelaAltura: 1936,
-            arquivo: './Molduras/moldura.png'  // ← nome FIXO agora
+            arquivo: './Molduras/moldura.png'
         };
-
-        // Aplica o título
-        document.getElementById('tituloEvento').textContent = EVENTO.titulo;
-        document.title = EVENTO.titulo;
 
         // ELEMENTOS
         const telaEscolha = document.getElementById('telaEscolha');
@@ -402,7 +381,6 @@
             reader.readAsDataURL(arquivo);
         });
 
-        // AJUSTE
         function iniciarAjuste() {
             fotoAjuste.src = imagemOriginal.src;
             fotoAjuste.style.width = imagemOriginal.width + 'px';
@@ -655,38 +633,35 @@
 
         btnBaixar.addEventListener('click', () => {
             const link = document.createElement('a');
-            link.download = EVENTO.nomeArquivo + '-' + Date.now() + '.jpg';
+            link.download = 'foto-' + Date.now() + '.jpg';
             link.href = canvas.toDataURL('image/jpeg', 0.95);
             link.click();
         });
 
-        // ⭐ NOVO: COMPARTILHAR
+        // COMPARTILHAR
         btnCompartilhar.addEventListener('click', async () => {
             try {
-                // Converte canvas em blob
                 canvas.toBlob(async (blob) => {
                     const arquivo = new File(
                         [blob], 
-                        EVENTO.nomeArquivo + '.jpg',
+                        'foto-' + Date.now() + '.jpg',
                         { type: 'image/jpeg' }
                     );
 
-                    // Verifica se pode compartilhar arquivos
                     if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
                         await navigator.share({
                             files: [arquivo],
-                            title: EVENTO.titulo,
-                            text: 'Momento especial capturado! 📸'
+                            title: 'Momento especial',
+                            text: '✨ Eternize esse momento'
                         });
                     } else {
-                        // Fallback: baixa a foto
                         alert('Seu navegador não suporta compartilhamento direto. Vamos baixar a foto pra você compartilhar manualmente.');
                         btnBaixar.click();
                     }
                 }, 'image/jpeg', 0.95);
             } catch (err) {
                 if (err.name !== 'AbortError') {
-                    console.error('Erro ao compartilhar:', err);
+                    console.error(err);
                     alert('Não foi possível compartilhar. Tente baixar a foto.');
                 }
             }
