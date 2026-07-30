@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>MolduraApp - Cecília 1 Aninho</title>
+    <title>MolduraApp</title>
     <style>
         * {
             margin: 0;
@@ -133,9 +133,7 @@
             cursor: grab;
         }
 
-        .area-ajuste:active {
-            cursor: grabbing;
-        }
+        .area-ajuste:active { cursor: grabbing; }
 
         #fotoAjuste {
             position: absolute;
@@ -187,29 +185,14 @@
             background: #ff7eb0;
         }
 
-        .btn-voltar {
-            background: #444;
-            flex: 0 0 auto;
-            min-width: 80px;
-        }
+        .btn-voltar { background: #444; flex: 0 0 auto; min-width: 80px; }
+        .btn-reset { background: #666; flex: 0 0 auto; min-width: 80px; }
+        .btn-confirmar { background: #4CAF50; }
+        .btn-confirmar:active { background: #45a049; }
+        .btn-compartilhar { background: #25D366; }
+        .btn-compartilhar:active { background: #1DA851; }
 
-        .btn-reset {
-            background: #666;
-            flex: 0 0 auto;
-            min-width: 80px;
-        }
-
-        .btn-confirmar {
-            background: #4CAF50;
-        }
-
-        .btn-confirmar:active {
-            background: #45a049;
-        }
-
-        .hidden {
-            display: none !important;
-        }
+        .hidden { display: none !important; }
 
         #mensagem {
             padding: 5px;
@@ -219,9 +202,7 @@
             min-height: 20px;
         }
 
-        #inputFoto {
-            display: none;
-        }
+        #inputFoto { display: none; }
 
         .dica-ajuste {
             text-align: center;
@@ -232,9 +213,9 @@
     </style>
 </head>
 <body>
-    <h1>📸 Cecília - 1 Aninho</h1>
+    <!-- ⭐ TÍTULO DO EVENTO - TROCAR AQUI PRA CADA EVENTO NOVO -->
+    <h1 id="tituloEvento">📸 Cecília - 1 Aninho</h1>
 
-    <!-- TELA 1: ESCOLHA -->
     <div class="tela-escolha" id="telaEscolha">
         <div class="subtitulo">Como quer criar sua foto?</div>
         
@@ -253,21 +234,18 @@
         <input type="file" id="inputFoto" accept="image/*">
     </div>
 
-    <!-- TELA 2: CÂMERA -->
     <div class="container hidden" id="areaCamera">
         <video id="video" autoplay playsinline muted></video>
-        <img class="moldura-overlay" src="./Molduras/cecilia.png" alt="Moldura">
+        <img class="moldura-overlay" src="./Molduras/moldura.png" alt="Moldura">
     </div>
 
-    <!-- TELA 3: AJUSTE -->
     <div class="container hidden" id="areaAjuste">
         <div class="area-ajuste" id="areaFoto">
             <img id="fotoAjuste" alt="Sua foto">
         </div>
-        <img class="moldura-overlay" src="./Molduras/cecilia.png" alt="Moldura">
+        <img class="moldura-overlay" src="./Molduras/moldura.png" alt="Moldura">
     </div>
 
-    <!-- TELA 4: RESULTADO -->
     <div class="container hidden" id="areaResultado">
         <canvas id="canvasResultado"></canvas>
     </div>
@@ -291,12 +269,23 @@
 
     <div class="botoes hidden" id="botoesResultado">
         <button class="btn-voltar" id="btnRefazer">↩️ Refazer</button>
-        <button id="btnBaixar">⬇️ Baixar Foto</button>
+        <button id="btnBaixar">⬇️ Baixar</button>
+        <button class="btn-compartilhar" id="btnCompartilhar">📤 Compartilhar</button>
     </div>
 
     <script>
         // ============================================
+        // ⭐ CONFIGURAÇÕES DO EVENTO
+        // TROQUE AQUI PRA CADA EVENTO NOVO:
+        // ============================================
+        const EVENTO = {
+            titulo: '📸 Cecília - 1 Aninho',  // ← título mostrado no topo
+            nomeArquivo: 'cecilia-1-aninho'    // ← nome usado ao baixar/compartilhar
+        };
+
+        // ============================================
         // CONFIGURAÇÕES DA MOLDURA
+        // (só mexer se mudar as medidas da polaroide)
         // ============================================
         const MOLDURA = {
             larguraTotal: 2000,
@@ -305,8 +294,12 @@
             janelaY: 87,
             janelaLargura: 1600,
             janelaAltura: 1936,
-            arquivo: './Molduras/cecilia.png'
+            arquivo: './Molduras/moldura.png'  // ← nome FIXO agora
         };
+
+        // Aplica o título
+        document.getElementById('tituloEvento').textContent = EVENTO.titulo;
+        document.title = EVENTO.titulo;
 
         // ELEMENTOS
         const telaEscolha = document.getElementById('telaEscolha');
@@ -334,6 +327,7 @@
         const btnConfirmarAjuste = document.getElementById('btnConfirmarAjuste');
         const btnRefazer = document.getElementById('btnRefazer');
         const btnBaixar = document.getElementById('btnBaixar');
+        const btnCompartilhar = document.getElementById('btnCompartilhar');
         const inputFoto = document.getElementById('inputFoto');
         const mensagem = document.getElementById('mensagem');
 
@@ -344,16 +338,9 @@
         let streamAtual = null;
         let imagemOriginal = null;
         
-        let ajuste = {
-            x: 0,
-            y: 0,
-            scale: 1,
-            initialScale: 1
-        };
+        let ajuste = { x: 0, y: 0, scale: 1, initialScale: 1 };
 
-        // ============================================
         // NAVEGAÇÃO
-        // ============================================
         function mostrarTela(tela) {
             telaEscolha.classList.add('hidden');
             areaCamera.classList.add('hidden');
@@ -382,17 +369,13 @@
             }
         }
 
-        // ============================================
-        // ABRIR CÂMERA
-        // ============================================
+        // CÂMERA
         btnAbrirCamera.addEventListener('click', () => {
             mostrarTela('camera');
             iniciarCamera();
         });
 
-        // ============================================
-        // ABRIR GALERIA
-        // ============================================
+        // GALERIA
         btnAbrirGaleria.addEventListener('click', () => {
             inputFoto.click();
         });
@@ -408,11 +391,7 @@
                 const img = new Image();
                 img.onload = () => {
                     imagemOriginal = img;
-                    
-                    // MOSTRA A TELA PRIMEIRO (pra ter dimensões válidas)
                     mostrarTela('ajuste');
-                    
-                    // Espera o DOM atualizar e daí calcula
                     setTimeout(() => {
                         iniciarAjuste();
                         mensagem.textContent = '';
@@ -423,41 +402,27 @@
             reader.readAsDataURL(arquivo);
         });
 
-        // ============================================
-        // INICIAR AJUSTE
-        // ============================================
+        // AJUSTE
         function iniciarAjuste() {
-            // Define a imagem
             fotoAjuste.src = imagemOriginal.src;
             fotoAjuste.style.width = imagemOriginal.width + 'px';
             fotoAjuste.style.height = imagemOriginal.height + 'px';
 
-            // Pega dimensões REAIS da área (agora que está visível)
             const rectArea = areaFoto.getBoundingClientRect();
             
-            console.log('Área ajuste:', rectArea.width, 'x', rectArea.height);
-            console.log('Imagem:', imagemOriginal.width, 'x', imagemOriginal.height);
-            
             if (rectArea.width === 0 || rectArea.height === 0) {
-                console.error('Área ainda não tem dimensões');
                 setTimeout(iniciarAjuste, 100);
                 return;
             }
 
-            // Calcula scale "cover" (menor scale que cobre toda a janela)
             const scaleX = rectArea.width / imagemOriginal.width;
             const scaleY = rectArea.height / imagemOriginal.height;
             const scaleCover = Math.max(scaleX, scaleY);
 
             ajuste.scale = scaleCover;
             ajuste.initialScale = scaleCover;
-
-            // Centraliza
             ajuste.x = (rectArea.width - imagemOriginal.width * scaleCover) / 2;
             ajuste.y = (rectArea.height - imagemOriginal.height * scaleCover) / 2;
-
-            console.log('Scale inicial:', scaleCover);
-            console.log('Posição inicial:', ajuste.x, ajuste.y);
 
             aplicarTransform();
         }
@@ -467,34 +432,29 @@
                 `translate(${ajuste.x}px, ${ajuste.y}px) scale(${ajuste.scale})`;
         }
 
-        // ============================================
         // GESTOS
-        // ============================================
         let toqueInicial = null;
         let distanciaInicial = 0;
         let scaleInicial = 1;
         let ajusteInicial = { x: 0, y: 0 };
 
-        function getDistancia(touches) {
-            const dx = touches[0].clientX - touches[1].clientX;
-            const dy = touches[0].clientY - touches[1].clientY;
+        function getDistancia(t) {
+            const dx = t[0].clientX - t[1].clientX;
+            const dy = t[0].clientY - t[1].clientY;
             return Math.sqrt(dx * dx + dy * dy);
         }
 
-        function getCentro(touches) {
+        function getCentro(t) {
             return {
-                x: (touches[0].clientX + touches[1].clientX) / 2,
-                y: (touches[0].clientY + touches[1].clientY) / 2
+                x: (t[0].clientX + t[1].clientX) / 2,
+                y: (t[0].clientY + t[1].clientY) / 2
             };
         }
 
         areaFoto.addEventListener('touchstart', (e) => {
             e.preventDefault();
             if (e.touches.length === 1) {
-                toqueInicial = {
-                    x: e.touches[0].clientX,
-                    y: e.touches[0].clientY
-                };
+                toqueInicial = { x: e.touches[0].clientX, y: e.touches[0].clientY };
                 ajusteInicial = { x: ajuste.x, y: ajuste.y };
             } else if (e.touches.length === 2) {
                 distanciaInicial = getDistancia(e.touches);
@@ -541,15 +501,13 @@
             }
         });
 
-        // Mouse (pra desktop)
+        // Mouse
         let mouseDown = false;
-        
         areaFoto.addEventListener('mousedown', (e) => {
             mouseDown = true;
             toqueInicial = { x: e.clientX, y: e.clientY };
             ajusteInicial = { x: ajuste.x, y: ajuste.y };
         });
-
         areaFoto.addEventListener('mousemove', (e) => {
             if (!mouseDown) return;
             const dx = e.clientX - toqueInicial.x;
@@ -558,10 +516,8 @@
             ajuste.y = ajusteInicial.y + dy;
             aplicarTransform();
         });
-
         areaFoto.addEventListener('mouseup', () => { mouseDown = false; });
         areaFoto.addEventListener('mouseleave', () => { mouseDown = false; });
-
         areaFoto.addEventListener('wheel', (e) => {
             e.preventDefault();
             const delta = e.deltaY > 0 ? 0.9 : 1.1;
@@ -569,84 +525,58 @@
                 ajuste.initialScale * 0.5,
                 Math.min(ajuste.scale * delta, ajuste.initialScale * 5)
             );
-            
             const rectArea = areaFoto.getBoundingClientRect();
             const cx = e.clientX - rectArea.left;
             const cy = e.clientY - rectArea.top;
-            
             const scaleDiff = novoScale / ajuste.scale;
             ajuste.x = cx - (cx - ajuste.x) * scaleDiff;
             ajuste.y = cy - (cy - ajuste.y) * scaleDiff;
             ajuste.scale = novoScale;
-            
             aplicarTransform();
         }, { passive: false });
 
-        // ============================================
         // BOTÕES AJUSTE
-        // ============================================
         btnVoltarAjuste.addEventListener('click', () => {
             inputFoto.value = '';
             mostrarTela('escolha');
         });
 
-        btnResetAjuste.addEventListener('click', () => {
-            iniciarAjuste();
-        });
+        btnResetAjuste.addEventListener('click', iniciarAjuste);
 
         btnConfirmarAjuste.addEventListener('click', () => {
-            aplicarAjusteNoCanvas();
-        });
-
-        // ============================================
-        // APLICAR AJUSTE NO CANVAS
-        // ============================================
-        function aplicarAjusteNoCanvas() {
             canvas.width = MOLDURA.larguraTotal;
             canvas.height = MOLDURA.alturaTotal;
-
             ctx.fillStyle = '#FFFFFF';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             const rectArea = areaFoto.getBoundingClientRect();
-            const proporcaoLargura = MOLDURA.janelaLargura / rectArea.width;
-            const proporcaoAltura = MOLDURA.janelaAltura / rectArea.height;
+            const propL = MOLDURA.janelaLargura / rectArea.width;
+            const propA = MOLDURA.janelaAltura / rectArea.height;
 
             ctx.save();
-            
-            // Recorta na área da janela
             ctx.beginPath();
             ctx.rect(MOLDURA.janelaX, MOLDURA.janelaY, MOLDURA.janelaLargura, MOLDURA.janelaAltura);
             ctx.clip();
-
-            // Aplica transformações escaladas pro tamanho real
             ctx.translate(MOLDURA.janelaX, MOLDURA.janelaY);
-            ctx.translate(ajuste.x * proporcaoLargura, ajuste.y * proporcaoAltura);
-            ctx.scale(ajuste.scale * proporcaoLargura, ajuste.scale * proporcaoAltura);
-
+            ctx.translate(ajuste.x * propL, ajuste.y * propA);
+            ctx.scale(ajuste.scale * propL, ajuste.scale * propA);
             ctx.drawImage(imagemOriginal, 0, 0);
-
             ctx.restore();
 
             if (moldura.complete && moldura.naturalWidth > 0) {
                 ctx.drawImage(moldura, 0, 0, MOLDURA.larguraTotal, MOLDURA.alturaTotal);
             }
-
             mostrarTela('resultado');
-        }
+        });
 
-        // ============================================
         // CÂMERA
-        // ============================================
         async function iniciarCamera() {
             try {
                 mensagem.textContent = 'Iniciando câmera...';
-                
                 if (streamAtual) {
-                    streamAtual.getTracks().forEach(track => track.stop());
+                    streamAtual.getTracks().forEach(t => t.stop());
                     streamAtual = null;
                 }
-
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: { 
                         facingMode: cameraAtual,
@@ -655,38 +585,27 @@
                     },
                     audio: false
                 });
-                
                 streamAtual = stream;
                 video.srcObject = stream;
-                
-                if (cameraAtual === 'user') {
-                    video.classList.add('espelhado');
-                } else {
-                    video.classList.remove('espelhado');
-                }
-                
+                if (cameraAtual === 'user') video.classList.add('espelhado');
+                else video.classList.remove('espelhado');
                 video.onloadedmetadata = () => {
                     video.play();
                     mensagem.textContent = '';
                 };
-                
             } catch (err) {
                 mensagem.textContent = '❌ Erro: ' + err.message;
-                console.error(err);
             }
         }
 
         function pararCamera() {
             if (streamAtual) {
-                streamAtual.getTracks().forEach(track => track.stop());
+                streamAtual.getTracks().forEach(t => t.stop());
                 streamAtual = null;
             }
         }
 
-        btnVoltarCamera.addEventListener('click', () => {
-            mostrarTela('escolha');
-        });
-
+        btnVoltarCamera.addEventListener('click', () => mostrarTela('escolha'));
         btnVirarCamera.addEventListener('click', () => {
             cameraAtual = cameraAtual === 'environment' ? 'user' : 'environment';
             iniciarCamera();
@@ -697,41 +616,34 @@
                 alert('Câmera ainda não está pronta.');
                 return;
             }
-
             canvas.width = MOLDURA.larguraTotal;
             canvas.height = MOLDURA.alturaTotal;
-
             ctx.fillStyle = '#FFFFFF';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            const proporcaoJanela = MOLDURA.janelaLargura / MOLDURA.janelaAltura;
-            const proporcaoCamera = video.videoWidth / video.videoHeight;
+            const propJ = MOLDURA.janelaLargura / MOLDURA.janelaAltura;
+            const propC = video.videoWidth / video.videoHeight;
+            let sx, sy, sW, sH;
 
-            let sx, sy, sWidth, sHeight;
-
-            if (proporcaoCamera > proporcaoJanela) {
-                sHeight = video.videoHeight;
-                sWidth = video.videoHeight * proporcaoJanela;
-                sx = (video.videoWidth - sWidth) / 2;
+            if (propC > propJ) {
+                sH = video.videoHeight;
+                sW = video.videoHeight * propJ;
+                sx = (video.videoWidth - sW) / 2;
                 sy = 0;
             } else {
-                sWidth = video.videoWidth;
-                sHeight = video.videoWidth / proporcaoJanela;
+                sW = video.videoWidth;
+                sH = video.videoWidth / propJ;
                 sx = 0;
-                sy = (video.videoHeight - sHeight) / 2;
+                sy = (video.videoHeight - sH) / 2;
             }
 
-            ctx.drawImage(
-                video,
-                sx, sy, sWidth, sHeight,
+            ctx.drawImage(video, sx, sy, sW, sH,
                 MOLDURA.janelaX, MOLDURA.janelaY,
-                MOLDURA.janelaLargura, MOLDURA.janelaAltura
-            );
+                MOLDURA.janelaLargura, MOLDURA.janelaAltura);
 
             if (moldura.complete && moldura.naturalWidth > 0) {
                 ctx.drawImage(moldura, 0, 0, MOLDURA.larguraTotal, MOLDURA.alturaTotal);
             }
-
             mostrarTela('resultado');
         });
 
@@ -743,9 +655,41 @@
 
         btnBaixar.addEventListener('click', () => {
             const link = document.createElement('a');
-            link.download = 'cecilia-' + Date.now() + '.jpg';
+            link.download = EVENTO.nomeArquivo + '-' + Date.now() + '.jpg';
             link.href = canvas.toDataURL('image/jpeg', 0.95);
             link.click();
+        });
+
+        // ⭐ NOVO: COMPARTILHAR
+        btnCompartilhar.addEventListener('click', async () => {
+            try {
+                // Converte canvas em blob
+                canvas.toBlob(async (blob) => {
+                    const arquivo = new File(
+                        [blob], 
+                        EVENTO.nomeArquivo + '.jpg',
+                        { type: 'image/jpeg' }
+                    );
+
+                    // Verifica se pode compartilhar arquivos
+                    if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+                        await navigator.share({
+                            files: [arquivo],
+                            title: EVENTO.titulo,
+                            text: 'Momento especial capturado! 📸'
+                        });
+                    } else {
+                        // Fallback: baixa a foto
+                        alert('Seu navegador não suporta compartilhamento direto. Vamos baixar a foto pra você compartilhar manualmente.');
+                        btnBaixar.click();
+                    }
+                }, 'image/jpeg', 0.95);
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    console.error('Erro ao compartilhar:', err);
+                    alert('Não foi possível compartilhar. Tente baixar a foto.');
+                }
+            }
         });
 
         mostrarTela('escolha');
