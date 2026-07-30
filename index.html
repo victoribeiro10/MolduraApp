@@ -58,6 +58,11 @@
             display: block;
         }
 
+        /* Espelha o vídeo quando a câmera é frontal (efeito espelho) */
+        video.espelhado {
+            transform: scaleX(-1);
+        }
+
         .moldura-overlay {
             position: absolute;
             top: 0;
@@ -144,12 +149,12 @@
         const btnBaixar = document.getElementById('btnBaixar');
         const mensagem = document.getElementById('mensagem');
 
-        // Carrega a moldura para usar no canvas
+        // Carrega a moldura em alta resolução
         const moldura = new Image();
         moldura.src = './Molduras/cecilia.png';
         
         moldura.onload = () => {
-            mensagem.textContent = '✅ Moldura carregada!';
+            mensagem.textContent = '✅ Pronto!';
             setTimeout(() => { mensagem.textContent = ''; }, 1500);
         };
         
@@ -169,10 +174,14 @@
                     streamAtual = null;
                 }
 
-                // Configuração SIMPLES - sem forçar resolução (evita zoom maluco)
+                // Pede a MAIOR resolução possível (ideal), mas sem forçar
+                // O "ideal" faz o navegador escolher a melhor resolução disponível
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: { 
-                        facingMode: cameraAtual
+                        facingMode: cameraAtual,
+                        width: { ideal: 1920 },
+                        height: { ideal: 1920 },
+                        aspectRatio: { ideal: 9/16 }
                     },
                     audio: false
                 });
@@ -180,9 +189,18 @@
                 streamAtual = stream;
                 video.srcObject = stream;
                 
+                // Aplica efeito espelho SÓ no preview da câmera frontal
+                if (cameraAtual === 'user') {
+                    video.classList.add('espelhado');
+                } else {
+                    video.classList.remove('espelhado');
+                }
+                
                 video.onloadedmetadata = () => {
                     video.play();
                     mensagem.textContent = '';
+                    // Debug - mostra resolução real (você pode remover depois)
+                    console.log('Resolução câmera:', video.videoWidth, 'x', video.videoHeight);
                 };
                 
             } catch (err) {
@@ -202,23 +220,17 @@
                 return;
             }
 
+            // Usa a resolução real do vídeo (máxima qualidade)
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
 
-            // Se for câmera frontal, espelha
-            if (cameraAtual === 'user') {
-                ctx.translate(canvas.width, 0);
-                ctx.scale(-1, 1);
-            }
-
+            // A foto salva NÃO fica espelhada (padrão profissional, tipo Instagram)
+            // O preview mostra espelhado (parece espelho), mas a foto sai normal
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-            // Desenha a moldura por cima
+            // Desenha a moldura por cima em alta qualidade
             if (moldura.complete && moldura.naturalWidth > 0) {
                 ctx.drawImage(moldura, 0, 0, canvas.width, canvas.height);
-            } else {
-                alert('⚠️ Moldura não carregou. Foto será salva sem moldura.');
             }
 
             areaCamera.classList.add('hidden');
@@ -240,8 +252,9 @@
 
         btnBaixar.addEventListener('click', () => {
             const link = document.createElement('a');
-            link.download = 'foto-cecilia-' + Date.now() + '.png';
-            link.href = canvas.toDataURL('image/png');
+            link.download = 'foto-cecilia-' + Date.now() + '.jpg';
+            // JPG com qualidade máxima (0.95 = 95% qualidade, arquivo menor que PNG)
+            link.href = canvas.toDataURL('image/jpeg', 0.95);
             link.click();
         });
 
