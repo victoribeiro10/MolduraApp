@@ -35,30 +35,40 @@
             color: #ff9ec7;
         }
 
+        /* Container mantém a proporção EXATA da moldura: 2000x2666 = 3:4 */
         .container {
             position: relative;
             width: 100%;
             max-width: 400px;
-            flex: 1;
-            max-height: calc(100vh - 140px);
-            aspect-ratio: 9 / 16;
+            aspect-ratio: 2000 / 2666;
             background: #111;
             border-radius: 12px;
             overflow: hidden;
             margin-bottom: 10px;
         }
 
-        video, #canvasResultado {
+        /* O vídeo fica posicionado exatamente na área da janela transparente */
+        /* Janela: X=200/2000=10%, Y=87/2666=3.26%, W=1600/2000=80%, H=1936/2666=72.62% */
+        #video {
+            position: absolute;
+            top: 3.26%;
+            left: 10%;
+            width: 80%;
+            height: 72.62%;
+            object-fit: cover;
+            display: block;
+        }
+
+        #canvasResultado {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
             display: block;
         }
 
-        /* Espelha o vídeo quando a câmera é frontal (efeito espelho) */
         video.espelhado {
             transform: scaleX(-1);
         }
@@ -71,7 +81,6 @@
             height: 100%;
             pointer-events: none;
             z-index: 10;
-            object-fit: cover;
         }
 
         .botoes {
@@ -120,11 +129,13 @@
     <h1>📸 Cecília - 1 Aninho</h1>
     <div id="mensagem">Iniciando...</div>
 
+    <!-- Área da câmera -->
     <div class="container" id="areaCamera">
         <video id="video" autoplay playsinline muted></video>
         <img id="molduraImg" class="moldura-overlay" src="./Molduras/cecilia.png" alt="Moldura">
     </div>
 
+    <!-- Área do resultado -->
     <div class="container hidden" id="areaResultado">
         <canvas id="canvasResultado"></canvas>
     </div>
@@ -137,6 +148,22 @@
     </div>
 
     <script>
+        // ============================================
+        // CONFIGURAÇÕES DA MOLDURA (Cecília)
+        // ============================================
+        const MOLDURA = {
+            larguraTotal: 2000,   // largura total da moldura em px
+            alturaTotal: 2666,    // altura total da moldura em px
+            janelaX: 200,         // posição X onde começa a janela
+            janelaY: 87,          // posição Y onde começa a janela  
+            janelaLargura: 1600,  // largura da janela transparente
+            janelaAltura: 1936,   // altura da janela transparente
+            arquivo: './Molduras/cecilia.png'
+        };
+
+        // ============================================
+        // ELEMENTOS DA PÁGINA
+        // ============================================
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvasResultado');
         const ctx = canvas.getContext('2d');
@@ -149,9 +176,11 @@
         const btnBaixar = document.getElementById('btnBaixar');
         const mensagem = document.getElementById('mensagem');
 
-        // Carrega a moldura em alta resolução
+        // ============================================
+        // CARREGA A MOLDURA
+        // ============================================
         const moldura = new Image();
-        moldura.src = './Molduras/cecilia.png';
+        moldura.src = MOLDURA.arquivo;
         
         moldura.onload = () => {
             mensagem.textContent = '✅ Pronto!';
@@ -165,6 +194,9 @@
         let cameraAtual = 'environment';
         let streamAtual = null;
 
+        // ============================================
+        // INICIA A CÂMERA
+        // ============================================
         async function iniciarCamera() {
             try {
                 mensagem.textContent = 'Iniciando câmera...';
@@ -174,14 +206,12 @@
                     streamAtual = null;
                 }
 
-                // Pede a MAIOR resolução possível (ideal), mas sem forçar
-                // O "ideal" faz o navegador escolher a melhor resolução disponível
+                // Pede alta resolução com proporção da JANELA (1600/1936 ≈ 0.826)
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: { 
                         facingMode: cameraAtual,
                         width: { ideal: 1920 },
-                        height: { ideal: 1920 },
-                        aspectRatio: { ideal: 9/16 }
+                        height: { ideal: 2322 } // mantém proporção da janela
                     },
                     audio: false
                 });
@@ -189,7 +219,7 @@
                 streamAtual = stream;
                 video.srcObject = stream;
                 
-                // Aplica efeito espelho SÓ no preview da câmera frontal
+                // Espelha apenas o preview da câmera frontal
                 if (cameraAtual === 'user') {
                     video.classList.add('espelhado');
                 } else {
@@ -199,7 +229,6 @@
                 video.onloadedmetadata = () => {
                     video.play();
                     mensagem.textContent = '';
-                    // Debug - mostra resolução real (você pode remover depois)
                     console.log('Resolução câmera:', video.videoWidth, 'x', video.videoHeight);
                 };
                 
@@ -209,30 +238,70 @@
             }
         }
 
+        // ============================================
+        // BOTÃO: VIRAR CÂMERA
+        // ============================================
         btnVirarCamera.addEventListener('click', () => {
             cameraAtual = cameraAtual === 'environment' ? 'user' : 'environment';
             iniciarCamera();
         });
 
+        // ============================================
+        // BOTÃO: TIRAR FOTO
+        // Essa é a parte principal: monta a foto final em alta qualidade
+        // ============================================
         btnTirarFoto.addEventListener('click', () => {
             if (!video.videoWidth) {
                 alert('Câmera ainda não está pronta. Aguarde 1 segundo.');
                 return;
             }
 
-            // Usa a resolução real do vídeo (máxima qualidade)
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            // Define o canvas com o TAMANHO EXATO da moldura (2000x2666)
+            canvas.width = MOLDURA.larguraTotal;
+            canvas.height = MOLDURA.alturaTotal;
 
-            // A foto salva NÃO fica espelhada (padrão profissional, tipo Instagram)
-            // O preview mostra espelhado (parece espelho), mas a foto sai normal
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            // Fundo branco (caso a moldura tenha transparência em algum lugar)
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Desenha a moldura por cima em alta qualidade
-            if (moldura.complete && moldura.naturalWidth > 0) {
-                ctx.drawImage(moldura, 0, 0, canvas.width, canvas.height);
+            // Calcula o crop da câmera pra caber exatamente na janela
+            // Proporção da janela: 1600/1936 = 0.826
+            const proporcaoJanela = MOLDURA.janelaLargura / MOLDURA.janelaAltura;
+            const proporcaoCamera = video.videoWidth / video.videoHeight;
+
+            let sx, sy, sWidth, sHeight;
+
+            if (proporcaoCamera > proporcaoJanela) {
+                // Câmera mais LARGA que a janela: corta as laterais
+                sHeight = video.videoHeight;
+                sWidth = video.videoHeight * proporcaoJanela;
+                sx = (video.videoWidth - sWidth) / 2;
+                sy = 0;
+            } else {
+                // Câmera mais ALTA que a janela: corta topo/baixo
+                sWidth = video.videoWidth;
+                sHeight = video.videoWidth / proporcaoJanela;
+                sx = 0;
+                sy = (video.videoHeight - sHeight) / 2;
             }
 
+            // Se for câmera frontal, salva a foto NORMAL (não espelhada)
+            // (o preview é espelhado, mas a foto final sai correta)
+            
+            // Desenha a câmera EXATAMENTE dentro da janela da moldura
+            ctx.drawImage(
+                video,
+                sx, sy, sWidth, sHeight,           // origem (crop da câmera)
+                MOLDURA.janelaX, MOLDURA.janelaY,  // destino no canvas
+                MOLDURA.janelaLargura, MOLDURA.janelaAltura
+            );
+
+            // Desenha a moldura POR CIMA (cobre tudo, exceto a janela transparente)
+            if (moldura.complete && moldura.naturalWidth > 0) {
+                ctx.drawImage(moldura, 0, 0, MOLDURA.larguraTotal, MOLDURA.alturaTotal);
+            }
+
+            // Mostra o resultado
             areaCamera.classList.add('hidden');
             areaResultado.classList.remove('hidden');
             btnTirarFoto.classList.add('hidden');
@@ -241,6 +310,9 @@
             btnBaixar.classList.remove('hidden');
         });
 
+        // ============================================
+        // BOTÃO: REFAZER FOTO
+        // ============================================
         btnRefazer.addEventListener('click', () => {
             areaCamera.classList.remove('hidden');
             areaResultado.classList.add('hidden');
@@ -250,14 +322,17 @@
             btnBaixar.classList.add('hidden');
         });
 
+        // ============================================
+        // BOTÃO: BAIXAR FOTO
+        // ============================================
         btnBaixar.addEventListener('click', () => {
             const link = document.createElement('a');
-            link.download = 'foto-cecilia-' + Date.now() + '.jpg';
-            // JPG com qualidade máxima (0.95 = 95% qualidade, arquivo menor que PNG)
+            link.download = 'cecilia-' + Date.now() + '.jpg';
             link.href = canvas.toDataURL('image/jpeg', 0.95);
             link.click();
         });
 
+        // Inicia
         iniciarCamera();
     </script>
 </body>
