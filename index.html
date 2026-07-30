@@ -43,7 +43,6 @@
             margin-bottom: 5px;
         }
 
-        /* TELA INICIAL */
         .tela-escolha {
             display: flex;
             flex-direction: column;
@@ -87,7 +86,6 @@
             opacity: 0.9;
         }
 
-        /* CONTAINER PRINCIPAL - Proporção da moldura */
         .container {
             position: relative;
             width: 100%;
@@ -99,7 +97,6 @@
             margin-bottom: 10px;
         }
 
-        /* CÂMERA */
         #video {
             position: absolute;
             top: 3.26%;
@@ -114,7 +111,6 @@
             transform: scaleX(-1);
         }
 
-        /* RESULTADO */
         #canvasResultado {
             position: absolute;
             top: 0;
@@ -125,7 +121,6 @@
             display: block;
         }
 
-        /* AJUSTE - Área da foto (janela) */
         .area-ajuste {
             position: absolute;
             top: 3.26%;
@@ -144,12 +139,15 @@
 
         #fotoAjuste {
             position: absolute;
+            top: 0;
+            left: 0;
             transform-origin: 0 0;
             will-change: transform;
             pointer-events: none;
+            max-width: none;
+            max-height: none;
         }
 
-        /* MOLDURA POR CIMA */
         .moldura-overlay {
             position: absolute;
             top: 0;
@@ -160,7 +158,6 @@
             z-index: 10;
         }
 
-        /* BOTÕES */
         .botoes {
             display: flex;
             gap: 8px;
@@ -262,7 +259,7 @@
         <img class="moldura-overlay" src="./Molduras/cecilia.png" alt="Moldura">
     </div>
 
-    <!-- TELA 3: AJUSTE DA FOTO -->
+    <!-- TELA 3: AJUSTE -->
     <div class="container hidden" id="areaAjuste">
         <div class="area-ajuste" id="areaFoto">
             <img id="fotoAjuste" alt="Sua foto">
@@ -277,24 +274,21 @@
 
     <div id="mensagem"></div>
 
-    <!-- Botões da câmera -->
     <div class="botoes hidden" id="botoesCamera">
         <button class="btn-voltar" id="btnVoltarCamera">← Voltar</button>
         <button id="btnTirarFoto">📷 Tirar Foto</button>
         <button id="btnVirarCamera">🔄 Virar</button>
     </div>
 
-    <!-- Botões do ajuste -->
     <div class="botoes hidden" id="botoesAjuste">
         <button class="btn-voltar" id="btnVoltarAjuste">← Voltar</button>
         <button class="btn-reset" id="btnResetAjuste">🔄 Resetar</button>
         <button class="btn-confirmar" id="btnConfirmarAjuste">✅ Confirmar</button>
     </div>
     <div class="dica-ajuste hidden" id="dicaAjuste">
-        👆 Arraste a foto • 🤏 Use 2 dedos pra zoom
+        👆 Arraste • 🤏 2 dedos pra zoom
     </div>
 
-    <!-- Botões do resultado -->
     <div class="botoes hidden" id="botoesResultado">
         <button class="btn-voltar" id="btnRefazer">↩️ Refazer</button>
         <button id="btnBaixar">⬇️ Baixar Foto</button>
@@ -314,9 +308,7 @@
             arquivo: './Molduras/cecilia.png'
         };
 
-        // ============================================
         // ELEMENTOS
-        // ============================================
         const telaEscolha = document.getElementById('telaEscolha');
         const areaCamera = document.getElementById('areaCamera');
         const areaAjuste = document.getElementById('areaAjuste');
@@ -345,26 +337,22 @@
         const inputFoto = document.getElementById('inputFoto');
         const mensagem = document.getElementById('mensagem');
 
-        // ============================================
-        // CARREGA A MOLDURA
-        // ============================================
         const moldura = new Image();
         moldura.src = MOLDURA.arquivo;
 
         let cameraAtual = 'environment';
         let streamAtual = null;
-
-        // Variáveis do ajuste
-        let imagemOriginal = null; // Image object da foto enviada
+        let imagemOriginal = null;
+        
         let ajuste = {
-            x: 0,           // deslocamento X
-            y: 0,           // deslocamento Y
-            scale: 1,       // zoom
-            initialScale: 1 // zoom inicial (cover)
+            x: 0,
+            y: 0,
+            scale: 1,
+            initialScale: 1
         };
 
         // ============================================
-        // NAVEGAÇÃO ENTRE TELAS
+        // NAVEGAÇÃO
         // ============================================
         function mostrarTela(tela) {
             telaEscolha.classList.add('hidden');
@@ -420,8 +408,15 @@
                 const img = new Image();
                 img.onload = () => {
                     imagemOriginal = img;
-                    iniciarAjuste();
-                    mensagem.textContent = '';
+                    
+                    // MOSTRA A TELA PRIMEIRO (pra ter dimensões válidas)
+                    mostrarTela('ajuste');
+                    
+                    // Espera o DOM atualizar e daí calcula
+                    setTimeout(() => {
+                        iniciarAjuste();
+                        mensagem.textContent = '';
+                    }, 100);
                 };
                 img.src = event.target.result;
             };
@@ -429,16 +424,27 @@
         });
 
         // ============================================
-        // INICIAR AJUSTE MANUAL
+        // INICIAR AJUSTE
         // ============================================
         function iniciarAjuste() {
-            // Define a imagem no elemento visual
+            // Define a imagem
             fotoAjuste.src = imagemOriginal.src;
             fotoAjuste.style.width = imagemOriginal.width + 'px';
             fotoAjuste.style.height = imagemOriginal.height + 'px';
 
-            // Calcula o "scale cover" inicial (menor scale que cobre toda a janela)
+            // Pega dimensões REAIS da área (agora que está visível)
             const rectArea = areaFoto.getBoundingClientRect();
+            
+            console.log('Área ajuste:', rectArea.width, 'x', rectArea.height);
+            console.log('Imagem:', imagemOriginal.width, 'x', imagemOriginal.height);
+            
+            if (rectArea.width === 0 || rectArea.height === 0) {
+                console.error('Área ainda não tem dimensões');
+                setTimeout(iniciarAjuste, 100);
+                return;
+            }
+
+            // Calcula scale "cover" (menor scale que cobre toda a janela)
             const scaleX = rectArea.width / imagemOriginal.width;
             const scaleY = rectArea.height / imagemOriginal.height;
             const scaleCover = Math.max(scaleX, scaleY);
@@ -450,8 +456,10 @@
             ajuste.x = (rectArea.width - imagemOriginal.width * scaleCover) / 2;
             ajuste.y = (rectArea.height - imagemOriginal.height * scaleCover) / 2;
 
+            console.log('Scale inicial:', scaleCover);
+            console.log('Posição inicial:', ajuste.x, ajuste.y);
+
             aplicarTransform();
-            mostrarTela('ajuste');
         }
 
         function aplicarTransform() {
@@ -460,7 +468,7 @@
         }
 
         // ============================================
-        // GESTOS DE TOQUE (ARRASTAR + ZOOM)
+        // GESTOS
         // ============================================
         let toqueInicial = null;
         let distanciaInicial = 0;
@@ -483,14 +491,12 @@
         areaFoto.addEventListener('touchstart', (e) => {
             e.preventDefault();
             if (e.touches.length === 1) {
-                // Um dedo: preparar arrastar
                 toqueInicial = {
                     x: e.touches[0].clientX,
                     y: e.touches[0].clientY
                 };
                 ajusteInicial = { x: ajuste.x, y: ajuste.y };
             } else if (e.touches.length === 2) {
-                // Dois dedos: preparar zoom
                 distanciaInicial = getDistancia(e.touches);
                 scaleInicial = ajuste.scale;
                 toqueInicial = getCentro(e.touches);
@@ -501,14 +507,12 @@
         areaFoto.addEventListener('touchmove', (e) => {
             e.preventDefault();
             if (e.touches.length === 1 && toqueInicial) {
-                // Arrastar
                 const dx = e.touches[0].clientX - toqueInicial.x;
                 const dy = e.touches[0].clientY - toqueInicial.y;
                 ajuste.x = ajusteInicial.x + dx;
                 ajuste.y = ajusteInicial.y + dy;
                 aplicarTransform();
             } else if (e.touches.length === 2 && distanciaInicial > 0) {
-                // Zoom
                 const novaDistancia = getDistancia(e.touches);
                 const escalaFator = novaDistancia / distanciaInicial;
                 const novoScale = Math.max(
@@ -516,7 +520,6 @@
                     Math.min(scaleInicial * escalaFator, ajuste.initialScale * 5)
                 );
                 
-                // Ajusta posição pra dar zoom no centro dos dedos
                 const centroAtual = getCentro(e.touches);
                 const rectArea = areaFoto.getBoundingClientRect();
                 const cx = centroAtual.x - rectArea.left;
@@ -538,9 +541,7 @@
             }
         });
 
-        // ============================================
-        // SUPORTE A MOUSE (pra testar no computador)
-        // ============================================
+        // Mouse (pra desktop)
         let mouseDown = false;
         
         areaFoto.addEventListener('mousedown', (e) => {
@@ -582,7 +583,7 @@
         }, { passive: false });
 
         // ============================================
-        // BOTÕES DO AJUSTE
+        // BOTÕES AJUSTE
         // ============================================
         btnVoltarAjuste.addEventListener('click', () => {
             inputFoto.value = '';
@@ -598,7 +599,7 @@
         });
 
         // ============================================
-        // APLICAR O AJUSTE FEITO NO CANVAS FINAL
+        // APLICAR AJUSTE NO CANVAS
         // ============================================
         function aplicarAjusteNoCanvas() {
             canvas.width = MOLDURA.larguraTotal;
@@ -607,30 +608,26 @@
             ctx.fillStyle = '#FFFFFF';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Calcula a proporção entre a área de ajuste visual e a janela real
             const rectArea = areaFoto.getBoundingClientRect();
             const proporcaoLargura = MOLDURA.janelaLargura / rectArea.width;
             const proporcaoAltura = MOLDURA.janelaAltura / rectArea.height;
 
-            // Salva o estado do contexto
             ctx.save();
             
-            // Cria uma "área de recorte" na janela da moldura
+            // Recorta na área da janela
             ctx.beginPath();
             ctx.rect(MOLDURA.janelaX, MOLDURA.janelaY, MOLDURA.janelaLargura, MOLDURA.janelaAltura);
             ctx.clip();
 
-            // Aplica as transformações escaladas pro tamanho real
+            // Aplica transformações escaladas pro tamanho real
             ctx.translate(MOLDURA.janelaX, MOLDURA.janelaY);
             ctx.translate(ajuste.x * proporcaoLargura, ajuste.y * proporcaoAltura);
             ctx.scale(ajuste.scale * proporcaoLargura, ajuste.scale * proporcaoAltura);
 
-            // Desenha a imagem original
             ctx.drawImage(imagemOriginal, 0, 0);
 
             ctx.restore();
 
-            // Aplica a moldura por cima
             if (moldura.complete && moldura.naturalWidth > 0) {
                 ctx.drawImage(moldura, 0, 0, MOLDURA.larguraTotal, MOLDURA.alturaTotal);
             }
@@ -697,7 +694,7 @@
 
         btnTirarFoto.addEventListener('click', () => {
             if (!video.videoWidth) {
-                alert('Câmera ainda não está pronta. Aguarde 1 segundo.');
+                alert('Câmera ainda não está pronta.');
                 return;
             }
 
@@ -738,9 +735,7 @@
             mostrarTela('resultado');
         });
 
-        // ============================================
         // RESULTADO
-        // ============================================
         btnRefazer.addEventListener('click', () => {
             inputFoto.value = '';
             mostrarTela('escolha');
@@ -753,9 +748,6 @@
             link.click();
         });
 
-        // ============================================
-        // INÍCIO
-        // ============================================
         mostrarTela('escolha');
     </script>
 </body>
