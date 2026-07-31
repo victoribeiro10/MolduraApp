@@ -95,6 +95,10 @@
             position: absolute;
             object-fit: cover;
             display: block;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
         }
 
         video.espelhado { transform: scaleX(-1); }
@@ -115,6 +119,10 @@
             background: #333;
             touch-action: none;
             cursor: grab;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
         }
 
         .area-ajuste:active { cursor: grabbing; }
@@ -213,7 +221,6 @@
             margin-top: 5px;
         }
 
-        /* TELA DE LOADING INICIAL */
         .loading-inicial {
             position: fixed;
             top: 0; left: 0;
@@ -307,7 +314,6 @@
 </head>
 <body>
 
-    <!-- LOADING INICIAL -->
     <div id="loadingInicial" class="loading-inicial">
         <div class="loading-spinner"></div>
         <p>Carregando...</p>
@@ -386,7 +392,7 @@
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // ============================================
-        // CONFIGURAÇÕES DA MOLDURA (serão carregadas do Supabase)
+        // CONFIGURAÇÕES DA MOLDURA (carregadas do Supabase)
         // ============================================
         let MOLDURA = {
             larguraTotal: 2000,
@@ -443,7 +449,7 @@
         let ajuste = { x: 0, y: 0, scale: 1, initialScale: 1 };
 
         // ============================================
-        // CARREGA CONFIGURAÇÃO DO SUPABASE (moldura + coordenadas)
+        // CARREGA CONFIGURAÇÃO DO SUPABASE
         // ============================================
         async function carregarConfiguracao() {
             try {
@@ -463,12 +469,10 @@
                 MOLDURA.janelaAltura = data.janela_altura;
                 MOLDURA.arquivo = data.moldura_url;
 
-                // Aplica moldura no HTML
                 molduraCamera.src = data.moldura_url;
                 molduraAjuste.src = data.moldura_url;
                 moldura.src = data.moldura_url;
 
-                // Aguarda a moldura carregar pra pegar tamanho real
                 await new Promise((resolve, reject) => {
                     if (moldura.complete && moldura.naturalWidth > 0) {
                         MOLDURA.larguraTotal = moldura.naturalWidth;
@@ -484,7 +488,6 @@
                     }
                 });
 
-                // Aplica proporção correta no container
                 aplicarProporcaoMoldura();
                 aplicarPosicoesJanela();
 
@@ -505,26 +508,24 @@
         }
 
         function aplicarPosicoesJanela() {
-            // Calcula percentuais baseados na moldura
             const topPct = (MOLDURA.janelaY / MOLDURA.alturaTotal) * 100;
             const leftPct = (MOLDURA.janelaX / MOLDURA.larguraTotal) * 100;
             const widthPct = (MOLDURA.janelaLargura / MOLDURA.larguraTotal) * 100;
             const heightPct = (MOLDURA.janelaAltura / MOLDURA.alturaTotal) * 100;
 
-            // Aplica no vídeo (câmera)
+            // Vídeo (câmera)
             video.style.top = topPct + '%';
             video.style.left = leftPct + '%';
             video.style.width = widthPct + '%';
             video.style.height = heightPct + '%';
 
-            // Aplica na área de ajuste (galeria)
+            // Área de ajuste (galeria)
             areaFoto.style.top = topPct + '%';
             areaFoto.style.left = leftPct + '%';
             areaFoto.style.width = widthPct + '%';
             areaFoto.style.height = heightPct + '%';
         }
 
-        // NAVEGAÇÃO
         function mostrarTela(tela) {
             telaEscolha.classList.add('hidden');
             areaCamera.classList.add('hidden');
