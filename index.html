@@ -704,6 +704,137 @@
             transform: translateY(-2px);
         }
 
+                /* ================================
+           OVERLAY DE ENVIO (barra de progresso)
+        ================================ */
+        .overlay-envio {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .overlay-envio.ativo {
+            display: flex;
+        }
+
+        .envio-conteudo {
+            max-width: 340px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .envio-icone {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 24px;
+            border: 1px solid var(--dourado);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dourado);
+            position: relative;
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+
+        .envio-icone svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .envio-titulo {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 500;
+            color: var(--branco);
+            margin-bottom: 6px;
+        }
+
+        .envio-subtitulo {
+            font-size: 10px;
+            color: var(--cinza-suave);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 32px;
+            font-weight: 400;
+        }
+
+        .barra-progresso {
+            width: 100%;
+            height: 6px;
+            background: rgba(212, 175, 122, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .barra-progresso-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--dourado-escuro), var(--dourado), var(--dourado-claro));
+            border-radius: 10px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .barra-progresso-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 1.8s infinite;
+        }
+
+        .envio-percentual {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 400;
+            color: var(--dourado);
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        .envio-mensagem {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 13px;
+            color: var(--dourado-claro);
+            letter-spacing: 1px;
+            min-height: 22px;
+            transition: opacity 0.3s ease;
+        }
+
+        @keyframes shimmer {
+            0%   { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(212, 175, 122, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 15px rgba(212, 175, 122, 0);
+            }
+        }
+
         /* ================================
            ANIMAÇÕES
         ================================ */
