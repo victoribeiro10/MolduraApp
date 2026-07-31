@@ -2,7 +2,7 @@
 // CONFIGURAÇÃO
 // ============================================================
 const SUPABASE_URL = "https://scwznirvzwrphztvopbz.supabase.co";
-const SERVICE_ROLE_KEY = "sb_secret_N5_wlyay4ApwasUVc1FOmA_3puq4q-b";
+const SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjd3puaXJ2endycGh6dHZvcGJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzI2NzQsImV4cCI6MjA5NTY0ODY3NH0.PLvr547bIEJwjECKxQaoR7lpazs8GbSpLYLMDiGD4Po";
 const BUCKET_FOTOS = "fotos-eventos";
 const BUCKET_MOLDURAS = "molduras";
 
