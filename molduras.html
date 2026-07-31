@@ -40,7 +40,7 @@
     .btn-apagar { background: #dc2626; }
     .btn-apagar:hover:not(:disabled) { background: #b91c1c; transform: scale(1.02); }
 
-    /* ========= NOVA SEÇÃO MOLDURA ========= */
+    /* ========= SEÇÃO MOLDURA ========= */
     .card-moldura {
       background: white;
       padding: 24px;
@@ -56,57 +56,144 @@
       align-items: center;
       gap: 8px;
     }
-    .moldura-conteudo {
-      display: grid;
-      grid-template-columns: 250px 1fr;
-      gap: 24px;
-      align-items: start;
-    }
-    @media (max-width: 700px) {
-      .moldura-conteudo { grid-template-columns: 1fr; }
-    }
-    .moldura-preview {
+
+    /* EDITOR VISUAL */
+    .editor-visual {
       background: #f5f5f5;
       border-radius: 12px;
-      padding: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
       text-align: center;
       position: relative;
     }
-    .moldura-preview img {
+
+    .editor-canvas-container {
+      position: relative;
+      display: inline-block;
       max-width: 100%;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+
+    #imgMolduraEditor {
+      display: block;
+      max-width: 100%;
+      max-height: 70vh;
+      user-select: none;
+      -webkit-user-drag: none;
+      pointer-events: none;
+    }
+
+    .janela-editor {
+      position: absolute;
+      border: 3px solid #2196F3;
+      background: rgba(33, 150, 243, 0.2);
+      cursor: move;
+      box-sizing: border-box;
+    }
+
+    .janela-editor::after {
+      content: '📷 Área da foto';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(33, 150, 243, 0.9);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: bold;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .handle {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: white;
+      border: 2px solid #2196F3;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .handle-nw { top: -8px; left: -8px; cursor: nwse-resize; }
+    .handle-ne { top: -8px; right: -8px; cursor: nesw-resize; }
+    .handle-sw { bottom: -8px; left: -8px; cursor: nesw-resize; }
+    .handle-se { bottom: -8px; right: -8px; cursor: nwse-resize; }
+    .handle-n  { top: -8px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+    .handle-s  { bottom: -8px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+    .handle-w  { top: 50%; left: -8px; transform: translateY(-50%); cursor: ew-resize; }
+    .handle-e  { top: 50%; right: -8px; transform: translateY(-50%); cursor: ew-resize; }
+
+    .coords-tempo-real {
+      display: inline-flex;
+      gap: 20px;
+      background: white;
+      padding: 12px 20px;
+      border-radius: 12px;
+      margin-top: 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      color: #555;
+      flex-wrap: wrap;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .coords-tempo-real span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .coords-tempo-real strong {
+      color: #2196F3;
+      font-weight: bold;
+    }
+
+    .instrucoes-editor {
+      background: #e3f2fd;
+      border-left: 4px solid #2196F3;
+      padding: 10px 14px;
       border-radius: 8px;
-      display: block;
-      margin: 0 auto;
+      font-size: 13px;
+      color: #1565c0;
+      margin-bottom: 16px;
+      text-align: left;
+      line-height: 1.5;
     }
-    .moldura-preview .sem-moldura {
-      padding: 40px 20px;
-      color: #888;
+
+    .moldura-form-simples {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 16px;
     }
-    .moldura-form label {
+    @media (max-width: 700px) {
+      .moldura-form-simples { grid-template-columns: 1fr 1fr; }
+    }
+    .moldura-form-simples label {
       display: block;
-      font-size: 12px;
+      font-size: 11px;
       color: #666;
       font-weight: bold;
       margin-bottom: 4px;
-      margin-top: 12px;
     }
-    .moldura-form input[type="number"] {
+    .moldura-form-simples input[type="number"] {
       width: 100%;
-      padding: 10px 12px;
+      padding: 8px 10px;
       border: 2px solid #eee;
-      border-radius: 10px;
-      font-size: 14px;
+      border-radius: 8px;
+      font-size: 13px;
       outline: none;
-      transition: border 0.3s;
     }
-    .moldura-form input[type="number"]:focus {
+    .moldura-form-simples input[type="number"]:focus {
       border-color: #ff7eb0;
     }
-    .grid-coords {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
+
     .moldura-acoes {
       display: flex;
       gap: 10px;
@@ -115,35 +202,28 @@
     }
     .moldura-acoes button {
       flex: 1;
-      min-width: 140px;
-      padding: 12px;
+      min-width: 180px;
+      padding: 14px;
       border: none;
       border-radius: 24px;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: bold;
       cursor: pointer;
       color: white;
       transition: 0.3s;
     }
     .btn-upload-moldura { background: #2196F3; }
-    .btn-upload-moldura:hover:not(:disabled) { background: #1976D2; }
+    .btn-upload-moldura:hover:not(:disabled) { background: #1976D2; transform: scale(1.02); }
     .btn-salvar-coords { background: #16a34a; }
-    .btn-salvar-coords:hover:not(:disabled) { background: #15803d; }
+    .btn-salvar-coords:hover:not(:disabled) { background: #15803d; transform: scale(1.02); }
     .btn-upload-moldura:disabled, .btn-salvar-coords:disabled { opacity: 0.5; cursor: not-allowed; }
     #inputMoldura { display: none; }
 
-    .info-moldura {
-      background: #fff8f0;
-      border-left: 4px solid #ff9ec7;
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 12px;
-      color: #666;
-      margin-top: 12px;
-      line-height: 1.5;
+    .sem-moldura-editor {
+      padding: 60px 20px;
+      color: #888;
+      text-align: center;
     }
-
-    /* ============= */
 
     .progresso { background: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
     .progresso p { color: #666; margin-bottom: 10px; font-size: 14px; font-weight: bold; }
@@ -217,49 +297,61 @@
       </div>
     </div>
 
-    <!-- ⭐ NOVA SEÇÃO: MOLDURA ATIVA -->
+    <!-- ⭐ EDITOR VISUAL DA MOLDURA -->
     <div class="card-moldura">
-      <h3>🖼️ Moldura Ativa</h3>
-      <div class="moldura-conteudo">
-        <div class="moldura-preview" id="molduraPreview">
-          <div class="sem-moldura">Carregando...</div>
-        </div>
-        <div class="moldura-form">
-          <label>📤 Trocar Moldura (PNG transparente)</label>
-          <input type="file" id="inputMoldura" accept="image/png,image/jpeg">
-          <button class="btn-upload-moldura" onclick="document.getElementById('inputMoldura').click()" id="btnEscolherMoldura" style="width:100%; padding:12px; margin-top:4px;">
-            🖼️ Escolher nova moldura
-          </button>
+      <h3>🖼️ Moldura Ativa — Editor Visual</h3>
 
-          <div class="grid-coords" style="margin-top: 16px;">
-            <div>
-              <label>Janela X (px)</label>
-              <input type="number" id="janelaX" value="0">
-            </div>
-            <div>
-              <label>Janela Y (px)</label>
-              <input type="number" id="janelaY" value="0">
-            </div>
-            <div>
-              <label>Largura (px)</label>
-              <input type="number" id="janelaLargura" value="0">
-            </div>
-            <div>
-              <label>Altura (px)</label>
-              <input type="number" id="janelaAltura" value="0">
-            </div>
-          </div>
+      <div class="instrucoes-editor">
+        💡 <strong>Como usar:</strong><br>
+        1️⃣ <strong>Arraste</strong> o retângulo azul pra posicionar onde a foto vai aparecer<br>
+        2️⃣ <strong>Puxe as bolinhas</strong> nos cantos/bordas pra redimensionar<br>
+        3️⃣ Ou digite os valores nos campos abaixo pra ajuste fino<br>
+        4️⃣ Clica em <strong>"💾 Salvar Coordenadas"</strong> quando estiver perfeito!
+      </div>
 
-          <div class="info-moldura">
-            💡 <strong>Como ajustar:</strong> Esses valores são em pixels do arquivo original da moldura. A "janela" é o retângulo onde a foto do convidado aparece.
-          </div>
-
-          <div class="moldura-acoes">
-            <button class="btn-salvar-coords" onclick="salvarCoordenadas()" id="btnSalvarCoords">
-              💾 Salvar Coordenadas
-            </button>
+      <div class="editor-visual">
+        <div class="editor-canvas-container" id="editorContainer">
+          <div class="sem-moldura-editor" id="semMolduraEditor">
+            ⏳ Carregando moldura...
           </div>
         </div>
+
+        <div class="coords-tempo-real" id="coordsTempoReal" style="display:none">
+          <span>📍 X: <strong id="txtX">0</strong> px</span>
+          <span>📍 Y: <strong id="txtY">0</strong> px</span>
+          <span>↔️ Largura: <strong id="txtW">0</strong> px</span>
+          <span>↕️ Altura: <strong id="txtH">0</strong> px</span>
+        </div>
+      </div>
+
+      <input type="file" id="inputMoldura" accept="image/png,image/jpeg">
+
+      <div class="moldura-form-simples">
+        <div>
+          <label>Janela X (px)</label>
+          <input type="number" id="janelaX" value="0" min="0">
+        </div>
+        <div>
+          <label>Janela Y (px)</label>
+          <input type="number" id="janelaY" value="0" min="0">
+        </div>
+        <div>
+          <label>Largura (px)</label>
+          <input type="number" id="janelaLargura" value="0" min="1">
+        </div>
+        <div>
+          <label>Altura (px)</label>
+          <input type="number" id="janelaAltura" value="0" min="1">
+        </div>
+      </div>
+
+      <div class="moldura-acoes">
+        <button class="btn-upload-moldura" onclick="document.getElementById('inputMoldura').click()" id="btnEscolherMoldura">
+          🖼️ Trocar Moldura
+        </button>
+        <button class="btn-salvar-coords" onclick="salvarCoordenadas()" id="btnSalvarCoords">
+          💾 Salvar Coordenadas
+        </button>
       </div>
     </div>
 
