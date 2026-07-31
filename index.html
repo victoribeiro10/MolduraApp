@@ -241,6 +241,9 @@
             margin-bottom: 12px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             animation: fadeIn 0.5s ease;
+            /* ⭐ IMPEDE o flexbox de esmagar/achatar o container,
+               preservando a proporção real da moldura */
+            flex-shrink: 0;
         }
 
         #video {
@@ -1146,6 +1149,7 @@
 
                 aplicarProporcaoMoldura();
                 aplicarPosicoesJanela();
+                dimensionarContainers();
 
                 console.log('✅ Configuração carregada');
                 return true;
@@ -1193,6 +1197,39 @@
             `;
         }
 
+        // ⭐ Ajusta o tamanho do container para caber na tela
+        // SEM perder a proporção real da moldura (nada de "quadrada")
+        function dimensionarContainers() {
+            const prop = MOLDURA.larguraTotal / MOLDURA.alturaTotal;
+            if (!prop) return;
+
+            // Largura máxima disponível (body tem 12px de padding de cada lado)
+            const larguraMax = Math.min(window.innerWidth - 24, 380);
+
+            // Mede o "chrome": tudo que fica fora do container na tela
+            const marcaEl = document.querySelector('.marca');
+            const botoesVisiveis =
+                (!botoesCamera.classList.contains('hidden') ? botoesCamera.offsetHeight : 0) +
+                (!botoesAjuste.classList.contains('hidden') ? botoesAjuste.offsetHeight : 0) +
+                (!botoesResultado.classList.contains('hidden') ? botoesResultado.offsetHeight : 0);
+
+            const chromeH =
+                16 + 60 +                                   // paddings do body (topo + base)
+                (marcaEl ? marcaEl.offsetHeight : 0) +
+                mensagem.offsetHeight +
+                (!dicaAjuste.classList.contains('hidden') ? dicaAjuste.offsetHeight : 0) +
+                botoesVisiveis +
+                40;                                         // folga (margens/borda)
+
+            // Altura que sobra pra moldura, convertida em largura pela proporção real
+            const alturaMax = window.innerHeight - chromeH;
+            const largura = Math.max(200, Math.min(larguraMax, alturaMax * prop));
+
+            document.querySelectorAll('.container').forEach(c => {
+                c.style.width = largura + 'px';
+            });
+        }
+
         function mostrarTela(tela) {
             telaEscolha.classList.add('hidden');
             areaCamera.classList.add('hidden');
@@ -1223,6 +1260,9 @@
                 btnEnviarImpressao.textContent = 'Enviar para impressão';
                 btnEnviarImpressao.style.display = fotoJaEnviada ? 'none' : 'inline-flex';
             }
+
+            // ⭐ Recalcula o tamanho do container após a troca de tela
+            requestAnimationFrame(dimensionarContainers);
         }
 
         btnAbrirCamera.addEventListener('click', () => {
@@ -1511,6 +1551,12 @@
             mostrarTela('escolha');
         });
 
+        // ⭐ Recalcula ao girar a tela / redimensionar a janela
+        window.addEventListener('resize', dimensionarContainers);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(dimensionarContainers, 300);
+        });
+
         btnBaixar.addEventListener('click', () => {
             const link = document.createElement('a');
             link.download = 'entreclicks-' + Date.now() + '.jpg';
@@ -1723,5 +1769,6 @@
             }
         })();
     </script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f"}' crossorigin="anonymous"></script>
 </body>
 </html>
