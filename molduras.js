@@ -10,8 +10,9 @@ const SENHA_ADMIN = "admin";
 
 const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
-// Variável global da configuração atual
 let configAtual = null;
+let molduraNaturalWidth = 0;
+let molduraNaturalHeight = 0;
 
 // ============================================================
 // LOGIN
@@ -19,7 +20,6 @@ let configAtual = null;
 window.fazerLogin = function () {
   const senha = document.getElementById("senhaInput").value;
   const erro  = document.getElementById("erroLogin");
-
   if (senha === SENHA_ADMIN) {
     sessionStorage.setItem("moldura_admin_logado", "sim");
     mostrarPainel();
@@ -46,7 +46,7 @@ if (sessionStorage.getItem("moldura_admin_logado") === "sim") {
 }
 
 // ============================================================
-// ⭐ CARREGAR CONFIGURAÇÃO DA MOLDURA
+// ⭐ CARREGAR CONFIGURAÇÃO + EDITOR VISUAL
 // ============================================================
 async function carregarConfiguracao() {
   try {
@@ -62,24 +62,226 @@ async function carregarConfiguracao() {
 
     configAtual = data;
 
-    // Preenche os campos
-    document.getElementById('janelaX').value        = data.janela_x;
-    document.getElementById('janelaY').value        = data.janela_y;
-    document.getElementById('janelaLargura').value  = data.janela_largura;
-    document.getElementById('janelaAltura').value   = data.janela_altura;
+    // Preenche campos numéricos
+    document.getElementById('janelaX').value       = data.janela_x;
+    document.getElementById('janelaY').value       = data.janela_y;
+    document.getElementById('janelaLargura').value = data.janela_largura;
+    document.getElementById('janelaAltura').value  = data.janela_altura;
 
-    // Preview
-    const preview = document.getElementById('molduraPreview');
     if (data.moldura_url) {
-      preview.innerHTML = `<img src="${data.moldura_url}?t=${Date.now()}" alt="Moldura atual">`;
+      montarEditorVisual(data.moldura_url, data.janela_x, data.janela_y, data.janela_largura, data.janela_altura);
     } else {
-      preview.innerHTML = `<div class="sem-moldura">📭 Nenhuma moldura</div>`;
+      document.getElementById('semMolduraEditor').textContent = '📭 Nenhuma moldura cadastrada';
     }
 
   } catch (err) {
     console.error(err);
-    mostrarMensagem("❌ Erro ao carregar config da moldura: " + err.message, "erro");
+    mostrarMensagem("❌ Erro ao carregar config: " + err.message, "erro");
   }
+}
+
+// ============================================================
+// ⭐ MONTAR EDITOR VISUAL
+// ============================================================
+function montarEditorVisual(molduraUrl, jx, jy, jw, jh) {
+  const container = document.getElementById('editorContainer');
+  const coordsBox = document.getElementById('coordsTempoReal');
+
+  container.innerHTML = `
+    <img id="imgMolduraEditor" src="${molduraUrl}?t=${Date.now()}" alt="Moldura">
+    <div class="janela-editor" id="janelaEditor">
+      <div class="handle handle-nw" data-dir="nw"></div>
+      <div class="handle handle-n"  data-dir="n"></div>
+      <div class="handle handle-ne" data-dir="ne"></div>
+      <div class="handle handle-e"  data-dir="e"></div>
+      <div class="handle handle-se" data-dir="se"></div>
+      <div class="handle handle-s"  data-dir="s"></div>
+      <div class="handle handle-sw" data-dir="sw"></div>
+      <div class="handle handle-w"  data-dir="w"></div>
+    </div>
+  `;
+
+  const img = document.getElementById('imgMolduraEditor');
+  const janela = document.getElementById('janelaEditor');
+
+  img.onload = () => {
+    molduraNaturalWidth = img.naturalWidth;
+    molduraNaturalHeight = img.naturalHeight;
+
+    coordsBox.style.display = 'inline-flex';
+
+    // Posiciona a janela com base nas coordenadas atuais
+    posicionarJanela(jx, jy, jw, jh);
+
+    // Ativa os eventos de arrastar/redimensionar
+    ativarInteracoesEditor();
+
+    // Redimensiona quando janela mudar de tamanho
+    window.addEventListener('resize', () => {
+      const cx = parseInt(document.getElementById('janelaX').value) || 0;
+      const cy = parseInt(document.getElementById('janelaY').value) || 0;
+      const cw = parseInt(document.getElementById('janelaLargura').value) || 100;
+      const ch = parseInt(document.getElementById('janelaAltura').value) || 100;
+      posicionarJanela(cx, cy, cw, ch);
+    });
+  };
+
+  img.onerror = () => {
+    container.innerHTML = '<div class="sem-moldura-editor">❌ Erro ao carregar moldura</div>';
+    coordsBox.style.display = 'none';
+  };
+}
+
+// Converte coords em PX (do arquivo) pra posição visual no editor
+function posicionarJanela(xPx, yPx, wPx, hPx) {
+  const img = document.getElementById('imgMolduraEditor');
+  const janela = document.getElementById('janelaEditor');
+  if (!img || !janela || !molduraNaturalWidth) return;
+
+  const escala = img.clientWidth / molduraNaturalWidth;
+
+  janela.style.left   = (xPx * escala) + 'px';
+  janela.style.top    = (yPx * escala) + 'px';
+  janela.style.width  = (wPx * escala) + 'px';
+  janela.style.height = (hPx * escala) + 'px';
+
+  atualizarCoordsTempoReal(xPx, yPx, wPx, hPx);
+}
+
+function atualizarCoordsTempoReal(x, y, w, h) {
+  document.getElementById('txtX').textContent = Math.round(x);
+  document.getElementById('txtY').textContent = Math.round(y);
+  document.getElementById('txtW').textContent = Math.round(w);
+  document.getElementById('txtH').textContent = Math.round(h);
+  document.getElementById('janelaX').value       = Math.round(x);
+  document.getElementById('janelaY').value       = Math.round(y);
+  document.getElementById('janelaLargura').value = Math.round(w);
+  document.getElementById('janelaAltura').value  = Math.round(h);
+}
+
+// ============================================================
+// ⭐ INTERAÇÕES: ARRASTAR + REDIMENSIONAR
+// ============================================================
+function ativarInteracoesEditor() {
+  const janela = document.getElementById('janelaEditor');
+  const img = document.getElementById('imgMolduraEditor');
+
+  let modo = null; // 'mover' ou 'resize'
+  let dirResize = null;
+  let startX, startY;
+  let startL, startT, startW, startH;
+
+  function getPos(e) {
+    if (e.touches && e.touches.length > 0) {
+      return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+    return { x: e.clientX, y: e.clientY };
+  }
+
+  function iniciar(e) {
+    const alvo = e.target;
+    const isHandle = alvo.classList.contains('handle');
+
+    if (isHandle) {
+      modo = 'resize';
+      dirResize = alvo.dataset.dir;
+    } else if (alvo === janela) {
+      modo = 'mover';
+    } else {
+      return;
+    }
+
+    e.preventDefault();
+    const pos = getPos(e);
+    startX = pos.x;
+    startY = pos.y;
+    startL = janela.offsetLeft;
+    startT = janela.offsetTop;
+    startW = janela.offsetWidth;
+    startH = janela.offsetHeight;
+
+    document.addEventListener('mousemove', mover);
+    document.addEventListener('mouseup', parar);
+    document.addEventListener('touchmove', mover, { passive: false });
+    document.addEventListener('touchend', parar);
+  }
+
+  function mover(e) {
+    if (!modo) return;
+    e.preventDefault();
+    const pos = getPos(e);
+    const dx = pos.x - startX;
+    const dy = pos.y - startY;
+
+    const imgW = img.clientWidth;
+    const imgH = img.clientHeight;
+
+    let novoL = startL;
+    let novoT = startT;
+    let novoW = startW;
+    let novoH = startH;
+
+    if (modo === 'mover') {
+      novoL = Math.max(0, Math.min(startL + dx, imgW - startW));
+      novoT = Math.max(0, Math.min(startT + dy, imgH - startH));
+    } else if (modo === 'resize') {
+      if (dirResize.includes('e')) {
+        novoW = Math.max(20, Math.min(startW + dx, imgW - startL));
+      }
+      if (dirResize.includes('s')) {
+        novoH = Math.max(20, Math.min(startH + dy, imgH - startT));
+      }
+      if (dirResize.includes('w')) {
+        const maxDx = startW - 20;
+        const dxLim = Math.max(-startL, Math.min(dx, maxDx));
+        novoL = startL + dxLim;
+        novoW = startW - dxLim;
+      }
+      if (dirResize.includes('n')) {
+        const maxDy = startH - 20;
+        const dyLim = Math.max(-startT, Math.min(dy, maxDy));
+        novoT = startT + dyLim;
+        novoH = startH - dyLim;
+      }
+    }
+
+    janela.style.left   = novoL + 'px';
+    janela.style.top    = novoT + 'px';
+    janela.style.width  = novoW + 'px';
+    janela.style.height = novoH + 'px';
+
+    // Converte px visual → px do arquivo original
+    const escala = molduraNaturalWidth / img.clientWidth;
+    atualizarCoordsTempoReal(
+      novoL * escala,
+      novoT * escala,
+      novoW * escala,
+      novoH * escala
+    );
+  }
+
+  function parar() {
+    modo = null;
+    dirResize = null;
+    document.removeEventListener('mousemove', mover);
+    document.removeEventListener('mouseup', parar);
+    document.removeEventListener('touchmove', mover);
+    document.removeEventListener('touchend', parar);
+  }
+
+  janela.addEventListener('mousedown', iniciar);
+  janela.addEventListener('touchstart', iniciar, { passive: false });
+
+  // Ajuste fino via inputs numéricos
+  ['janelaX', 'janelaY', 'janelaLargura', 'janelaAltura'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      const x = parseInt(document.getElementById('janelaX').value) || 0;
+      const y = parseInt(document.getElementById('janelaY').value) || 0;
+      const w = parseInt(document.getElementById('janelaLargura').value) || 100;
+      const h = parseInt(document.getElementById('janelaAltura').value) || 100;
+      posicionarJanela(x, y, w, h);
+    });
+  });
 }
 
 // ============================================================
@@ -93,7 +295,7 @@ window.salvarCoordenadas = async function () {
   const janelaAltura  = parseInt(document.getElementById('janelaAltura').value)  || 0;
 
   if (!configAtual) {
-    mostrarMensagem("❌ Configuração ainda não carregada. Recarregue a página.", "erro");
+    mostrarMensagem("❌ Configuração ainda não carregada.", "erro");
     return;
   }
 
@@ -118,7 +320,7 @@ window.salvarCoordenadas = async function () {
     configAtual.janela_largura = janelaLargura;
     configAtual.janela_altura = janelaAltura;
 
-    mostrarMensagem("✅ Coordenadas salvas! Convidados verão as mudanças na próxima vez que abrirem o site.", "sucesso");
+    mostrarMensagem("✅ Coordenadas salvas! Convidados verão as mudanças ao recarregar o site.", "sucesso");
 
   } catch (err) {
     console.error(err);
@@ -139,7 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const arquivo = e.target.files[0];
       if (!arquivo) return;
 
-      if (!confirm(`Trocar a moldura por "${arquivo.name}"?\n\nA moldura antiga será substituída e todos os convidados verão a nova.`)) {
+      if (!confirm(`Trocar a moldura por "${arquivo.name}"?\n\nA moldura antiga será substituída.`)) {
         e.target.value = '';
         return;
       }
@@ -149,12 +351,10 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.textContent = '⏳ Enviando...';
 
       try {
-        // Gera nome único
         const timestamp = Date.now();
         const ext = arquivo.name.split('.').pop().toLowerCase();
         const nomeArquivo = `moldura-${timestamp}.${ext}`;
 
-        // Upload pro bucket
         const { error: errUpload } = await supabaseAdmin
           .storage
           .from(BUCKET_MOLDURAS)
@@ -166,7 +366,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (errUpload) throw errUpload;
 
-        // Pega URL pública
         const { data: urlData } = supabaseAdmin
           .storage
           .from(BUCKET_MOLDURAS)
@@ -174,7 +373,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const novaUrl = urlData.publicUrl;
 
-        // Atualiza a tabela configuracao
         const { error: errUpdate } = await supabaseAdmin
           .from('configuracao')
           .update({ moldura_url: novaUrl })
@@ -184,18 +382,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         configAtual.moldura_url = novaUrl;
 
-        // Atualiza preview
-        const preview = document.getElementById('molduraPreview');
-        preview.innerHTML = `<img src="${novaUrl}?t=${Date.now()}" alt="Moldura nova">`;
+        // Recarrega o editor visual com a nova moldura
+        montarEditorVisual(
+          novaUrl,
+          configAtual.janela_x,
+          configAtual.janela_y,
+          configAtual.janela_largura,
+          configAtual.janela_altura
+        );
 
-        mostrarMensagem("✅ Moldura trocada com sucesso! Os convidados verão a nova moldura ao abrirem o site.", "sucesso");
+        mostrarMensagem("✅ Moldura trocada! Ajusta a posição da janela azul e clica em Salvar Coordenadas.", "sucesso");
 
       } catch (err) {
         console.error(err);
         mostrarMensagem("❌ Erro ao trocar moldura: " + err.message, "erro");
       } finally {
         btn.disabled = false;
-        btn.textContent = '🖼️ Escolher nova moldura';
+        btn.textContent = '🖼️ Trocar Moldura';
         e.target.value = '';
       }
     });
@@ -203,14 +406,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ============================================================
-// CARREGAR FOTOS DO BUCKET
+// CARREGAR FOTOS
 // ============================================================
 window.carregarFotos = async function () {
-  const galeria       = document.getElementById("galeria");
-  const vazio         = document.getElementById("vazio");
-  const totalFotos    = document.getElementById("totalFotos");
-  const totalTamanho  = document.getElementById("totalTamanho");
-  const contador      = document.getElementById("contadorFotos");
+  const galeria      = document.getElementById("galeria");
+  const vazio        = document.getElementById("vazio");
+  const totalFotos   = document.getElementById("totalFotos");
+  const totalTamanho = document.getElementById("totalTamanho");
+  const contador     = document.getElementById("contadorFotos");
 
   galeria.innerHTML = '<div class="carregando">⏳ Carregando fotos...</div>';
   vazio.style.display = "none";
@@ -219,10 +422,7 @@ window.carregarFotos = async function () {
     const { data: arquivos, error } = await supabaseAdmin
       .storage
       .from(BUCKET_FOTOS)
-      .list("", {
-        limit: 1000,
-        sortBy: { column: "created_at", order: "desc" }
-      });
+      .list("", { limit: 1000, sortBy: { column: "created_at", order: "desc" } });
 
     if (error) throw error;
 
@@ -236,7 +436,6 @@ window.carregarFotos = async function () {
     }
 
     const fotos = arquivos.filter(f => f.name && f.metadata);
-
     const total = fotos.length;
     const tamanhoBytes = fotos.reduce((soma, f) => soma + (f.metadata?.size || 0), 0);
     const tamanhoMB = (tamanhoBytes / (1024 * 1024)).toFixed(1);
@@ -248,7 +447,6 @@ window.carregarFotos = async function () {
     galeria.innerHTML = "";
     fotos.forEach((foto) => {
       const { data } = supabaseAdmin.storage.from(BUCKET_FOTOS).getPublicUrl(foto.name);
-
       const tamanhoFoto = ((foto.metadata?.size || 0) / (1024 * 1024)).toFixed(1);
       const dataEnvio = new Date(foto.created_at).toLocaleString("pt-BR", {
         day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
@@ -300,7 +498,6 @@ window.baixarFoto = async function(url, nome) {
 
 window.apagarFoto = async function(nome) {
   if (!confirm(`Tem certeza que quer apagar essa foto?\n\n${nome}\n\nEsta ação não pode ser desfeita.`)) return;
-
   try {
     const { error } = await supabaseAdmin.storage.from(BUCKET_FOTOS).remove([nome]);
     if (error) throw error;
@@ -327,7 +524,6 @@ window.baixarTudo = async function () {
     if (error) throw error;
 
     const fotos = arquivos.filter(f => f.name && f.metadata);
-
     if (fotos.length === 0) {
       mostrarMensagem("⚠️ Nenhuma foto para baixar.", "aviso");
       btnBaixar.disabled = false;
@@ -360,16 +556,15 @@ window.baixarTudo = async function () {
 
     const agora = new Date();
     const nomeZip = `molduras-fotos-${agora.getFullYear()}${(agora.getMonth()+1).toString().padStart(2,"0")}${agora.getDate().toString().padStart(2,"0")}-${agora.getHours().toString().padStart(2,"0")}${agora.getMinutes().toString().padStart(2,"0")}.zip`;
-
     saveAs(blob, nomeZip);
 
     progresso.style.display = "none";
-    mostrarMensagem(`✅ ${baixados} foto(s) baixada(s) com sucesso! Arquivo: ${nomeZip}`, "sucesso");
+    mostrarMensagem(`✅ ${baixados} foto(s) baixada(s)! Arquivo: ${nomeZip}`, "sucesso");
 
   } catch (err) {
     console.error(err);
     progresso.style.display = "none";
-    mostrarMensagem("❌ Erro ao baixar fotos: " + err.message, "erro");
+    mostrarMensagem("❌ Erro ao baixar: " + err.message, "erro");
   } finally {
     btnBaixar.disabled = false;
     btnApagar.disabled = false;
@@ -400,7 +595,6 @@ async function apagarTudo() {
     if (error) throw error;
 
     const fotos = arquivos.filter(f => f.name && f.metadata);
-
     if (fotos.length === 0) {
       mostrarMensagem("⚠️ Não há fotos para apagar.", "aviso");
       btnBaixar.disabled = false;
@@ -419,7 +613,7 @@ async function apagarTudo() {
     progressoFill.style.width = "100%";
     setTimeout(() => {
       progresso.style.display = "none";
-      mostrarMensagem(`✅ ${fotos.length} foto(s) apagada(s) com sucesso! Bucket limpo.`, "sucesso");
+      mostrarMensagem(`✅ ${fotos.length} foto(s) apagada(s)! Bucket limpo.`, "sucesso");
       carregarFotos();
     }, 500);
 
