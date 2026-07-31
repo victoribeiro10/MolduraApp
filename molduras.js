@@ -13,6 +13,7 @@ const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KE
 let configAtual = null;
 let molduraNaturalWidth = 0;
 let molduraNaturalHeight = 0;
+let editorInicializado = false;
 
 // ============================================================
 // LOGIN
@@ -46,7 +47,7 @@ if (sessionStorage.getItem("moldura_admin_logado") === "sim") {
 }
 
 // ============================================================
-// ⭐ CARREGAR CONFIGURAÇÃO + EDITOR VISUAL
+// ⭐ CARREGAR CONFIGURAÇÃO (só card compacto)
 // ============================================================
 async function carregarConfiguracao() {
   try {
@@ -62,16 +63,16 @@ async function carregarConfiguracao() {
 
     configAtual = data;
 
-    // Preenche campos numéricos
-    document.getElementById('janelaX').value       = data.janela_x;
-    document.getElementById('janelaY').value       = data.janela_y;
-    document.getElementById('janelaLargura').value = data.janela_largura;
-    document.getElementById('janelaAltura').value  = data.janela_altura;
+    // Atualiza card compacto
+    const mini = document.getElementById('molduraMini');
+    const infoTxt = document.getElementById('molduraInfoTxt');
 
     if (data.moldura_url) {
-      montarEditorVisual(data.moldura_url, data.janela_x, data.janela_y, data.janela_largura, data.janela_altura);
+      mini.innerHTML = `<img src="${data.moldura_url}?t=${Date.now()}" alt="Moldura">`;
+      infoTxt.textContent = `Janela: ${data.janela_largura}×${data.janela_altura}px • Posição: ${data.janela_x},${data.janela_y}`;
     } else {
-      document.getElementById('semMolduraEditor').textContent = '📭 Nenhuma moldura cadastrada';
+      mini.innerHTML = `<span style="font-size:11px; color:#aaa;">📭</span>`;
+      infoTxt.textContent = 'Nenhuma moldura cadastrada';
     }
 
   } catch (err) {
@@ -79,6 +80,59 @@ async function carregarConfiguracao() {
     mostrarMensagem("❌ Erro ao carregar config: " + err.message, "erro");
   }
 }
+
+// ============================================================
+// ⭐ MODAL: ABRIR / FECHAR
+// ============================================================
+window.abrirModalConfig = function() {
+  const modal = document.getElementById('modalConfig');
+  modal.classList.add('ativo');
+  document.body.style.overflow = 'hidden';
+
+  // Preenche campos numéricos com valores atuais
+  if (configAtual) {
+    document.getElementById('janelaX').value       = configAtual.janela_x;
+    document.getElementById('janelaY').value       = configAtual.janela_y;
+    document.getElementById('janelaLargura').value = configAtual.janela_largura;
+    document.getElementById('janelaAltura').value  = configAtual.janela_altura;
+
+    if (configAtual.moldura_url) {
+      montarEditorVisual(
+        configAtual.moldura_url,
+        configAtual.janela_x,
+        configAtual.janela_y,
+        configAtual.janela_largura,
+        configAtual.janela_altura
+      );
+    } else {
+      document.getElementById('editorContainer').innerHTML = 
+        '<div class="sem-moldura-editor">📭 Nenhuma moldura cadastrada. Clica em "Trocar Moldura" pra subir uma!</div>';
+    }
+  }
+};
+
+window.fecharModalConfig = function() {
+  const modal = document.getElementById('modalConfig');
+  modal.classList.remove('ativo');
+  document.body.style.overflow = '';
+};
+
+// Fecha ao clicar fora
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('modalConfig');
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) fecharModalConfig();
+    });
+  }
+  // Fecha com ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const m = document.getElementById('modalConfig');
+      if (m && m.classList.contains('ativo')) fecharModalConfig();
+    }
+  });
+});
 
 // ============================================================
 // ⭐ MONTAR EDITOR VISUAL
@@ -102,28 +156,13 @@ function montarEditorVisual(molduraUrl, jx, jy, jw, jh) {
   `;
 
   const img = document.getElementById('imgMolduraEditor');
-  const janela = document.getElementById('janelaEditor');
 
   img.onload = () => {
     molduraNaturalWidth = img.naturalWidth;
     molduraNaturalHeight = img.naturalHeight;
-
     coordsBox.style.display = 'inline-flex';
-
-    // Posiciona a janela com base nas coordenadas atuais
     posicionarJanela(jx, jy, jw, jh);
-
-    // Ativa os eventos de arrastar/redimensionar
     ativarInteracoesEditor();
-
-    // Redimensiona quando janela mudar de tamanho
-    window.addEventListener('resize', () => {
-      const cx = parseInt(document.getElementById('janelaX').value) || 0;
-      const cy = parseInt(document.getElementById('janelaY').value) || 0;
-      const cw = parseInt(document.getElementById('janelaLargura').value) || 100;
-      const ch = parseInt(document.getElementById('janelaAltura').value) || 100;
-      posicionarJanela(cx, cy, cw, ch);
-    });
   };
 
   img.onerror = () => {
@@ -132,7 +171,6 @@ function montarEditorVisual(molduraUrl, jx, jy, jw, jh) {
   };
 }
 
-// Converte coords em PX (do arquivo) pra posição visual no editor
 function posicionarJanela(xPx, yPx, wPx, hPx) {
   const img = document.getElementById('imgMolduraEditor');
   const janela = document.getElementById('janelaEditor');
@@ -166,7 +204,7 @@ function ativarInteracoesEditor() {
   const janela = document.getElementById('janelaEditor');
   const img = document.getElementById('imgMolduraEditor');
 
-  let modo = null; // 'mover' ou 'resize'
+  let modo = null;
   let dirResize = null;
   let startX, startY;
   let startL, startT, startW, startH;
@@ -250,7 +288,6 @@ function ativarInteracoesEditor() {
     janela.style.width  = novoW + 'px';
     janela.style.height = novoH + 'px';
 
-    // Converte px visual → px do arquivo original
     const escala = molduraNaturalWidth / img.clientWidth;
     atualizarCoordsTempoReal(
       novoL * escala,
@@ -320,7 +357,14 @@ window.salvarCoordenadas = async function () {
     configAtual.janela_largura = janelaLargura;
     configAtual.janela_altura = janelaAltura;
 
+    // Atualiza card compacto
+    document.getElementById('molduraInfoTxt').textContent = 
+      `Janela: ${janelaLargura}×${janelaAltura}px • Posição: ${janelaX},${janelaY}`;
+
     mostrarMensagem("✅ Coordenadas salvas! Convidados verão as mudanças ao recarregar o site.", "sucesso");
+
+    // Fecha modal automaticamente após 1s
+    setTimeout(() => fecharModalConfig(), 1200);
 
   } catch (err) {
     console.error(err);
@@ -382,7 +426,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         configAtual.moldura_url = novaUrl;
 
-        // Recarrega o editor visual com a nova moldura
+        // Atualiza card compacto
+        document.getElementById('molduraMini').innerHTML = 
+          `<img src="${novaUrl}?t=${Date.now()}" alt="Moldura">`;
+
+        // Recarrega editor
         montarEditorVisual(
           novaUrl,
           configAtual.janela_x,
@@ -391,7 +439,7 @@ document.addEventListener('DOMContentLoaded', () => {
           configAtual.janela_altura
         );
 
-        mostrarMensagem("✅ Moldura trocada! Ajusta a posição da janela azul e clica em Salvar Coordenadas.", "sucesso");
+        mostrarMensagem("✅ Moldura trocada! Ajusta a janela azul e clica em Salvar Coordenadas.", "sucesso");
 
       } catch (err) {
         console.error(err);
