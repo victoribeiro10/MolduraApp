@@ -16,7 +16,7 @@ let molduraNaturalHeight = 0;
 let editorInicializado = false;
 
 // ============================================================
-// LOGIN
+// LOGIN (substitua a função existente)
 // ============================================================
 window.fazerLogin = function () {
   const senha = document.getElementById("senhaInput").value;
@@ -25,10 +25,21 @@ window.fazerLogin = function () {
     sessionStorage.setItem("moldura_admin_logado", "sim");
     mostrarPainel();
   } else {
-    erro.textContent = "❌ Senha incorreta";
+    erro.textContent = "senha incorreta";
     document.getElementById("senhaInput").value = "";
+    document.getElementById("senhaInput").focus();
   }
 };
+
+// ============================================================
+// MENSAGENS (substitua a função existente)
+// ============================================================
+function mostrarMensagem(texto, tipo) {
+  // Remove emojis do texto pra ficar mais clean
+  const textoLimpo = texto.replace(/[✅❌⚠️📭⏳🖼️💾]/g, '').trim();
+  document.getElementById("mensagem").innerHTML = `<div class="msg-${tipo}">${textoLimpo}</div>`;
+  if (tipo === "sucesso" || tipo === "aviso") setTimeout(limparMensagem, 6000);
+}
 
 window.sair = function () {
   sessionStorage.removeItem("moldura_admin_logado");
