@@ -1544,26 +1544,88 @@
             }
         });
 
-        btnEnviarImpressao.addEventListener('click', async () => {
+               btnEnviarImpressao.addEventListener('click', async () => {
             if (fotoJaEnviada) {
                 mostrarModal('info', 'Foto já enviada', 'Essa foto já foi enviada para impressão!');
                 return;
             }
 
+            const overlay = document.getElementById('overlayEnvio');
+            const barraFill = document.getElementById('barraFill');
+            const percentualEl = document.getElementById('envioPercentual');
+            const mensagemEl = document.getElementById('envioMensagem');
+
+            // Mensagens que mudam durante o envio
+            const mensagens = [
+                { pct: 0,   texto: 'Preparando sua foto...' },
+                { pct: 20,  texto: 'Otimizando qualidade...' },
+                { pct: 50,  texto: 'Enviando para impressão...' },
+                { pct: 80,  texto: 'Quase lá...' },
+                { pct: 95,  texto: 'Finalizando...' }
+            ];
+
+            function atualizarProgresso(pct) {
+                barraFill.style.width = pct + '%';
+                percentualEl.textContent = Math.round(pct) + '%';
+                
+                // Atualiza mensagem baseada no progresso
+                for (let i = mensagens.length - 1; i >= 0; i--) {
+                    if (pct >= mensagens[i].pct) {
+                        if (mensagemEl.textContent !== mensagens[i].texto) {
+                            mensagemEl.style.opacity = '0';
+                            setTimeout(() => {
+                                mensagemEl.textContent = mensagens[i].texto;
+                                mensagemEl.style.opacity = '1';
+                            }, 200);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            // Mostra o overlay
+            overlay.classList.add('ativo');
+            atualizarProgresso(0);
             btnEnviarImpressao.disabled = true;
-            btnEnviarImpressao.textContent = 'Enviando...';
+
+            // Simula progresso enquanto processa (0-30%)
+            let progressoSimulado = 0;
+            const intervalSimulado = setInterval(() => {
+                progressoSimulado += Math.random() * 3;
+                if (progressoSimulado >= 30) {
+                    progressoSimulado = 30;
+                    clearInterval(intervalSimulado);
+                }
+                atualizarProgresso(progressoSimulado);
+            }, 100);
 
             try {
+                // Gera o blob (rápido)
                 const blob = await new Promise((resolve) => {
                     canvas.toBlob(resolve, 'image/jpeg', 0.95);
                 });
 
                 if (!blob) throw new Error('Erro ao gerar foto');
 
+                clearInterval(intervalSimulado);
+                atualizarProgresso(35);
+
                 const timestamp = Date.now();
                 const random = Math.random().toString(36).substring(2, 8);
                 const nomeArquivo = `foto-${timestamp}-${random}.jpg`;
 
+                // Simula progresso durante upload (35-90%)
+                let progressoUpload = 35;
+                const intervalUpload = setInterval(() => {
+                    progressoUpload += Math.random() * 4;
+                    if (progressoUpload >= 90) {
+                        progressoUpload = 90;
+                        clearInterval(intervalUpload);
+                    }
+                    atualizarProgresso(progressoUpload);
+                }, 150);
+
+                // Upload real pro Supabase
                 const { error } = await supabaseClient
                     .storage
                     .from(BUCKET_FOTOS)
@@ -1573,21 +1635,32 @@
                         contentType: 'image/jpeg'
                     });
 
+                clearInterval(intervalUpload);
+
                 if (error) throw error;
+
+                // Completa 100% suavemente
+                atualizarProgresso(100);
+
+                // Aguarda um instante pra mostrar o 100%
+                await new Promise(r => setTimeout(r, 600));
 
                 fotoJaEnviada = true;
                 btnEnviarImpressao.style.display = 'none';
+                overlay.classList.remove('ativo');
                 
-                // ⭐ MODAL DE SUCESSO COM CTA
+                // Modal de sucesso
                 mostrarModal(
                     'sucesso',
                     'Foto enviada',
                     'Sua foto será impressa e entregue durante o evento.<br><br>Você também pode baixar ou compartilhar sua foto agora.',
-                    true // mostrar CTA de redes sociais
+                    true
                 );
 
             } catch (err) {
                 console.error('Erro upload:', err);
+                clearInterval(intervalSimulado);
+                overlay.classList.remove('ativo');
                 btnEnviarImpressao.disabled = false;
                 btnEnviarImpressao.textContent = 'Enviar para impressão';
                 
