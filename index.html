@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Eternize esse momento</title>
+    <title>Entre Clicks — Eternize esse momento</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
     <style>
         * {
             margin: 0;
@@ -13,6 +19,18 @@
             user-select: none;
         }
 
+        :root {
+            --preto: #0a0a0a;
+            --preto-2: #141414;
+            --grafite: #1c1c1c;
+            --cinza: #2a2a2a;
+            --dourado: #d4af7a;
+            --dourado-claro: #e8c99a;
+            --dourado-escuro: #a88855;
+            --branco: #f5f5f5;
+            --cinza-suave: #888;
+        }
+
         html, body {
             width: 100%;
             height: 100%;
@@ -20,75 +38,208 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background: #000;
-            color: white;
+            font-family: 'Inter', sans-serif;
+            background: 
+                radial-gradient(ellipse at top, #1a1a1a 0%, var(--preto) 70%),
+                var(--preto);
+            color: var(--branco);
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 10px;
+            padding: 16px 12px;
+            font-weight: 300;
+            letter-spacing: 0.3px;
+            min-height: 100vh;
         }
 
-        h1 {
+        /* ================================
+           HEADER / MARCA
+        ================================ */
+        .marca {
             text-align: center;
-            margin: 8px 0;
-            font-size: 20px;
-            color: #ff9ec7;
+            margin: 8px 0 12px 0;
+            animation: fadeInDown 0.8s ease;
         }
 
-        .subtitulo {
-            text-align: center;
-            color: #ff9ec7;
-            font-size: 13px;
-            margin-bottom: 5px;
+        .marca-logo {
+            font-family: 'Playfair Display', serif;
+            font-weight: 500;
+            font-size: 22px;
+            color: var(--dourado);
+            letter-spacing: 6px;
+            text-transform: uppercase;
         }
 
+        .marca-linha {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 4px;
+            opacity: 0.7;
+        }
+
+        .marca-linha::before,
+        .marca-linha::after {
+            content: '';
+            width: 30px;
+            height: 1px;
+            background: var(--dourado);
+        }
+
+        .marca-subtitulo {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 11px;
+            color: var(--dourado-claro);
+            letter-spacing: 2px;
+            text-transform: lowercase;
+        }
+
+        /* ================================
+           TELA DE ESCOLHA
+        ================================ */
         .tela-escolha {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 20px;
+            gap: 24px;
             flex: 1;
             width: 100%;
-            max-width: 400px;
-            padding: 20px;
+            max-width: 380px;
+            padding: 20px 10px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .titulo-secao {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .titulo-secao h1 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 400;
+            font-size: 26px;
+            color: var(--branco);
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .titulo-secao h1 em {
+            font-style: italic;
+            color: var(--dourado);
+            font-weight: 500;
+        }
+
+        .titulo-secao p {
+            color: var(--cinza-suave);
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 400;
         }
 
         .btn-escolha {
             width: 100%;
-            padding: 30px 20px;
-            background: linear-gradient(135deg, #ff9ec7, #ff7eb0);
-            border: none;
-            border-radius: 20px;
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
+            padding: 22px 20px;
+            background: linear-gradient(135deg, var(--grafite), var(--preto-2));
+            border: 1px solid rgba(212, 175, 122, 0.3);
+            border-radius: 4px;
+            color: var(--branco);
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.4s ease;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-escolha::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 122, 0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn-escolha:hover::before,
+        .btn-escolha:active::before {
+            left: 100%;
+        }
+
+        .btn-escolha:hover,
+        .btn-escolha:active {
+            border-color: var(--dourado);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(212, 175, 122, 0.15);
+        }
+
+        .btn-escolha .icone {
+            width: 44px;
+            height: 44px;
+            border: 1px solid var(--dourado);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: var(--dourado);
+            transition: all 0.3s ease;
+        }
+
+        .btn-escolha:hover .icone {
+            background: var(--dourado);
+            color: var(--preto);
+        }
+
+        .btn-escolha .icone svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .btn-escolha .texto {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 8px;
+            gap: 3px;
+            text-align: left;
+            flex: 1;
         }
 
-        .btn-escolha:active { transform: scale(0.97); }
-        .btn-escolha .icone { font-size: 40px; }
-        .btn-escolha .descricao {
-            font-size: 12px;
-            font-weight: normal;
-            opacity: 0.9;
+        .btn-escolha .titulo-btn {
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            color: var(--branco);
         }
 
+        .btn-escolha .desc {
+            font-size: 11px;
+            color: var(--cinza-suave);
+            letter-spacing: 0.5px;
+            font-weight: 300;
+        }
+
+        /* ================================
+           CONTAINER (câmera / ajuste / resultado)
+        ================================ */
         .container {
             position: relative;
             width: 100%;
-            max-width: 400px;
+            max-width: 380px;
             aspect-ratio: 2000 / 2666;
-            background: #111;
-            border-radius: 12px;
+            background: var(--preto-2);
+            border: 1px solid rgba(212, 175, 122, 0.2);
+            border-radius: 6px;
             overflow: hidden;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.5s ease;
         }
 
         #video {
@@ -110,7 +261,7 @@
         .area-ajuste {
             position: absolute;
             overflow: hidden;
-            background: #333;
+            background: var(--cinza);
             touch-action: none;
             cursor: grab;
         }
@@ -138,202 +289,403 @@
             z-index: 10;
         }
 
+        /* ================================
+           BOTÕES DE AÇÃO
+        ================================ */
         .botoes {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
             justify-content: center;
             width: 100%;
-            max-width: 400px;
+            max-width: 380px;
             padding: 5px 0;
         }
 
-        button {
-            background: #ff9ec7;
-            color: white;
-            border: none;
+        .btn {
+            background: var(--grafite);
+            color: var(--branco);
+            border: 1px solid rgba(212, 175, 122, 0.25);
             padding: 12px 16px;
-            font-size: 14px;
-            font-weight: bold;
-            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            border-radius: 3px;
             cursor: pointer;
             flex: 1;
             min-width: 100px;
-            transition: 0.2s;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
-        button:active {
-            transform: scale(0.95);
-            background: #ff7eb0;
+        .btn:hover:not(:disabled),
+        .btn:active {
+            background: var(--preto-2);
+            border-color: var(--dourado);
+            color: var(--dourado);
         }
 
-        button:disabled {
-            opacity: 0.6;
+        .btn:disabled {
+            opacity: 0.5;
             cursor: not-allowed;
         }
 
-        .btn-voltar { background: #444; flex: 0 0 auto; min-width: 80px; }
-        .btn-reset { background: #666; flex: 0 0 auto; min-width: 80px; }
-        .btn-confirmar { background: #4CAF50; }
-        .btn-confirmar:active { background: #45a049; }
-        .btn-compartilhar { background: #25D366; }
-        .btn-compartilhar:active { background: #1DA851; }
+        .btn svg { width: 14px; height: 14px; }
 
-        .btn-enviar-impressao {
-            background: linear-gradient(135deg, #2196F3, #1976D2);
-            width: 100%;
-            padding: 16px;
-            font-size: 16px;
-            flex: 1 1 100%;
-            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+        .btn-voltar {
+            background: transparent;
+            border-color: rgba(255,255,255,0.15);
+            color: var(--cinza-suave);
+            flex: 0 0 auto;
+            min-width: 90px;
         }
 
-        .btn-enviar-impressao:active {
-            background: linear-gradient(135deg, #1976D2, #1565C0);
+        .btn-voltar:hover:not(:disabled) {
+            border-color: rgba(255,255,255,0.4);
+            color: var(--branco);
+            background: transparent;
+        }
+
+        .btn-primario {
+            background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro));
+            color: var(--preto);
+            border: none;
+            font-weight: 600;
+        }
+
+        .btn-primario:hover:not(:disabled) {
+            background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
+            color: var(--preto);
+            box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4);
+        }
+
+        .btn-enviar-impressao {
+            background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro));
+            color: var(--preto);
+            border: none;
+            width: 100%;
+            padding: 15px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            flex: 1 1 100%;
+            box-shadow: 0 4px 20px rgba(212, 175, 122, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-enviar-impressao::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.7s;
+        }
+
+        .btn-enviar-impressao:hover::before {
+            left: 100%;
+        }
+
+        .btn-enviar-impressao:hover:not(:disabled) {
+            background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
+            box-shadow: 0 6px 30px rgba(212, 175, 122, 0.5);
         }
 
         .hidden { display: none !important; }
 
+        /* ================================
+           MENSAGENS
+        ================================ */
         #mensagem {
             padding: 5px;
             text-align: center;
-            color: #ff9ec7;
-            font-size: 12px;
+            color: var(--dourado);
+            font-size: 11px;
             min-height: 20px;
+            letter-spacing: 1px;
+            font-style: italic;
+            font-family: 'Playfair Display', serif;
         }
 
         #inputFoto { display: none; }
 
         .dica-ajuste {
             text-align: center;
-            color: #888;
-            font-size: 11px;
-            margin-top: 5px;
+            color: var(--cinza-suave);
+            font-size: 10px;
+            margin-top: 4px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 400;
         }
 
+        .dica-ajuste .separador {
+            color: var(--dourado);
+            margin: 0 8px;
+        }
+
+        /* ================================
+           LOADING INICIAL
+        ================================ */
         .loading-inicial {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: #000;
+            background: var(--preto);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            gap: 20px;
-        }
-        .loading-spinner {
-            border: 5px solid #333;
-            border-top: 5px solid #ff9ec7;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-        }
-        .loading-inicial p {
-            color: #ff9ec7;
-            font-size: 14px;
+            gap: 24px;
         }
 
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 1px solid rgba(212, 175, 122, 0.15);
+            border-top: 1px solid var(--dourado);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-inicial .marca-logo {
+            font-size: 18px;
+            letter-spacing: 8px;
+            opacity: 0.9;
+        }
+
+        .loading-inicial p {
+            color: var(--cinza-suave);
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 300;
+        }
+
+        /* ================================
+           MODAL
+        ================================ */
         .modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1000;
             padding: 20px;
+            animation: fadeIn 0.3s ease;
         }
 
         .modal-conteudo {
-            background: white;
-            color: #333;
-            padding: 30px 25px;
-            border-radius: 20px;
+            background: linear-gradient(135deg, var(--grafite), var(--preto-2));
+            color: var(--branco);
+            padding: 40px 30px;
+            border: 1px solid rgba(212, 175, 122, 0.3);
+            border-radius: 6px;
             text-align: center;
             max-width: 350px;
             width: 100%;
-            animation: fadeIn 0.3s;
+            animation: slideUp 0.4s ease;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
+        .modal-conteudo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 20%;
+            right: 20%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--dourado), transparent);
         }
 
         .modal-icone {
-            font-size: 60px;
-            margin-bottom: 15px;
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px;
+            border: 1px solid var(--dourado);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dourado);
+        }
+
+        .modal-icone svg {
+            width: 28px;
+            height: 28px;
         }
 
         .modal-titulo {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #333;
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: var(--branco);
         }
 
         .modal-texto {
-            font-size: 14px;
-            color: #666;
-            line-height: 1.5;
-            margin-bottom: 20px;
+            font-size: 13px;
+            color: var(--cinza-suave);
+            line-height: 1.7;
+            margin-bottom: 24px;
+            font-weight: 300;
+        }
+
+        .modal-texto small {
+            font-size: 10px;
+            opacity: 0.6;
         }
 
         .modal button {
-            background: #ff9ec7;
-            color: white;
-            padding: 12px 30px;
-            border-radius: 30px;
+            background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro));
+            color: var(--preto);
+            padding: 12px 40px;
+            border-radius: 3px;
             border: none;
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
             cursor: pointer;
-            width: auto;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .modal button:hover {
+            background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
+            box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4);
+        }
+
+        /* ================================
+           RODAPÉ SUTIL
+        ================================ */
+        .rodape {
+            position: fixed;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 9px;
+            color: rgba(212, 175, 122, 0.4);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 300;
+            pointer-events: none;
+        }
+
+        /* ================================
+           ANIMAÇÕES
+        ================================ */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Responsividade extra pequenos telas */
+        @media (max-width: 360px) {
+            .marca-logo { font-size: 18px; letter-spacing: 4px; }
+            .titulo-secao h1 { font-size: 22px; }
+            .btn-escolha { padding: 18px 16px; }
+            .btn-escolha .titulo-btn { font-size: 14px; }
+        }
     </style>
 </head>
 <body>
 
+    <!-- LOADING INICIAL -->
     <div id="loadingInicial" class="loading-inicial">
+        <div class="marca-logo">ENTRE CLICKS</div>
         <div class="loading-spinner"></div>
-        <p>Carregando...</p>
+        <p>Carregando</p>
     </div>
 
-    <h1>✨ Eternize esse momento</h1>
+    <!-- MARCA -->
+    <div class="marca">
+        <div class="marca-logo">ENTRE CLICKS</div>
+        <div class="marca-linha">
+            <span class="marca-subtitulo">momentos eternos</span>
+        </div>
+    </div>
 
+    <!-- TELA DE ESCOLHA -->
     <div class="tela-escolha hidden" id="telaEscolha">
-        <div class="subtitulo">Como quer criar sua foto?</div>
-        
+        <div class="titulo-secao">
+            <h1>Eternize <em>este</em> momento</h1>
+            <p>escolha como registrar</p>
+        </div>
+
         <button class="btn-escolha" id="btnAbrirCamera">
-            <span class="icone">📷</span>
-            <span>TIRAR FOTO</span>
-            <span class="descricao">Usar câmera do celular</span>
+            <div class="icone">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+                </svg>
+            </div>
+            <div class="texto">
+                <span class="titulo-btn">Câmera</span>
+                <span class="desc">Capture agora este instante</span>
+            </div>
         </button>
 
         <button class="btn-escolha" id="btnAbrirGaleria">
-            <span class="icone">🖼️</span>
-            <span>ENVIAR FOTO</span>
-            <span class="descricao">Escolher da galeria</span>
+            <div class="icone">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                </svg>
+            </div>
+            <div class="texto">
+                <span class="titulo-btn">Galeria</span>
+                <span class="desc">Escolha uma memória sua</span>
+            </div>
         </button>
 
         <input type="file" id="inputFoto" accept="image/*">
     </div>
 
+    <!-- ÁREA DA CÂMERA -->
     <div class="container hidden" id="areaCamera">
         <video id="video" autoplay playsinline muted></video>
         <img class="moldura-overlay" id="molduraCamera" alt="Moldura">
     </div>
 
+    <!-- ÁREA DE AJUSTE -->
     <div class="container hidden" id="areaAjuste">
         <div class="area-ajuste" id="areaFoto">
             <img id="fotoAjuste" alt="Sua foto">
@@ -341,33 +693,68 @@
         <img class="moldura-overlay" id="molduraAjuste" alt="Moldura">
     </div>
 
+    <!-- RESULTADO -->
     <div class="container hidden" id="areaResultado">
         <canvas id="canvasResultado"></canvas>
     </div>
 
     <div id="mensagem"></div>
 
+    <!-- BOTÕES CÂMERA -->
     <div class="botoes hidden" id="botoesCamera">
-        <button class="btn-voltar" id="btnVoltarCamera">← Voltar</button>
-        <button id="btnTirarFoto">📷 Tirar Foto</button>
-        <button id="btnVirarCamera">🔄 Virar</button>
+        <button class="btn btn-voltar" id="btnVoltarCamera">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+            Voltar
+        </button>
+        <button class="btn btn-primario" id="btnTirarFoto">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="4"/><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/></svg>
+            Capturar
+        </button>
+        <button class="btn" id="btnVirarCamera">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+            Virar
+        </button>
     </div>
 
+    <!-- BOTÕES AJUSTE -->
     <div class="botoes hidden" id="botoesAjuste">
-        <button class="btn-voltar" id="btnVoltarAjuste">← Voltar</button>
-        <button class="btn-reset" id="btnResetAjuste">🔄 Resetar</button>
-        <button class="btn-confirmar" id="btnConfirmarAjuste">✅ Confirmar</button>
+        <button class="btn btn-voltar" id="btnVoltarAjuste">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+            Voltar
+        </button>
+        <button class="btn" id="btnResetAjuste">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+            Resetar
+        </button>
+        <button class="btn btn-primario" id="btnConfirmarAjuste">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+            Confirmar
+        </button>
     </div>
     <div class="dica-ajuste hidden" id="dicaAjuste">
-        👆 Arraste • 🤏 2 dedos pra zoom
+        Arraste <span class="separador">•</span> pinça para zoom
     </div>
 
+    <!-- BOTÕES RESULTADO -->
     <div class="botoes hidden" id="botoesResultado">
-        <button class="btn-voltar" id="btnRefazer">↩️ Refazer</button>
-        <button id="btnBaixar">⬇️ Baixar</button>
-        <button class="btn-compartilhar" id="btnCompartilhar">📤 Compartilhar</button>
-        <button class="btn-enviar-impressao" id="btnEnviarImpressao">📮 Enviar pra Impressão</button>
+        <button class="btn btn-voltar" id="btnRefazer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/></svg>
+            Refazer
+        </button>
+        <button class="btn" id="btnBaixar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+            Baixar
+        </button>
+        <button class="btn" id="btnCompartilhar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"/></svg>
+            Compartilhar
+        </button>
+        <button class="btn btn-enviar-impressao" id="btnEnviarImpressao">
+            Enviar para impressão
+        </button>
     </div>
+
+    <div class="rodape">Entre Clicks · Fotografia</div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -381,8 +768,15 @@
         
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        // Ícones SVG pro modal
+        const ICONES_MODAL = {
+            sucesso: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>',
+            erro: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>',
+            info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>'
+        };
+
         // ============================================
-        // CONFIGURAÇÕES DA MOLDURA (carregadas do Supabase)
+        // CONFIGURAÇÕES DA MOLDURA
         // ============================================
         let MOLDURA = {
             larguraTotal: 2000,
@@ -481,19 +875,12 @@
                 aplicarProporcaoMoldura();
                 aplicarPosicoesJanela();
 
-                console.log('✅ Configuração carregada:', {
-                    larguraTotal: MOLDURA.larguraTotal,
-                    alturaTotal: MOLDURA.alturaTotal,
-                    janelaX: MOLDURA.janelaX,
-                    janelaY: MOLDURA.janelaY,
-                    janelaLargura: MOLDURA.janelaLargura,
-                    janelaAltura: MOLDURA.janelaAltura
-                });
+                console.log('✅ Configuração carregada');
                 return true;
             } catch (err) {
                 console.error('Erro ao carregar configuração:', err);
-                mostrarModal('erro', '❌', 'Erro de configuração', 
-                    'Não foi possível carregar a configuração da moldura. Recarregue a página.<br><br><small>' + err.message + '</small>');
+                mostrarModal('erro', 'Erro', 
+                    'Não foi possível carregar a configuração. Recarregue a página.<br><br><small>' + err.message + '</small>');
                 return false;
             }
         }
@@ -510,14 +897,6 @@
             const widthPct = (MOLDURA.janelaLargura / MOLDURA.larguraTotal) * 100;
             const heightPct = (MOLDURA.janelaAltura / MOLDURA.alturaTotal) * 100;
 
-            console.log('📐 Aplicando posições:', {
-                top: topPct.toFixed(2) + '%',
-                left: leftPct.toFixed(2) + '%',
-                width: widthPct.toFixed(2) + '%',
-                height: heightPct.toFixed(2) + '%'
-            });
-
-            // Vídeo (câmera) - reseta TUDO e aplica só o necessário
             video.style.cssText = `
                 position: absolute;
                 top: ${topPct}%;
@@ -529,7 +908,6 @@
                 transform: ${cameraAtual === 'user' ? 'scaleX(-1)' : 'none'};
             `;
 
-            // Área de ajuste (galeria)
             areaFoto.style.cssText = `
                 position: absolute;
                 top: ${topPct}%;
@@ -537,7 +915,7 @@
                 width: ${widthPct}%;
                 height: ${heightPct}%;
                 overflow: hidden;
-                background: #333;
+                background: #2a2a2a;
                 touch-action: none;
                 cursor: grab;
             `;
@@ -570,8 +948,8 @@
                 botoesResultado.classList.remove('hidden');
                 pararCamera();
                 btnEnviarImpressao.disabled = false;
-                btnEnviarImpressao.textContent = '📮 Enviar pra Impressão';
-                btnEnviarImpressao.style.display = fotoJaEnviada ? 'none' : 'block';
+                btnEnviarImpressao.textContent = 'Enviar para impressão';
+                btnEnviarImpressao.style.display = fotoJaEnviada ? 'none' : 'inline-flex';
             }
         }
 
@@ -789,7 +1167,6 @@
                 streamAtual = stream;
                 video.srcObject = stream;
                 
-                // Aplica espelhamento na câmera frontal
                 if (cameraAtual === 'user') {
                     video.style.transform = 'scaleX(-1)';
                 } else {
@@ -801,7 +1178,7 @@
                     mensagem.textContent = '';
                 };
             } catch (err) {
-                mensagem.textContent = '❌ Erro: ' + err.message;
+                mensagem.textContent = 'Erro: ' + err.message;
             }
         }
 
@@ -862,7 +1239,7 @@
 
         btnBaixar.addEventListener('click', () => {
             const link = document.createElement('a');
-            link.download = 'foto-' + Date.now() + '.jpg';
+            link.download = 'entreclicks-' + Date.now() + '.jpg';
             link.href = canvas.toDataURL('image/jpeg', 0.95);
             link.click();
         });
@@ -872,15 +1249,15 @@
                 canvas.toBlob(async (blob) => {
                     const arquivo = new File(
                         [blob], 
-                        'foto-' + Date.now() + '.jpg',
+                        'entreclicks-' + Date.now() + '.jpg',
                         { type: 'image/jpeg' }
                     );
 
                     if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
                         await navigator.share({
                             files: [arquivo],
-                            title: 'Momento especial',
-                            text: '✨ Eternize esse momento'
+                            title: 'Entre Clicks',
+                            text: 'Eternize esse momento'
                         });
                     } else {
                         alert('Seu navegador não suporta compartilhamento direto. Vamos baixar a foto pra você compartilhar manualmente.');
@@ -897,12 +1274,12 @@
 
         btnEnviarImpressao.addEventListener('click', async () => {
             if (fotoJaEnviada) {
-                mostrarModal('info', '⚠️', 'Foto já enviada', 'Essa foto já foi enviada pra impressão!');
+                mostrarModal('info', 'Foto já enviada', 'Essa foto já foi enviada para impressão!');
                 return;
             }
 
             btnEnviarImpressao.disabled = true;
-            btnEnviarImpressao.textContent = '⏳ Enviando...';
+            btnEnviarImpressao.textContent = 'Enviando...';
 
             try {
                 const blob = await new Promise((resolve) => {
@@ -931,28 +1308,28 @@
                 
                 mostrarModal(
                     'sucesso',
-                    '🎉',
-                    'Foto enviada!',
-                    'Sua foto será impressa e entregue durante a festa! 💖<br><br>Você também pode baixar ou compartilhar essa foto agora.'
+                    'Foto enviada',
+                    'Sua foto será impressa e entregue durante o evento.<br><br>Você também pode baixar ou compartilhar sua foto agora.'
                 );
 
             } catch (err) {
                 console.error('Erro upload:', err);
                 btnEnviarImpressao.disabled = false;
-                btnEnviarImpressao.textContent = '📮 Enviar pra Impressão';
+                btnEnviarImpressao.textContent = 'Enviar para impressão';
                 
                 mostrarModal(
                     'erro',
-                    '❌',
-                    'Ops! Algo deu errado',
-                    'Não foi possível enviar a foto. Verifique sua internet e tente novamente.<br><br><small>Erro: ' + err.message + '</small>'
+                    'Algo deu errado',
+                    'Não foi possível enviar. Verifique sua internet e tente novamente.<br><br><small>' + err.message + '</small>'
                 );
             }
         });
 
-        function mostrarModal(tipo, icone, titulo, texto) {
+        function mostrarModal(tipo, titulo, texto) {
             const modalExistente = document.querySelector('.modal');
             if (modalExistente) modalExistente.remove();
+
+            const icone = ICONES_MODAL[tipo] || ICONES_MODAL.info;
 
             const modal = document.createElement('div');
             modal.className = 'modal';
