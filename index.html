@@ -93,10 +93,6 @@
 
         #video {
             position: absolute;
-            top: 3.26%;
-            left: 10%;
-            width: 80%;
-            height: 72.62%;
             object-fit: cover;
             display: block;
         }
@@ -115,10 +111,6 @@
 
         .area-ajuste {
             position: absolute;
-            top: 3.26%;
-            left: 10%;
-            width: 80%;
-            height: 72.62%;
             overflow: hidden;
             background: #333;
             touch-action: none;
@@ -189,7 +181,6 @@
         .btn-compartilhar { background: #25D366; }
         .btn-compartilhar:active { background: #1DA851; }
 
-        /* BOTÃO DESTAQUE - ENVIAR PRA IMPRESSÃO */
         .btn-enviar-impressao {
             background: linear-gradient(135deg, #2196F3, #1976D2);
             width: 100%;
@@ -222,7 +213,32 @@
             margin-top: 5px;
         }
 
-        /* MODAL DE ENVIO / SUCESSO */
+        /* TELA DE LOADING INICIAL */
+        .loading-inicial {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            gap: 20px;
+        }
+        .loading-spinner {
+            border: 5px solid #333;
+            border-top: 5px solid #ff9ec7;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        .loading-inicial p {
+            color: #ff9ec7;
+            font-size: 14px;
+        }
+
         .modal {
             position: fixed;
             top: 0;
@@ -283,16 +299,6 @@
             width: auto;
         }
 
-        .loading {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #2196F3;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px auto;
-        }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -300,9 +306,16 @@
     </style>
 </head>
 <body>
+
+    <!-- LOADING INICIAL -->
+    <div id="loadingInicial" class="loading-inicial">
+        <div class="loading-spinner"></div>
+        <p>Carregando...</p>
+    </div>
+
     <h1>✨ Eternize esse momento</h1>
 
-    <div class="tela-escolha" id="telaEscolha">
+    <div class="tela-escolha hidden" id="telaEscolha">
         <div class="subtitulo">Como quer criar sua foto?</div>
         
         <button class="btn-escolha" id="btnAbrirCamera">
@@ -322,14 +335,14 @@
 
     <div class="container hidden" id="areaCamera">
         <video id="video" autoplay playsinline muted></video>
-        <img class="moldura-overlay" src="./Molduras/moldura.png" alt="Moldura">
+        <img class="moldura-overlay" id="molduraCamera" alt="Moldura">
     </div>
 
     <div class="container hidden" id="areaAjuste">
         <div class="area-ajuste" id="areaFoto">
             <img id="fotoAjuste" alt="Sua foto">
         </div>
-        <img class="moldura-overlay" src="./Molduras/moldura.png" alt="Moldura">
+        <img class="moldura-overlay" id="molduraAjuste" alt="Moldura">
     </div>
 
     <div class="container hidden" id="areaResultado">
@@ -360,7 +373,6 @@
         <button class="btn-enviar-impressao" id="btnEnviarImpressao">📮 Enviar pra Impressão</button>
     </div>
 
-    <!-- Biblioteca do Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
@@ -374,19 +386,20 @@
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // ============================================
-        // CONFIGURAÇÕES DA MOLDURA
+        // CONFIGURAÇÕES DA MOLDURA (serão carregadas do Supabase)
         // ============================================
-        const MOLDURA = {
+        let MOLDURA = {
             larguraTotal: 2000,
             alturaTotal: 2666,
             janelaX: 200,
             janelaY: 87,
             janelaLargura: 1600,
             janelaAltura: 1936,
-            arquivo: './Molduras/moldura.png'
+            arquivo: ''
         };
 
         // ELEMENTOS
+        const loadingInicial = document.getElementById('loadingInicial');
         const telaEscolha = document.getElementById('telaEscolha');
         const areaCamera = document.getElementById('areaCamera');
         const areaAjuste = document.getElementById('areaAjuste');
@@ -401,6 +414,8 @@
         const ctx = canvas.getContext('2d');
         const areaFoto = document.getElementById('areaFoto');
         const fotoAjuste = document.getElementById('fotoAjuste');
+        const molduraCamera = document.getElementById('molduraCamera');
+        const molduraAjuste = document.getElementById('molduraAjuste');
         
         const btnAbrirCamera = document.getElementById('btnAbrirCamera');
         const btnAbrirGaleria = document.getElementById('btnAbrirGaleria');
@@ -418,14 +433,96 @@
         const mensagem = document.getElementById('mensagem');
 
         const moldura = new Image();
-        moldura.src = MOLDURA.arquivo;
+        moldura.crossOrigin = 'anonymous';
 
         let cameraAtual = 'environment';
         let streamAtual = null;
         let imagemOriginal = null;
-        let fotoJaEnviada = false; // controla se essa foto já foi enviada
+        let fotoJaEnviada = false;
         
         let ajuste = { x: 0, y: 0, scale: 1, initialScale: 1 };
+
+        // ============================================
+        // CARREGA CONFIGURAÇÃO DO SUPABASE (moldura + coordenadas)
+        // ============================================
+        async function carregarConfiguracao() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('configuracao')
+                    .select('*')
+                    .order('id', { ascending: false })
+                    .limit(1)
+                    .single();
+
+                if (error) throw error;
+                if (!data) throw new Error('Sem configuração cadastrada');
+
+                MOLDURA.janelaX = data.janela_x;
+                MOLDURA.janelaY = data.janela_y;
+                MOLDURA.janelaLargura = data.janela_largura;
+                MOLDURA.janelaAltura = data.janela_altura;
+                MOLDURA.arquivo = data.moldura_url;
+
+                // Aplica moldura no HTML
+                molduraCamera.src = data.moldura_url;
+                molduraAjuste.src = data.moldura_url;
+                moldura.src = data.moldura_url;
+
+                // Aguarda a moldura carregar pra pegar tamanho real
+                await new Promise((resolve, reject) => {
+                    if (moldura.complete && moldura.naturalWidth > 0) {
+                        MOLDURA.larguraTotal = moldura.naturalWidth;
+                        MOLDURA.alturaTotal = moldura.naturalHeight;
+                        resolve();
+                    } else {
+                        moldura.onload = () => {
+                            MOLDURA.larguraTotal = moldura.naturalWidth;
+                            MOLDURA.alturaTotal = moldura.naturalHeight;
+                            resolve();
+                        };
+                        moldura.onerror = () => reject(new Error('Falha ao carregar imagem da moldura'));
+                    }
+                });
+
+                // Aplica proporção correta no container
+                aplicarProporcaoMoldura();
+                aplicarPosicoesJanela();
+
+                console.log('✅ Configuração carregada:', MOLDURA);
+                return true;
+            } catch (err) {
+                console.error('Erro ao carregar configuração:', err);
+                mostrarModal('erro', '❌', 'Erro de configuração', 
+                    'Não foi possível carregar a configuração da moldura. Recarregue a página.<br><br><small>' + err.message + '</small>');
+                return false;
+            }
+        }
+
+        function aplicarProporcaoMoldura() {
+            const containers = document.querySelectorAll('.container');
+            const proporcao = `${MOLDURA.larguraTotal} / ${MOLDURA.alturaTotal}`;
+            containers.forEach(c => c.style.aspectRatio = proporcao);
+        }
+
+        function aplicarPosicoesJanela() {
+            // Calcula percentuais baseados na moldura
+            const topPct = (MOLDURA.janelaY / MOLDURA.alturaTotal) * 100;
+            const leftPct = (MOLDURA.janelaX / MOLDURA.larguraTotal) * 100;
+            const widthPct = (MOLDURA.janelaLargura / MOLDURA.larguraTotal) * 100;
+            const heightPct = (MOLDURA.janelaAltura / MOLDURA.alturaTotal) * 100;
+
+            // Aplica no vídeo (câmera)
+            video.style.top = topPct + '%';
+            video.style.left = leftPct + '%';
+            video.style.width = widthPct + '%';
+            video.style.height = heightPct + '%';
+
+            // Aplica na área de ajuste (galeria)
+            areaFoto.style.top = topPct + '%';
+            areaFoto.style.left = leftPct + '%';
+            areaFoto.style.width = widthPct + '%';
+            areaFoto.style.height = heightPct + '%';
+        }
 
         // NAVEGAÇÃO
         function mostrarTela(tela) {
@@ -441,7 +538,7 @@
             if (tela === 'escolha') {
                 telaEscolha.classList.remove('hidden');
                 pararCamera();
-                fotoJaEnviada = false; // reseta ao voltar pra escolha
+                fotoJaEnviada = false;
             } else if (tela === 'camera') {
                 areaCamera.classList.remove('hidden');
                 botoesCamera.classList.remove('hidden');
@@ -454,20 +551,17 @@
                 areaResultado.classList.remove('hidden');
                 botoesResultado.classList.remove('hidden');
                 pararCamera();
-                // Reseta botão de enviar
                 btnEnviarImpressao.disabled = false;
                 btnEnviarImpressao.textContent = '📮 Enviar pra Impressão';
                 btnEnviarImpressao.style.display = fotoJaEnviada ? 'none' : 'block';
             }
         }
 
-        // CÂMERA
         btnAbrirCamera.addEventListener('click', () => {
             mostrarTela('camera');
             iniciarCamera();
         });
 
-        // GALERIA
         btnAbrirGaleria.addEventListener('click', () => {
             inputFoto.click();
         });
@@ -592,7 +686,6 @@
             }
         });
 
-        // Mouse
         let mouseDown = false;
         areaFoto.addEventListener('mousedown', (e) => {
             mouseDown = true;
@@ -626,7 +719,6 @@
             aplicarTransform();
         }, { passive: false });
 
-        // BOTÕES AJUSTE
         btnVoltarAjuste.addEventListener('click', () => {
             inputFoto.value = '';
             mostrarTela('escolha');
@@ -661,7 +753,6 @@
             mostrarTela('resultado');
         });
 
-        // CÂMERA
         async function iniciarCamera() {
             try {
                 mensagem.textContent = 'Iniciando câmera...';
@@ -740,13 +831,11 @@
             mostrarTela('resultado');
         });
 
-        // RESULTADO - REFAZER
         btnRefazer.addEventListener('click', () => {
             inputFoto.value = '';
             mostrarTela('escolha');
         });
 
-        // RESULTADO - BAIXAR
         btnBaixar.addEventListener('click', () => {
             const link = document.createElement('a');
             link.download = 'foto-' + Date.now() + '.jpg';
@@ -754,7 +843,6 @@
             link.click();
         });
 
-        // RESULTADO - COMPARTILHAR
         btnCompartilhar.addEventListener('click', async () => {
             try {
                 canvas.toBlob(async (blob) => {
@@ -783,9 +871,6 @@
             }
         });
 
-        // ============================================
-        // ⭐ NOVO: ENVIAR PRA IMPRESSÃO (SUPABASE)
-        // ============================================
         btnEnviarImpressao.addEventListener('click', async () => {
             if (fotoJaEnviada) {
                 mostrarModal('info', '⚠️', 'Foto já enviada', 'Essa foto já foi enviada pra impressão!');
@@ -796,21 +881,16 @@
             btnEnviarImpressao.textContent = '⏳ Enviando...';
 
             try {
-                // Converte canvas em blob
                 const blob = await new Promise((resolve) => {
                     canvas.toBlob(resolve, 'image/jpeg', 0.95);
                 });
 
-                if (!blob) {
-                    throw new Error('Erro ao gerar foto');
-                }
+                if (!blob) throw new Error('Erro ao gerar foto');
 
-                // Nome único do arquivo
                 const timestamp = Date.now();
                 const random = Math.random().toString(36).substring(2, 8);
                 const nomeArquivo = `foto-${timestamp}-${random}.jpg`;
 
-                // Upload pro Supabase
                 const { error } = await supabaseClient
                     .storage
                     .from(BUCKET_FOTOS)
@@ -822,7 +902,6 @@
 
                 if (error) throw error;
 
-                // Sucesso!
                 fotoJaEnviada = true;
                 btnEnviarImpressao.style.display = 'none';
                 
@@ -847,9 +926,6 @@
             }
         });
 
-        // ============================================
-        // MODAL
-        // ============================================
         function mostrarModal(tipo, icone, titulo, texto) {
             const modalExistente = document.querySelector('.modal');
             if (modalExistente) modalExistente.remove();
@@ -867,7 +943,16 @@
             document.body.appendChild(modal);
         }
 
-        mostrarTela('escolha');
+        // ============================================
+        // INICIALIZAÇÃO
+        // ============================================
+        (async function inicializar() {
+            const ok = await carregarConfiguracao();
+            if (ok) {
+                loadingInicial.style.display = 'none';
+                mostrarTela('escolha');
+            }
+        })();
     </script>
 </body>
 </html>
