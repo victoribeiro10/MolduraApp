@@ -3,184 +3,878 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel Admin - Molduras</title>
+  <title>Entre Clicks — Painel Administrativo</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #f8f5fa; font-family: Arial, sans-serif; color: #333; min-height: 100vh; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-    .tela-login { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: linear-gradient(135deg, #ff9ec7 0%, #ff7eb0 100%); }
-    .login-box { background: white; padding: 40px 30px; border-radius: 22px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 400px; width: 100%; text-align: center; }
-    .login-icone { font-size: 60px; margin-bottom: 15px; }
-    .login-box h2 { color: #ff7eb0; margin-bottom: 8px; }
-    .login-sub { color: #888; font-size: 14px; margin-bottom: 24px; }
-    .login-box input { width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 12px; font-size: 16px; margin-bottom: 12px; outline: none; transition: border 0.3s; }
-    .login-box input:focus { border-color: #ff7eb0; }
-    .login-box button { width: 100%; padding: 14px; border: none; border-radius: 30px; background: #ff7eb0; color: white; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-    .login-box button:hover { background: #ff5a95; transform: scale(1.02); }
-    .erro-login { color: #dc2626; font-size: 14px; margin-top: 12px; min-height: 20px; }
+    :root {
+      --preto: #0a0a0a;
+      --preto-2: #141414;
+      --grafite: #1c1c1c;
+      --cinza: #2a2a2a;
+      --cinza-2: #333;
+      --dourado: #d4af7a;
+      --dourado-claro: #e8c99a;
+      --dourado-escuro: #a88855;
+      --branco: #f5f5f5;
+      --cinza-suave: #888;
+      --verde: #4ade80;
+      --vermelho: #f87171;
+      --azul: #60a5fa;
+    }
 
-    .painel { max-width: 1400px; margin: 0 auto; padding: 20px; }
-    .admin-header { background: white; padding: 20px 24px; border-radius: 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); flex-wrap: wrap; gap: 15px; }
-    .header-titulo { color: #ff7eb0; font-weight: bold; font-size: 22px; display: flex; align-items: center; gap: 10px; }
-    .btn-sair { padding: 10px 20px; border: none; background: #eee; color: #666; border-radius: 20px; cursor: pointer; font-size: 14px; transition: 0.3s; font-weight: bold; }
-    .btn-sair:hover { background: #dc2626; color: white; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(ellipse at top, #1a1a1a 0%, var(--preto) 70%), var(--preto);
+      color: var(--branco);
+      min-height: 100vh;
+      font-weight: 300;
+      letter-spacing: 0.3px;
+    }
 
-    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-    .stat-card { background: white; padding: 24px; border-radius: 16px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.06); display: flex; flex-direction: column; gap: 6px; }
-    .stat-numero { font-size: 42px; font-weight: bold; color: #ff7eb0; }
-    .stat-label { color: #888; font-size: 14px; }
-
-    .acoes { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px; }
-    .acoes button { padding: 16px; border: none; border-radius: 30px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; color: white; }
-    .acoes button:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-atualizar { background: #6b7280; }
-    .btn-atualizar:hover:not(:disabled) { background: #4b5563; }
-    .btn-baixar { background: #16a34a; }
-    .btn-baixar:hover:not(:disabled) { background: #15803d; transform: scale(1.02); }
-    .btn-apagar { background: #dc2626; }
-    .btn-apagar:hover:not(:disabled) { background: #b91c1c; transform: scale(1.02); }
-
-    /* ========= CARD COMPACTO DA MOLDURA ========= */
-    .card-moldura-compact {
-      background: white;
-      padding: 16px 20px;
-      border-radius: 16px;
-      margin-bottom: 24px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    /* ================================
+       TELA DE LOGIN
+    ================================ */
+    .tela-login {
+      min-height: 100vh;
       display: flex;
       align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tela-login::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(212, 175, 122, 0.08) 0%, transparent 50%);
+      animation: rotateGlow 20s linear infinite;
+    }
+
+    @keyframes rotateGlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .login-box {
+      background: linear-gradient(135deg, var(--grafite), var(--preto-2));
+      padding: 50px 40px 40px;
+      border-radius: 8px;
+      border: 1px solid rgba(212, 175, 122, 0.2);
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      animation: fadeInUp 0.6s ease;
+      z-index: 1;
+    }
+
+    .login-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 20%;
+      right: 20%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--dourado), transparent);
+    }
+
+    .login-marca {
+      font-family: 'Playfair Display', serif;
+      font-weight: 500;
+      font-size: 22px;
+      color: var(--dourado);
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .login-marca-sub {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 11px;
+      color: var(--dourado-claro);
+      letter-spacing: 2px;
+      margin-bottom: 30px;
+      opacity: 0.7;
+    }
+
+    .login-icone {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      border: 1px solid var(--dourado);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--dourado);
+    }
+
+    .login-icone svg { width: 28px; height: 28px; }
+
+    .login-titulo {
+      font-family: 'Playfair Display', serif;
+      font-weight: 400;
+      font-size: 22px;
+      color: var(--branco);
+      margin-bottom: 6px;
+    }
+
+    .login-sub {
+      color: var(--cinza-suave);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 14px 18px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(212, 175, 122, 0.25);
+      border-radius: 4px;
+      font-size: 14px;
+      color: var(--branco);
+      margin-bottom: 16px;
+      outline: none;
+      transition: all 0.3s;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 2px;
+      text-align: center;
+    }
+
+    .login-box input::placeholder {
+      color: var(--cinza-suave);
+      letter-spacing: 1px;
+    }
+
+    .login-box input:focus {
+      border-color: var(--dourado);
+      box-shadow: 0 0 0 3px rgba(212, 175, 122, 0.1);
+    }
+
+    .login-box button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 4px;
+      background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro));
+      color: var(--preto);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Inter', sans-serif;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-box button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.6s;
+    }
+
+    .login-box button:hover::before { left: 100%; }
+
+    .login-box button:hover {
+      background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
+      box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4);
+    }
+
+    .erro-login {
+      color: var(--vermelho);
+      font-size: 12px;
+      margin-top: 14px;
+      min-height: 18px;
+      letter-spacing: 1px;
+      font-style: italic;
+      font-family: 'Playfair Display', serif;
+    }
+
+    /* ================================
+       PAINEL PRINCIPAL
+    ================================ */
+    .painel {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px 20px 60px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    /* HEADER */
+    .admin-header {
+      background: linear-gradient(135deg, var(--grafite), var(--preto-2));
+      padding: 20px 28px;
+      border-radius: 6px;
+      border: 1px solid rgba(212, 175, 122, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 15px;
+      position: relative;
+    }
+
+    .admin-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 10%;
+      right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(212, 175, 122, 0.5), transparent);
+    }
+
+    .header-marca {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .header-titulo {
+      font-family: 'Playfair Display', serif;
+      color: var(--dourado);
+      font-weight: 500;
+      font-size: 20px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+    }
+
+    .header-subtitulo {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 10px;
+      color: var(--cinza-suave);
+      letter-spacing: 2px;
+    }
+
+    .btn-sair {
+      padding: 10px 22px;
+      border: 1px solid rgba(212, 175, 122, 0.3);
+      background: transparent;
+      color: var(--dourado);
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 11px;
+      transition: all 0.3s;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-sair:hover {
+      background: var(--vermelho);
+      border-color: var(--vermelho);
+      color: var(--branco);
+    }
+
+    /* STATS */
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, var(--grafite), var(--preto-2));
+      padding: 28px 24px;
+      border-radius: 6px;
+      border: 1px solid rgba(212, 175, 122, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--dourado), var(--dourado-escuro));
+    }
+
+    .stat-card:hover {
+      border-color: rgba(212, 175, 122, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .stat-icone {
+      width: 52px;
+      height: 52px;
+      border: 1px solid var(--dourado);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--dourado);
+      flex-shrink: 0;
+    }
+
+    .stat-icone svg { width: 24px; height: 24px; }
+
+    .stat-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-numero {
+      font-family: 'Playfair Display', serif;
+      font-size: 34px;
+      font-weight: 500;
+      color: var(--dourado);
+      line-height: 1;
+      letter-spacing: 1px;
+    }
+
+    .stat-label {
+      color: var(--cinza-suave);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* CARD MOLDURA */
+    .card-moldura-compact {
+      background: linear-gradient(135deg, var(--grafite), var(--preto-2));
+      padding: 20px 24px;
+      border-radius: 6px;
+      border: 1px solid rgba(212, 175, 122, 0.15);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
       flex-wrap: wrap;
     }
+
     .moldura-mini {
       width: 60px;
       height: 80px;
-      border-radius: 8px;
+      border-radius: 4px;
       overflow: hidden;
-      background: #f5f5f5;
+      background: var(--preto);
+      border: 1px solid rgba(212, 175, 122, 0.2);
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
     }
+
     .moldura-mini img {
       width: 100%;
       height: 100%;
       object-fit: contain;
     }
+
     .moldura-info-compact {
       flex: 1;
       min-width: 200px;
     }
+
     .moldura-info-compact h4 {
-      color: #ff7eb0;
-      font-size: 15px;
-      margin-bottom: 4px;
+      font-family: 'Playfair Display', serif;
+      color: var(--dourado);
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
+
+    .moldura-info-compact p {
+      color: var(--cinza-suave);
+      font-size: 11px;
+      letter-spacing: 1px;
+    }
+
+    .btn-configurar {
+      background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro));
+      color: var(--preto);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
       display: flex;
       align-items: center;
+      gap: 8px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-configurar svg { width: 14px; height: 14px; }
+
+    .btn-configurar:hover {
+      background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
+      box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4);
+    }
+
+    /* AÇÕES */
+    .acoes {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .acoes button {
+      padding: 15px 18px;
+      border: 1px solid rgba(212, 175, 122, 0.25);
+      background: var(--grafite);
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      color: var(--branco);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-family: 'Inter', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .acoes button svg { width: 14px; height: 14px; }
+
+    .acoes button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-atualizar:hover:not(:disabled) {
+      border-color: var(--dourado);
+      color: var(--dourado);
+      background: var(--preto-2);
+    }
+
+    .btn-baixar {
+      background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro));
+      color: var(--preto);
+      border-color: transparent;
+      font-weight: 700;
+    }
+
+    .btn-baixar:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
+      box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4);
+    }
+
+    .btn-apagar:hover:not(:disabled) {
+      border-color: var(--vermelho);
+      color: var(--vermelho);
+      background: rgba(248, 113, 113, 0.05);
+    }
+
+    /* PROGRESSO */
+    .progresso {
+      background: linear-gradient(135deg, var(--grafite), var(--preto-2));
+      padding: 22px 24px;
+      border-radius: 6px;
+      border: 1px solid rgba(212, 175, 122, 0.15);
+      margin-bottom: 20px;
+    }
+
+    .progresso p {
+      color: var(--dourado-claro);
+      margin-bottom: 12px;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 13px;
+      letter-spacing: 1px;
+    }
+
+    .progresso-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(212, 175, 122, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progresso-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--dourado-escuro), var(--dourado), var(--dourado-claro));
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    /* MENSAGENS */
+    .msg-sucesso, .msg-erro, .msg-aviso {
+      padding: 14px 18px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      border: 1px solid;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .msg-sucesso {
+      border-color: rgba(74, 222, 128, 0.4);
+      color: var(--verde);
+    }
+
+    .msg-erro {
+      border-color: rgba(248, 113, 113, 0.4);
+      color: var(--vermelho);
+    }
+
+    .msg-aviso {
+      border-color: rgba(252, 211, 77, 0.4);
+      color: #fcd34d;
+    }
+
+    /* GALERIA */
+    .galeria-titulo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+      padding: 0 4px;
+    }
+
+    .galeria-titulo h3 {
+      font-family: 'Playfair Display', serif;
+      color: var(--dourado);
+      font-size: 20px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .galeria-titulo span {
+      color: var(--cinza-suave);
+      font-size: 11px;
+      letter-spacing: 2px;
+      font-style: italic;
+      font-family: 'Playfair Display', serif;
+    }
+
+    .galeria {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .foto-item {
+      background: var(--grafite);
+      border: 1px solid rgba(212, 175, 122, 0.15);
+      border-radius: 4px;
+      overflow: hidden;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .foto-item:hover {
+      transform: translateY(-4px);
+      border-color: var(--dourado);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .foto-item img {
+      width: 100%;
+      aspect-ratio: 2000 / 2666;
+      object-fit: cover;
+      display: block;
+      background: var(--preto);
+      cursor: pointer;
+      transition: opacity 0.3s;
+    }
+
+    .foto-item:hover img { opacity: 0.85; }
+
+    .foto-info {
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: var(--cinza-suave);
+      background: var(--preto-2);
+      letter-spacing: 1px;
+    }
+
+    .foto-tamanho {
+      color: var(--dourado);
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 11px;
+    }
+
+    .foto-acoes {
+      padding: 8px 10px;
+      display: flex;
       gap: 6px;
+      background: var(--preto-2);
+      border-top: 1px solid rgba(212, 175, 122, 0.1);
     }
-    .moldura-info-compact p {
-      color: #888;
-      font-size: 12px;
+
+    .foto-acoes button {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid transparent;
+      background: transparent;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.2s;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--branco);
+      font-family: 'Inter', sans-serif;
     }
-    .btn-configurar {
-      background: #2196F3;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 24px;
+
+    .btn-download-item {
+      border-color: rgba(212, 175, 122, 0.3) !important;
+      color: var(--dourado) !important;
+    }
+
+    .btn-download-item:hover {
+      background: var(--dourado);
+      color: var(--preto) !important;
+    }
+
+    .btn-apagar-item {
+      border-color: rgba(248, 113, 113, 0.3) !important;
+      color: var(--vermelho) !important;
+    }
+
+    .btn-apagar-item:hover {
+      background: var(--vermelho);
+      color: var(--branco) !important;
+    }
+
+    .carregando, .vazio {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--cinza-suave);
+      grid-column: 1 / -1;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
       font-size: 14px;
-      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .vazio {
+      background: linear-gradient(135deg, var(--grafite), var(--preto-2));
+      border: 1px solid rgba(212, 175, 122, 0.15);
+      border-radius: 6px;
+    }
+
+    .vazio-icone {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 20px;
+      border: 1px solid var(--dourado);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--dourado);
+    }
+
+    .vazio-icone svg { width: 26px; height: 26px; }
+
+    /* MODAL DE FOTO */
+    .modal-foto {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 30px;
+      cursor: pointer;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal-foto img {
+      max-width: 100%;
+      max-height: 90vh;
+      border: 1px solid rgba(212, 175, 122, 0.3);
+      border-radius: 4px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-fechar {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: transparent;
+      color: var(--dourado);
+      border: 1px solid var(--dourado);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      font-size: 20px;
       cursor: pointer;
       transition: 0.3s;
       display: flex;
       align-items: center;
-      gap: 6px;
-    }
-    .btn-configurar:hover {
-      background: #1976D2;
-      transform: scale(1.05);
+      justify-content: center;
     }
 
-    /* ========= MODAL DE CONFIGURAÇÃO ========= */
+    .modal-fechar:hover {
+      background: var(--dourado);
+      color: var(--preto);
+    }
+
+    /* MODAL DE CONFIGURAÇÃO */
     .modal-config {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.75);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       display: none;
       align-items: center;
       justify-content: center;
       z-index: 2000;
       padding: 20px;
       overflow-y: auto;
+      animation: fadeIn 0.3s ease;
     }
-    .modal-config.ativo {
-      display: flex;
-    }
+
+    .modal-config.ativo { display: flex; }
+
     .modal-config-conteudo {
-      background: white;
-      border-radius: 20px;
+      background: linear-gradient(135deg, var(--grafite), var(--preto-2));
+      border: 1px solid rgba(212, 175, 122, 0.3);
+      border-radius: 6px;
       max-width: 900px;
       width: 100%;
       max-height: 95vh;
       overflow-y: auto;
-      animation: slideUp 0.3s ease;
+      animation: slideUp 0.4s ease;
       position: relative;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
     }
-    @keyframes slideUp {
-      from { transform: translateY(30px); opacity: 0; }
-      to   { transform: translateY(0); opacity: 1; }
+
+    .modal-config-conteudo::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 20%;
+      right: 20%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--dourado), transparent);
     }
+
     .modal-config-header {
-      padding: 20px 24px;
-      border-bottom: 1px solid #eee;
+      padding: 22px 28px;
+      border-bottom: 1px solid rgba(212, 175, 122, 0.15);
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: sticky;
       top: 0;
-      background: white;
+      background: var(--grafite);
       z-index: 10;
-      border-radius: 20px 20px 0 0;
+      border-radius: 6px 6px 0 0;
     }
+
     .modal-config-header h3 {
-      color: #ff7eb0;
+      font-family: 'Playfair Display', serif;
+      color: var(--dourado);
       font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 3px;
+      text-transform: uppercase;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
+
     .btn-fechar-modal {
-      background: #eee;
-      color: #666;
-      border: none;
+      background: transparent;
+      color: var(--dourado);
+      border: 1px solid rgba(212, 175, 122, 0.3);
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      font-size: 20px;
+      font-size: 18px;
       cursor: pointer;
-      font-weight: bold;
       transition: 0.3s;
-    }
-    .btn-fechar-modal:hover {
-      background: #dc2626;
-      color: white;
-    }
-    .modal-config-body {
-      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    /* EDITOR VISUAL */
+    .btn-fechar-modal:hover {
+      background: var(--vermelho);
+      border-color: var(--vermelho);
+      color: var(--branco);
+    }
+
+    .modal-config-body { padding: 24px 28px; }
+
+    .instrucoes-editor {
+      background: rgba(212, 175, 122, 0.08);
+      border-left: 2px solid var(--dourado);
+      padding: 14px 18px;
+      border-radius: 3px;
+      font-size: 12px;
+      color: var(--dourado-claro);
+      margin-bottom: 20px;
+      line-height: 1.8;
+      letter-spacing: 0.5px;
+    }
+
+    .instrucoes-editor strong {
+      color: var(--dourado);
+      font-weight: 600;
+    }
+
     .editor-visual {
-      background: #f5f5f5;
-      border-radius: 12px;
-      padding: 16px;
+      background: var(--preto);
+      border: 1px solid rgba(212, 175, 122, 0.15);
+      border-radius: 4px;
+      padding: 20px;
       margin-bottom: 20px;
       text-align: center;
-      position: relative;
     }
+
     .editor-canvas-container {
       position: relative;
       display: inline-block;
@@ -189,6 +883,7 @@
       -webkit-user-select: none;
       touch-action: none;
     }
+
     #imgMolduraEditor {
       display: block;
       max-width: 100%;
@@ -197,166 +892,205 @@
       -webkit-user-drag: none;
       pointer-events: none;
     }
+
     .janela-editor {
       position: absolute;
-      border: 3px solid #2196F3;
-      background: rgba(33, 150, 243, 0.2);
+      border: 2px solid var(--dourado);
+      background: rgba(212, 175, 122, 0.15);
       cursor: move;
       box-sizing: border-box;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
     }
+
     .janela-editor::after {
-      content: '📷 Área da foto';
+      content: 'ÁREA DA FOTO';
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(33, 150, 243, 0.9);
-      color: white;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: bold;
+      background: var(--dourado);
+      color: var(--preto);
+      padding: 4px 12px;
+      border-radius: 2px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
       white-space: nowrap;
       pointer-events: none;
     }
+
     .handle {
       position: absolute;
-      width: 16px;
-      height: 16px;
-      background: white;
-      border: 2px solid #2196F3;
+      width: 14px;
+      height: 14px;
+      background: var(--preto);
+      border: 2px solid var(--dourado);
       border-radius: 50%;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
     }
-    .handle-nw { top: -8px; left: -8px; cursor: nwse-resize; }
-    .handle-ne { top: -8px; right: -8px; cursor: nesw-resize; }
-    .handle-sw { bottom: -8px; left: -8px; cursor: nesw-resize; }
-    .handle-se { bottom: -8px; right: -8px; cursor: nwse-resize; }
-    .handle-n  { top: -8px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
-    .handle-s  { bottom: -8px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
-    .handle-w  { top: 50%; left: -8px; transform: translateY(-50%); cursor: ew-resize; }
-    .handle-e  { top: 50%; right: -8px; transform: translateY(-50%); cursor: ew-resize; }
+
+    .handle-nw { top: -7px; left: -7px; cursor: nwse-resize; }
+    .handle-ne { top: -7px; right: -7px; cursor: nesw-resize; }
+    .handle-sw { bottom: -7px; left: -7px; cursor: nesw-resize; }
+    .handle-se { bottom: -7px; right: -7px; cursor: nwse-resize; }
+    .handle-n  { top: -7px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+    .handle-s  { bottom: -7px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+    .handle-w  { top: 50%; left: -7px; transform: translateY(-50%); cursor: ew-resize; }
+    .handle-e  { top: 50%; right: -7px; transform: translateY(-50%); cursor: ew-resize; }
 
     .coords-tempo-real {
       display: inline-flex;
-      gap: 20px;
-      background: white;
-      padding: 12px 20px;
-      border-radius: 12px;
-      margin-top: 16px;
-      font-family: 'Courier New', monospace;
-      font-size: 14px;
-      color: #555;
+      gap: 24px;
+      background: var(--grafite);
+      border: 1px solid rgba(212, 175, 122, 0.2);
+      padding: 12px 22px;
+      border-radius: 3px;
+      margin-top: 18px;
+      font-family: 'Playfair Display', serif;
+      font-size: 13px;
+      color: var(--cinza-suave);
       flex-wrap: wrap;
       justify-content: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      letter-spacing: 1px;
     }
-    .coords-tempo-real span { display: flex; align-items: center; gap: 6px; }
-    .coords-tempo-real strong { color: #2196F3; font-weight: bold; }
 
-    .instrucoes-editor {
-      background: #e3f2fd;
-      border-left: 4px solid #2196F3;
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 13px;
-      color: #1565c0;
-      margin-bottom: 16px;
-      text-align: left;
-      line-height: 1.5;
+    .coords-tempo-real span { display: flex; align-items: center; gap: 6px; }
+    .coords-tempo-real strong {
+      color: var(--dourado);
+      font-weight: 600;
+      font-style: italic;
     }
 
     .moldura-form-simples {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-top: 16px;
+      gap: 12px;
+      margin-top: 20px;
     }
+
     @media (max-width: 700px) {
       .moldura-form-simples { grid-template-columns: 1fr 1fr; }
     }
+
     .moldura-form-simples label {
       display: block;
-      font-size: 11px;
-      color: #666;
-      font-weight: bold;
-      margin-bottom: 4px;
+      font-size: 10px;
+      color: var(--cinza-suave);
+      font-weight: 500;
+      margin-bottom: 6px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
     }
+
     .moldura-form-simples input[type="number"] {
       width: 100%;
-      padding: 8px 10px;
-      border: 2px solid #eee;
-      border-radius: 8px;
+      padding: 10px 12px;
+      background: var(--preto);
+      border: 1px solid rgba(212, 175, 122, 0.2);
+      border-radius: 3px;
       font-size: 13px;
+      color: var(--branco);
       outline: none;
+      font-family: 'Playfair Display', serif;
+      transition: all 0.3s;
     }
-    .moldura-form-simples input[type="number"]:focus { border-color: #ff7eb0; }
+
+    .moldura-form-simples input[type="number"]:focus {
+      border-color: var(--dourado);
+      box-shadow: 0 0 0 3px rgba(212, 175, 122, 0.1);
+    }
 
     .moldura-acoes {
       display: flex;
-      gap: 10px;
-      margin-top: 20px;
+      gap: 12px;
+      margin-top: 24px;
       flex-wrap: wrap;
-      padding-bottom: 10px;
     }
+
     .moldura-acoes button {
       flex: 1;
       min-width: 180px;
-      padding: 14px;
+      padding: 14px 20px;
       border: none;
-      border-radius: 24px;
-      font-size: 15px;
-      font-weight: bold;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 700;
       cursor: pointer;
-      color: white;
-      transition: 0.3s;
+      transition: all 0.3s;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      font-family: 'Inter', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
-    .btn-upload-moldura { background: #2196F3; }
-    .btn-upload-moldura:hover:not(:disabled) { background: #1976D2; transform: scale(1.02); }
-    .btn-salvar-coords { background: #16a34a; }
-    .btn-salvar-coords:hover:not(:disabled) { background: #15803d; transform: scale(1.02); }
-    .btn-upload-moldura:disabled, .btn-salvar-coords:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .moldura-acoes button svg { width: 14px; height: 14px; }
+
+    .btn-upload-moldura {
+      background: transparent;
+      color: var(--dourado);
+      border: 1px solid var(--dourado) !important;
+    }
+
+    .btn-upload-moldura:hover:not(:disabled) {
+      background: var(--dourado);
+      color: var(--preto);
+    }
+
+    .btn-salvar-coords {
+      background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro));
+      color: var(--preto);
+    }
+
+    .btn-salvar-coords:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
+      box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4);
+    }
+
+    .btn-upload-moldura:disabled, .btn-salvar-coords:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     #inputMoldura { display: none; }
 
     .sem-moldura-editor {
       padding: 60px 20px;
-      color: #888;
+      color: var(--cinza-suave);
       text-align: center;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      letter-spacing: 1px;
     }
 
-    .progresso { background: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
-    .progresso p { color: #666; margin-bottom: 10px; font-size: 14px; font-weight: bold; }
-    .progresso-bar { width: 100%; height: 14px; background: #eee; border-radius: 10px; overflow: hidden; }
-    .progresso-fill { height: 100%; background: linear-gradient(90deg, #ff9ec7, #16a34a); width: 0%; transition: width 0.3s; }
+    /* ANIMAÇÕES */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
 
-    .msg-sucesso { background: #f0fdf4; border: 1px solid #86efac; color: #16a34a; padding: 14px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; font-weight: bold; }
-    .msg-erro { background: #fff1f2; border: 1px solid #fca5a5; color: #dc2626; padding: 14px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; }
-    .msg-aviso { background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; padding: 14px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-    .galeria-titulo { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding: 0 4px; }
-    .galeria-titulo h3 { color: #ff7eb0; font-size: 18px; }
-    .galeria-titulo span { color: #888; font-size: 14px; }
-    .galeria { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
-    .foto-item { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: transform 0.2s; position: relative; }
-    .foto-item:hover { transform: scale(1.03); box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
-    .foto-item img { width: 100%; aspect-ratio: 2000 / 2666; object-fit: cover; display: block; background: #f5f5f5; cursor: pointer; }
-    .foto-info { padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #888; background: #fafafa; }
-    .foto-tamanho { font-weight: bold; color: #ff7eb0; }
-    .foto-acoes { padding: 8px 12px; display: flex; gap: 6px; background: #fafafa; border-top: 1px solid #eee; }
-    .foto-acoes button { flex: 1; padding: 8px; border: none; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-    .btn-download-item { background: #16a34a; color: white; }
-    .btn-download-item:hover { background: #15803d; }
-    .btn-apagar-item { background: #dc2626; color: white; }
-    .btn-apagar-item:hover { background: #b91c1c; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-    .carregando { text-align: center; padding: 40px; color: #888; grid-column: 1 / -1; font-size: 16px; }
-    .vazio { text-align: center; padding: 60px 20px; color: #888; background: white; border-radius: 16px; font-size: 16px; }
-    .vazio-icone { font-size: 60px; margin-bottom: 15px; }
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--preto); }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(212, 175, 122, 0.3);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: var(--dourado); }
 
-    .modal-foto { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; cursor: pointer; }
-    .modal-foto img { max-width: 100%; max-height: 90vh; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-    .modal-fechar { position: absolute; top: 20px; right: 20px; background: white; color: #333; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; cursor: pointer; font-weight: bold; }
-
+    /* RESPONSIVO */
     @media (max-width: 700px) {
       .acoes { grid-template-columns: 1fr; }
       .stats { grid-template-columns: 1fr; }
@@ -364,58 +1098,109 @@
       .galeria { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
       .card-moldura-compact { flex-direction: column; text-align: center; }
       .btn-configurar { width: 100%; justify-content: center; }
+      .header-titulo { font-size: 16px; letter-spacing: 3px; }
     }
   </style>
 </head>
 <body>
 
+  <!-- TELA DE LOGIN -->
   <div id="telaLogin" class="tela-login">
     <div class="login-box">
-      <div class="login-icone">🖼️</div>
-      <h2>Painel Molduras</h2>
-      <p class="login-sub">Digite a senha para acessar</p>
-      <input type="password" id="senhaInput" placeholder="Senha" onkeypress="if(event.key==='Enter') fazerLogin()">
+      <div class="login-marca">ENTRE CLICKS</div>
+      <div class="login-marca-sub">— painel administrativo —</div>
+
+      <div class="login-icone">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+        </svg>
+      </div>
+
+      <div class="login-titulo">Acesso Restrito</div>
+      <div class="login-sub">digite a senha para continuar</div>
+
+      <input type="password" id="senhaInput" placeholder="••••••" onkeypress="if(event.key==='Enter') fazerLogin()">
       <button onclick="fazerLogin()">Entrar</button>
       <p id="erroLogin" class="erro-login"></p>
     </div>
   </div>
 
+  <!-- PAINEL PRINCIPAL -->
   <div id="painelAdmin" class="painel" style="display:none">
-    
+
     <header class="admin-header">
-      <div class="header-titulo">🖼️ Painel Molduras</div>
+      <div class="header-marca">
+        <div class="header-titulo">ENTRE CLICKS</div>
+        <div class="header-subtitulo">painel administrativo</div>
+      </div>
       <button class="btn-sair" onclick="sair()">Sair</button>
     </header>
 
+    <!-- STATS -->
     <div class="stats">
       <div class="stat-card">
-        <span class="stat-numero" id="totalFotos">0</span>
-        <span class="stat-label">📸 Fotos no servidor</span>
+        <div class="stat-icone">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/>
+          </svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-numero" id="totalFotos">0</span>
+          <span class="stat-label">fotos no servidor</span>
+        </div>
       </div>
       <div class="stat-card">
-        <span class="stat-numero" id="totalTamanho">0 MB</span>
-        <span class="stat-label">💾 Espaço utilizado</span>
+        <div class="stat-icone">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z"/>
+          </svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-numero" id="totalTamanho">0 MB</span>
+          <span class="stat-label">espaço utilizado</span>
+        </div>
       </div>
     </div>
 
-    <!-- ⭐ CARD COMPACTO DA MOLDURA -->
+    <!-- CARD MOLDURA -->
     <div class="card-moldura-compact">
       <div class="moldura-mini" id="molduraMini">
-        <span style="font-size:11px; color:#aaa;">⏳</span>
+        <span style="font-size:11px; color:var(--cinza-suave);">⏳</span>
       </div>
       <div class="moldura-info-compact">
-        <h4>🖼️ Moldura Ativa</h4>
+        <h4>Moldura Ativa</h4>
         <p id="molduraInfoTxt">Carregando...</p>
       </div>
       <button class="btn-configurar" onclick="abrirModalConfig()">
-        ⚙️ Configurar Moldura
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        Configurar Moldura
       </button>
     </div>
 
+    <!-- AÇÕES -->
     <div class="acoes">
-      <button class="btn-atualizar" onclick="carregarFotos()">🔄 Atualizar Lista</button>
-      <button class="btn-baixar" onclick="baixarTudo()" id="btnBaixar">📥 Baixar Todas em ZIP</button>
-      <button class="btn-apagar" onclick="confirmarApagar()" id="btnApagar">🗑️ Apagar Todas as Fotos</button>
+      <button class="btn-atualizar" onclick="carregarFotos()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
+        </svg>
+        Atualizar Lista
+      </button>
+      <button class="btn-baixar" onclick="baixarTudo()" id="btnBaixar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+        </svg>
+        Baixar Todas em ZIP
+      </button>
+      <button class="btn-apagar" onclick="confirmarApagar()" id="btnApagar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+        </svg>
+        Apagar Todas
+      </button>
     </div>
 
     <div id="progressoContainer" class="progresso" style="display:none">
@@ -428,49 +1213,53 @@
     <div id="mensagem"></div>
 
     <div class="galeria-titulo">
-      <h3>📸 Fotos Enviadas pra Impressão</h3>
+      <h3>Fotos Enviadas</h3>
       <span id="contadorFotos"></span>
     </div>
     <div id="galeria" class="galeria"></div>
     <div id="vazio" class="vazio" style="display:none">
-      <div class="vazio-icone">📭</div>
-      <p>Nenhuma foto enviada ainda.</p>
-      <p style="font-size:13px; margin-top:8px; color:#aaa;">
-        Aguardando os convidados enviarem fotos pra impressão!
+      <div class="vazio-icone">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
+        </svg>
+      </div>
+      <p>Nenhuma foto enviada ainda</p>
+      <p style="font-size:11px; margin-top:10px; letter-spacing:2px; text-transform:uppercase; color:var(--cinza-suave); font-style:normal; font-family:'Inter',sans-serif;">
+        aguardando registros do evento
       </p>
     </div>
 
   </div>
 
-  <!-- ⭐ MODAL DE CONFIGURAÇÃO DA MOLDURA -->
+  <!-- MODAL DE CONFIGURAÇÃO -->
   <div class="modal-config" id="modalConfig">
     <div class="modal-config-conteudo">
       <div class="modal-config-header">
-        <h3>⚙️ Configurar Moldura</h3>
+        <h3>Configurar Moldura</h3>
         <button class="btn-fechar-modal" onclick="fecharModalConfig()">×</button>
       </div>
       <div class="modal-config-body">
 
         <div class="instrucoes-editor">
-          💡 <strong>Como usar:</strong><br>
-          1️⃣ <strong>Arraste</strong> o retângulo azul pra posicionar onde a foto vai aparecer<br>
-          2️⃣ <strong>Puxe as bolinhas</strong> nos cantos/bordas pra redimensionar<br>
-          3️⃣ Ou digite os valores nos campos abaixo pra ajuste fino<br>
-          4️⃣ Clica em <strong>"💾 Salvar Coordenadas"</strong> quando estiver perfeito!
+          <strong>Como usar:</strong><br>
+          1. <strong>Arraste</strong> o retângulo dourado para posicionar a foto<br>
+          2. <strong>Puxe as bolinhas</strong> nos cantos/bordas para redimensionar<br>
+          3. Ou digite os valores exatos nos campos abaixo<br>
+          4. Clique em <strong>Salvar Coordenadas</strong> quando estiver perfeito
         </div>
 
         <div class="editor-visual">
           <div class="editor-canvas-container" id="editorContainer">
             <div class="sem-moldura-editor" id="semMolduraEditor">
-              ⏳ Carregando moldura...
+              Carregando moldura...
             </div>
           </div>
 
           <div class="coords-tempo-real" id="coordsTempoReal" style="display:none">
-            <span>📍 X: <strong id="txtX">0</strong> px</span>
-            <span>📍 Y: <strong id="txtY">0</strong> px</span>
-            <span>↔️ Largura: <strong id="txtW">0</strong> px</span>
-            <span>↕️ Altura: <strong id="txtH">0</strong> px</span>
+            <span>X: <strong id="txtX">0</strong>px</span>
+            <span>Y: <strong id="txtY">0</strong>px</span>
+            <span>L: <strong id="txtW">0</strong>px</span>
+            <span>A: <strong id="txtH">0</strong>px</span>
           </div>
         </div>
 
@@ -478,29 +1267,35 @@
 
         <div class="moldura-form-simples">
           <div>
-            <label>Janela X (px)</label>
+            <label>Janela X</label>
             <input type="number" id="janelaX" value="0" min="0">
           </div>
           <div>
-            <label>Janela Y (px)</label>
+            <label>Janela Y</label>
             <input type="number" id="janelaY" value="0" min="0">
           </div>
           <div>
-            <label>Largura (px)</label>
+            <label>Largura</label>
             <input type="number" id="janelaLargura" value="0" min="1">
           </div>
           <div>
-            <label>Altura (px)</label>
+            <label>Altura</label>
             <input type="number" id="janelaAltura" value="0" min="1">
           </div>
         </div>
 
         <div class="moldura-acoes">
           <button class="btn-upload-moldura" onclick="document.getElementById('inputMoldura').click()" id="btnEscolherMoldura">
-            🖼️ Trocar Moldura
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+            </svg>
+            Trocar Moldura
           </button>
           <button class="btn-salvar-coords" onclick="salvarCoordenadas()" id="btnSalvarCoords">
-            💾 Salvar Coordenadas
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+            </svg>
+            Salvar Coordenadas
           </button>
         </div>
 
