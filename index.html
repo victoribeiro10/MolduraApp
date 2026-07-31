@@ -1401,16 +1401,18 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             const rectArea = areaFoto.getBoundingClientRect();
-            const propL = MOLDURA.janelaLargura / rectArea.width;
-            const propA = MOLDURA.janelaAltura / rectArea.height;
+            
+            // ⭐ USA UMA ÚNICA PROPORÇÃO (baseada na largura)
+            // Isso garante que a imagem NÃO seja distorcida
+            const prop = MOLDURA.janelaLargura / rectArea.width;
 
             ctx.save();
             ctx.beginPath();
             ctx.rect(MOLDURA.janelaX, MOLDURA.janelaY, MOLDURA.janelaLargura, MOLDURA.janelaAltura);
             ctx.clip();
             ctx.translate(MOLDURA.janelaX, MOLDURA.janelaY);
-            ctx.translate(ajuste.x * propL, ajuste.y * propA);
-            ctx.scale(ajuste.scale * propL, ajuste.scale * propA);
+            ctx.translate(ajuste.x * prop, ajuste.y * prop);
+            ctx.scale(ajuste.scale * prop, ajuste.scale * prop);
             ctx.drawImage(imagemOriginal, 0, 0);
             ctx.restore();
 
