@@ -177,12 +177,31 @@
             background: #ff7eb0;
         }
 
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         .btn-voltar { background: #444; flex: 0 0 auto; min-width: 80px; }
         .btn-reset { background: #666; flex: 0 0 auto; min-width: 80px; }
         .btn-confirmar { background: #4CAF50; }
         .btn-confirmar:active { background: #45a049; }
         .btn-compartilhar { background: #25D366; }
         .btn-compartilhar:active { background: #1DA851; }
+
+        /* BOTÃO DESTAQUE - ENVIAR PRA IMPRESSÃO */
+        .btn-enviar-impressao {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            flex: 1 1 100%;
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+        }
+
+        .btn-enviar-impressao:active {
+            background: linear-gradient(135deg, #1976D2, #1565C0);
+        }
 
         .hidden { display: none !important; }
 
@@ -202,10 +221,85 @@
             font-size: 11px;
             margin-top: 5px;
         }
+
+        /* MODAL DE ENVIO / SUCESSO */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-conteudo {
+            background: white;
+            color: #333;
+            padding: 30px 25px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 350px;
+            width: 100%;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-icone {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        .modal-titulo {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .modal-texto {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .modal button {
+            background: #ff9ec7;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            width: auto;
+        }
+
+        .loading {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2196F3;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <!-- TÍTULO GENÉRICO - vale pra qualquer evento -->
     <h1>✨ Eternize esse momento</h1>
 
     <div class="tela-escolha" id="telaEscolha">
@@ -263,12 +357,24 @@
         <button class="btn-voltar" id="btnRefazer">↩️ Refazer</button>
         <button id="btnBaixar">⬇️ Baixar</button>
         <button class="btn-compartilhar" id="btnCompartilhar">📤 Compartilhar</button>
+        <button class="btn-enviar-impressao" id="btnEnviarImpressao">📮 Enviar pra Impressão</button>
     </div>
+
+    <!-- Biblioteca do Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
         // ============================================
+        // CONFIGURAÇÃO DO SUPABASE
+        // ============================================
+        const SUPABASE_URL = "https://scwznirvzwrphztvopbz.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjd3puaXJ2endycGh6dHZvcGJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzI2NzQsImV4cCI6MjA5NTY0ODY3NH0.PLvr547bIEJwjECKxQaoR7lpazs8GbSpLYLMDiGD4Po";
+        const BUCKET_FOTOS = "molduras-fotos";
+        
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // ============================================
         // CONFIGURAÇÕES DA MOLDURA
-        // (só troca o arquivo moldura.png quando for evento novo)
         // ============================================
         const MOLDURA = {
             larguraTotal: 2000,
@@ -307,6 +413,7 @@
         const btnRefazer = document.getElementById('btnRefazer');
         const btnBaixar = document.getElementById('btnBaixar');
         const btnCompartilhar = document.getElementById('btnCompartilhar');
+        const btnEnviarImpressao = document.getElementById('btnEnviarImpressao');
         const inputFoto = document.getElementById('inputFoto');
         const mensagem = document.getElementById('mensagem');
 
@@ -316,6 +423,7 @@
         let cameraAtual = 'environment';
         let streamAtual = null;
         let imagemOriginal = null;
+        let fotoJaEnviada = false; // controla se essa foto já foi enviada
         
         let ajuste = { x: 0, y: 0, scale: 1, initialScale: 1 };
 
@@ -333,6 +441,7 @@
             if (tela === 'escolha') {
                 telaEscolha.classList.remove('hidden');
                 pararCamera();
+                fotoJaEnviada = false; // reseta ao voltar pra escolha
             } else if (tela === 'camera') {
                 areaCamera.classList.remove('hidden');
                 botoesCamera.classList.remove('hidden');
@@ -345,6 +454,10 @@
                 areaResultado.classList.remove('hidden');
                 botoesResultado.classList.remove('hidden');
                 pararCamera();
+                // Reseta botão de enviar
+                btnEnviarImpressao.disabled = false;
+                btnEnviarImpressao.textContent = '📮 Enviar pra Impressão';
+                btnEnviarImpressao.style.display = fotoJaEnviada ? 'none' : 'block';
             }
         }
 
@@ -544,6 +657,7 @@
             if (moldura.complete && moldura.naturalWidth > 0) {
                 ctx.drawImage(moldura, 0, 0, MOLDURA.larguraTotal, MOLDURA.alturaTotal);
             }
+            fotoJaEnviada = false;
             mostrarTela('resultado');
         });
 
@@ -622,15 +736,17 @@
             if (moldura.complete && moldura.naturalWidth > 0) {
                 ctx.drawImage(moldura, 0, 0, MOLDURA.larguraTotal, MOLDURA.alturaTotal);
             }
+            fotoJaEnviada = false;
             mostrarTela('resultado');
         });
 
-        // RESULTADO
+        // RESULTADO - REFAZER
         btnRefazer.addEventListener('click', () => {
             inputFoto.value = '';
             mostrarTela('escolha');
         });
 
+        // RESULTADO - BAIXAR
         btnBaixar.addEventListener('click', () => {
             const link = document.createElement('a');
             link.download = 'foto-' + Date.now() + '.jpg';
@@ -638,7 +754,7 @@
             link.click();
         });
 
-        // COMPARTILHAR
+        // RESULTADO - COMPARTILHAR
         btnCompartilhar.addEventListener('click', async () => {
             try {
                 canvas.toBlob(async (blob) => {
@@ -666,6 +782,90 @@
                 }
             }
         });
+
+        // ============================================
+        // ⭐ NOVO: ENVIAR PRA IMPRESSÃO (SUPABASE)
+        // ============================================
+        btnEnviarImpressao.addEventListener('click', async () => {
+            if (fotoJaEnviada) {
+                mostrarModal('info', '⚠️', 'Foto já enviada', 'Essa foto já foi enviada pra impressão!');
+                return;
+            }
+
+            btnEnviarImpressao.disabled = true;
+            btnEnviarImpressao.textContent = '⏳ Enviando...';
+
+            try {
+                // Converte canvas em blob
+                const blob = await new Promise((resolve) => {
+                    canvas.toBlob(resolve, 'image/jpeg', 0.95);
+                });
+
+                if (!blob) {
+                    throw new Error('Erro ao gerar foto');
+                }
+
+                // Nome único do arquivo
+                const timestamp = Date.now();
+                const random = Math.random().toString(36).substring(2, 8);
+                const nomeArquivo = `foto-${timestamp}-${random}.jpg`;
+
+                // Upload pro Supabase
+                const { error } = await supabaseClient
+                    .storage
+                    .from(BUCKET_FOTOS)
+                    .upload(nomeArquivo, blob, {
+                        cacheControl: '3600',
+                        upsert: false,
+                        contentType: 'image/jpeg'
+                    });
+
+                if (error) throw error;
+
+                // Sucesso!
+                fotoJaEnviada = true;
+                btnEnviarImpressao.style.display = 'none';
+                
+                mostrarModal(
+                    'sucesso',
+                    '🎉',
+                    'Foto enviada!',
+                    'Sua foto será impressa e entregue durante a festa! 💖<br><br>Você também pode baixar ou compartilhar essa foto agora.'
+                );
+
+            } catch (err) {
+                console.error('Erro upload:', err);
+                btnEnviarImpressao.disabled = false;
+                btnEnviarImpressao.textContent = '📮 Enviar pra Impressão';
+                
+                mostrarModal(
+                    'erro',
+                    '❌',
+                    'Ops! Algo deu errado',
+                    'Não foi possível enviar a foto. Verifique sua internet e tente novamente.<br><br><small>Erro: ' + err.message + '</small>'
+                );
+            }
+        });
+
+        // ============================================
+        // MODAL
+        // ============================================
+        function mostrarModal(tipo, icone, titulo, texto) {
+            const modalExistente = document.querySelector('.modal');
+            if (modalExistente) modalExistente.remove();
+
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-conteudo">
+                    <div class="modal-icone">${icone}</div>
+                    <div class="modal-titulo">${titulo}</div>
+                    <div class="modal-texto">${texto}</div>
+                    <button onclick="this.closest('.modal').remove()">OK</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
 
         mostrarTela('escolha');
     </script>
