@@ -95,13 +95,7 @@
             position: absolute;
             object-fit: cover;
             display: block;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
         }
-
-        video.espelhado { transform: scaleX(-1); }
 
         #canvasResultado {
             position: absolute;
@@ -119,10 +113,6 @@
             background: #333;
             touch-action: none;
             cursor: grab;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
         }
 
         .area-ajuste:active { cursor: grabbing; }
@@ -491,7 +481,14 @@
                 aplicarProporcaoMoldura();
                 aplicarPosicoesJanela();
 
-                console.log('✅ Configuração carregada:', MOLDURA);
+                console.log('✅ Configuração carregada:', {
+                    larguraTotal: MOLDURA.larguraTotal,
+                    alturaTotal: MOLDURA.alturaTotal,
+                    janelaX: MOLDURA.janelaX,
+                    janelaY: MOLDURA.janelaY,
+                    janelaLargura: MOLDURA.janelaLargura,
+                    janelaAltura: MOLDURA.janelaAltura
+                });
                 return true;
             } catch (err) {
                 console.error('Erro ao carregar configuração:', err);
@@ -513,17 +510,37 @@
             const widthPct = (MOLDURA.janelaLargura / MOLDURA.larguraTotal) * 100;
             const heightPct = (MOLDURA.janelaAltura / MOLDURA.alturaTotal) * 100;
 
-            // Vídeo (câmera)
-            video.style.top = topPct + '%';
-            video.style.left = leftPct + '%';
-            video.style.width = widthPct + '%';
-            video.style.height = heightPct + '%';
+            console.log('📐 Aplicando posições:', {
+                top: topPct.toFixed(2) + '%',
+                left: leftPct.toFixed(2) + '%',
+                width: widthPct.toFixed(2) + '%',
+                height: heightPct.toFixed(2) + '%'
+            });
+
+            // Vídeo (câmera) - reseta TUDO e aplica só o necessário
+            video.style.cssText = `
+                position: absolute;
+                top: ${topPct}%;
+                left: ${leftPct}%;
+                width: ${widthPct}%;
+                height: ${heightPct}%;
+                object-fit: cover;
+                display: block;
+                transform: ${cameraAtual === 'user' ? 'scaleX(-1)' : 'none'};
+            `;
 
             // Área de ajuste (galeria)
-            areaFoto.style.top = topPct + '%';
-            areaFoto.style.left = leftPct + '%';
-            areaFoto.style.width = widthPct + '%';
-            areaFoto.style.height = heightPct + '%';
+            areaFoto.style.cssText = `
+                position: absolute;
+                top: ${topPct}%;
+                left: ${leftPct}%;
+                width: ${widthPct}%;
+                height: ${heightPct}%;
+                overflow: hidden;
+                background: #333;
+                touch-action: none;
+                cursor: grab;
+            `;
         }
 
         function mostrarTela(tela) {
@@ -771,8 +788,14 @@
                 });
                 streamAtual = stream;
                 video.srcObject = stream;
-                if (cameraAtual === 'user') video.classList.add('espelhado');
-                else video.classList.remove('espelhado');
+                
+                // Aplica espelhamento na câmera frontal
+                if (cameraAtual === 'user') {
+                    video.style.transform = 'scaleX(-1)';
+                } else {
+                    video.style.transform = 'none';
+                }
+                
                 video.onloadedmetadata = () => {
                     video.play();
                     mensagem.textContent = '';
