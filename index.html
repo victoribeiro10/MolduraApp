@@ -1002,12 +1002,14 @@
         
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // ============================================
-        // ⭐ CONFIGURAÇÕES DE EXPORTAÇÃO PRA IMPRESSÃO
-        // ============================================
-        const LARGURA_IMPRESSAO = 780;
-        const ALTURA_IMPRESSAO = 1070;
-        const QUALIDADE_JPEG = 0.95;
+        /// ============================================
+// ⭐ CONFIGURAÇÕES DE EXPORTAÇÃO PRA IMPRESSÃO
+// Envia em 1.5x o tamanho final pra manter qualidade máxima
+// O Photoshop reduz pra 780x1070 na hora de montar a grade
+// ============================================
+const LARGURA_IMPRESSAO = 1170;
+const ALTURA_IMPRESSAO = 1605;
+const QUALIDADE_JPEG = 0.95;
 
         // Ícones SVG pro modal
         const ICONES_MODAL = {
