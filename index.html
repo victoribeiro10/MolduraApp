@@ -53,9 +53,6 @@
             min-height: 100vh;
         }
 
-        /* ================================
-           HEADER / MARCA
-        ================================ */
         .marca {
             text-align: center;
             margin: 8px 0 12px 0;
@@ -97,9 +94,6 @@
             text-transform: lowercase;
         }
 
-        /* ================================
-           TELA DE ESCOLHA
-        ================================ */
         .tela-escolha {
             display: flex;
             flex-direction: column;
@@ -226,9 +220,6 @@
             font-weight: 300;
         }
 
-        /* ================================
-           CONTAINER (câmera / ajuste / resultado)
-        ================================ */
         .container {
             position: relative;
             width: 100%;
@@ -241,8 +232,6 @@
             margin-bottom: 12px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             animation: fadeIn 0.5s ease;
-            /* ⭐ IMPEDE o flexbox de esmagar/achatar o container,
-               preservando a proporção real da moldura */
             flex-shrink: 0;
         }
 
@@ -293,9 +282,6 @@
             z-index: 10;
         }
 
-        /* ================================
-           BOTÕES DE AÇÃO
-        ================================ */
         .botoes {
             display: flex;
             gap: 8px;
@@ -433,9 +419,6 @@
             margin: 0 8px;
         }
 
-        /* ================================
-           LOADING INICIAL
-        ================================ */
         .loading-inicial {
             position: fixed;
             top: 0; left: 0;
@@ -472,9 +455,6 @@
             font-weight: 300;
         }
 
-        /* ================================
-           MODAL
-        ================================ */
         .modal {
             position: fixed;
             top: 0;
@@ -574,9 +554,6 @@
             box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4);
         }
 
-        /* ================================
-           MODAL: CTA REDES SOCIAIS
-        ================================ */
         .modal-cta {
             margin-top: 24px;
             padding-top: 20px;
@@ -639,9 +616,6 @@
             box-shadow: 0 4px 16px rgba(228, 64, 95, 0.4);
         }
 
-        /* ================================
-           RODAPÉ FIXO COM REDES
-        ================================ */
         .rodape {
             position: fixed;
             bottom: 0;
@@ -707,9 +681,6 @@
             transform: translateY(-2px);
         }
 
-                /* ================================
-           OVERLAY DE ENVIO (barra de progresso)
-        ================================ */
         .overlay-envio {
             position: fixed;
             top: 0;
@@ -838,9 +809,6 @@
             }
         }
 
-        /* ================================
-           ANIMAÇÕES
-        ================================ */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -871,14 +839,12 @@
 </head>
 <body>
 
-    <!-- LOADING INICIAL -->
     <div id="loadingInicial" class="loading-inicial">
         <div class="marca-logo">ENTRE CLICKS</div>
         <div class="loading-spinner"></div>
         <p>Carregando</p>
     </div>
 
-    <!-- MARCA -->
     <div class="marca">
         <div class="marca-logo">ENTRE CLICKS</div>
         <div class="marca-linha">
@@ -886,7 +852,6 @@
         </div>
     </div>
 
-    <!-- TELA DE ESCOLHA -->
     <div class="tela-escolha hidden" id="telaEscolha">
         <div class="titulo-secao">
             <h1>Eternize <em>este</em> momento</h1>
@@ -990,7 +955,6 @@
         </button>
     </div>
 
-    <!-- RODAPÉ COM REDES SOCIAIS -->
     <div class="rodape">
         <div class="rodape-marca">Entre Clicks · Fotografia</div>
         <div class="rodape-redes">
@@ -1009,7 +973,6 @@
         </div>
     </div>
 
-        <!-- OVERLAY DE ENVIO -->
     <div class="overlay-envio" id="overlayEnvio">
         <div class="envio-conteudo">
             <div class="envio-icone">
@@ -1039,6 +1002,13 @@
         
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        // ============================================
+        // ⭐ CONFIGURAÇÕES DE EXPORTAÇÃO PRA IMPRESSÃO
+        // ============================================
+        const LARGURA_IMPRESSAO = 780;
+        const ALTURA_IMPRESSAO = 1070;
+        const QUALIDADE_JPEG = 0.95;
+
         // Ícones SVG pro modal
         const ICONES_MODAL = {
             sucesso: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>',
@@ -1046,7 +1016,6 @@
             info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>'
         };
 
-        // Ícones das redes sociais (para o modal)
         const ICONE_WHATS = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>';
         const ICONE_INSTA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
 
@@ -1108,6 +1077,49 @@
         let ajuste = { x: 0, y: 0, scale: 1, initialScale: 1 };
 
         // ============================================
+        // ⭐ FUNÇÃO DE REDIMENSIONAMENTO DE ALTA QUALIDADE
+        // Reduz em etapas de 2x pra manter qualidade máxima
+        // ============================================
+        async function redimensionarCanvasComQualidade(canvasOrigem, larguraFinal, alturaFinal, qualidade = 0.95) {
+            let canvasAtual = canvasOrigem;
+            let larguraAtual = canvasOrigem.width;
+            let alturaAtual = canvasOrigem.height;
+
+            // Reduz em etapas de 50% até chegar perto do tamanho final
+            while (larguraAtual > larguraFinal * 2) {
+                const novaLargura = Math.floor(larguraAtual / 2);
+                const novaAltura = Math.floor(alturaAtual / 2);
+
+                const canvasTemp = document.createElement('canvas');
+                canvasTemp.width = novaLargura;
+                canvasTemp.height = novaAltura;
+                
+                const ctxTemp = canvasTemp.getContext('2d');
+                ctxTemp.imageSmoothingEnabled = true;
+                ctxTemp.imageSmoothingQuality = 'high';
+                ctxTemp.drawImage(canvasAtual, 0, 0, novaLargura, novaAltura);
+
+                canvasAtual = canvasTemp;
+                larguraAtual = novaLargura;
+                alturaAtual = novaAltura;
+            }
+
+            // Última etapa: redimensiona pro tamanho final exato
+            const canvasFinal = document.createElement('canvas');
+            canvasFinal.width = larguraFinal;
+            canvasFinal.height = alturaFinal;
+            
+            const ctxFinal = canvasFinal.getContext('2d');
+            ctxFinal.imageSmoothingEnabled = true;
+            ctxFinal.imageSmoothingQuality = 'high';
+            ctxFinal.drawImage(canvasAtual, 0, 0, larguraFinal, alturaFinal);
+
+            return new Promise((resolve) => {
+                canvasFinal.toBlob(resolve, 'image/jpeg', qualidade);
+            });
+        }
+
+        // ============================================
         // CARREGA CONFIGURAÇÃO DO SUPABASE
         // ============================================
         async function carregarConfiguracao() {
@@ -1152,6 +1164,8 @@
                 dimensionarContainers();
 
                 console.log('✅ Configuração carregada');
+                console.log('📐 Moldura:', MOLDURA.larguraTotal, 'x', MOLDURA.alturaTotal);
+                console.log('🖨️ Exportação:', LARGURA_IMPRESSAO, 'x', ALTURA_IMPRESSAO);
                 return true;
             } catch (err) {
                 console.error('Erro ao carregar configuração:', err);
@@ -1197,16 +1211,12 @@
             `;
         }
 
-        // ⭐ Ajusta o tamanho do container para caber na tela
-        // SEM perder a proporção real da moldura (nada de "quadrada")
         function dimensionarContainers() {
             const prop = MOLDURA.larguraTotal / MOLDURA.alturaTotal;
             if (!prop) return;
 
-            // Largura máxima disponível (body tem 12px de padding de cada lado)
             const larguraMax = Math.min(window.innerWidth - 24, 380);
 
-            // Mede o "chrome": tudo que fica fora do container na tela
             const marcaEl = document.querySelector('.marca');
             const botoesVisiveis =
                 (!botoesCamera.classList.contains('hidden') ? botoesCamera.offsetHeight : 0) +
@@ -1214,14 +1224,13 @@
                 (!botoesResultado.classList.contains('hidden') ? botoesResultado.offsetHeight : 0);
 
             const chromeH =
-                16 + 60 +                                   // paddings do body (topo + base)
+                16 + 60 +
                 (marcaEl ? marcaEl.offsetHeight : 0) +
                 mensagem.offsetHeight +
                 (!dicaAjuste.classList.contains('hidden') ? dicaAjuste.offsetHeight : 0) +
                 botoesVisiveis +
-                40;                                         // folga (margens/borda)
+                40;
 
-            // Altura que sobra pra moldura, convertida em largura pela proporção real
             const alturaMax = window.innerHeight - chromeH;
             const largura = Math.max(200, Math.min(larguraMax, alturaMax * prop));
 
@@ -1261,7 +1270,6 @@
                 btnEnviarImpressao.style.display = fotoJaEnviada ? 'none' : 'inline-flex';
             }
 
-            // ⭐ Recalcula o tamanho do container após a troca de tela
             requestAnimationFrame(dimensionarContainers);
         }
 
@@ -1441,9 +1449,6 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             const rectArea = areaFoto.getBoundingClientRect();
-            
-            // ⭐ USA UMA ÚNICA PROPORÇÃO (baseada na largura)
-            // Isso garante que a imagem NÃO seja distorcida
             const prop = MOLDURA.janelaLargura / rectArea.width;
 
             ctx.save();
@@ -1551,7 +1556,6 @@
             mostrarTela('escolha');
         });
 
-        // ⭐ Recalcula ao girar a tela / redimensionar a janela
         window.addEventListener('resize', dimensionarContainers);
         window.addEventListener('orientationchange', () => {
             setTimeout(dimensionarContainers, 300);
@@ -1593,185 +1597,19 @@
         });
 
         // ============================================
-// REDIMENSIONAMENTO DE ALTA QUALIDADE
-// Reduz em etapas de 2x pra manter qualidade máxima
-// (técnica profissional de downsampling)
-// ============================================
-async function redimensionarCanvasComQualidade(canvasOrigem, larguraFinal, alturaFinal) {
-    let canvasAtual = canvasOrigem;
-    let larguraAtual = canvasOrigem.width;
-    let alturaAtual = canvasOrigem.height;
-
-    // Reduz em etapas de 50% até chegar perto do tamanho final
-    // Isso produz muito melhor qualidade que reduzir de uma vez
-    while (larguraAtual > larguraFinal * 2) {
-        const novaLargura = Math.floor(larguraAtual / 2);
-        const novaAltura = Math.floor(alturaAtual / 2);
-
-        const canvasTemp = document.createElement('canvas');
-        canvasTemp.width = novaLargura;
-        canvasTemp.height = novaAltura;
-        
-        const ctxTemp = canvasTemp.getContext('2d');
-        ctxTemp.imageSmoothingEnabled = true;
-        ctxTemp.imageSmoothingQuality = 'high';
-        ctxTemp.drawImage(canvasAtual, 0, 0, novaLargura, novaAltura);
-
-        canvasAtual = canvasTemp;
-        larguraAtual = novaLargura;
-        alturaAtual = novaAltura;
-    }
-
-    // Última etapa: redimensiona pro tamanho final exato
-    const canvasFinal = document.createElement('canvas');
-    canvasFinal.width = larguraFinal;
-    canvasFinal.height = alturaFinal;
-    
-    const ctxFinal = canvasFinal.getContext('2d');
-    ctxFinal.imageSmoothingEnabled = true;
-    ctxFinal.imageSmoothingQuality = 'high';
-    ctxFinal.drawImage(canvasAtual, 0, 0, larguraFinal, alturaFinal);
-
-    // Converte pra blob JPEG com qualidade máxima
-    return new Promise((resolve) => {
-        canvasFinal.toBlob(resolve, 'image/jpeg', 0.95);
-    });
-}
-        
-              btnEnviarImpressao.addEventListener('click', async () => {
-    if (fotoJaEnviada) {
-        mostrarModal('info', 'Foto já enviada', 'Essa foto já foi enviada para impressão!');
-        return;
-    }
-
-    const overlay = document.getElementById('overlayEnvio');
-    const barraFill = document.getElementById('barraFill');
-    const percentualEl = document.getElementById('envioPercentual');
-    const mensagemEl = document.getElementById('envioMensagem');
-
-    // Tamanho final pro Photoshop
-    const LARGURA_FINAL = 780;
-    const ALTURA_FINAL = 1070;
-
-    const mensagens = [
-        { pct: 0,   texto: 'Preparando sua foto...' },
-        { pct: 20,  texto: 'Otimizando qualidade...' },
-        { pct: 50,  texto: 'Enviando para impressão...' },
-        { pct: 80,  texto: 'Quase lá...' },
-        { pct: 95,  texto: 'Finalizando...' }
-    ];
-
-    function atualizarProgresso(pct) {
-        barraFill.style.width = pct + '%';
-        percentualEl.textContent = Math.round(pct) + '%';
-        
-        for (let i = mensagens.length - 1; i >= 0; i--) {
-            if (pct >= mensagens[i].pct) {
-                if (mensagemEl.textContent !== mensagens[i].texto) {
-                    mensagemEl.style.opacity = '0';
-                    setTimeout(() => {
-                        mensagemEl.textContent = mensagens[i].texto;
-                        mensagemEl.style.opacity = '1';
-                    }, 200);
-                }
-                break;
-            }
-        }
-    }
-
-    overlay.classList.add('ativo');
-    atualizarProgresso(0);
-    btnEnviarImpressao.disabled = true;
-
-    let progressoSimulado = 0;
-    const intervalSimulado = setInterval(() => {
-        progressoSimulado += Math.random() * 3;
-        if (progressoSimulado >= 30) {
-            progressoSimulado = 30;
-            clearInterval(intervalSimulado);
-        }
-        atualizarProgresso(progressoSimulado);
-    }, 100);
-
-    try {
+        // ⭐ ENVIAR PARA IMPRESSÃO - COM REDIMENSIONAMENTO
         // ============================================
-        // ⭐ REDIMENSIONAMENTO DE ALTA QUALIDADE
-        // Reduz o canvas final pra 780x1070 usando 
-        // downsampling em etapas (melhor qualidade)
-        // ============================================
-        const blob = await redimensionarCanvasComQualidade(
-            canvas, 
-            LARGURA_FINAL, 
-            ALTURA_FINAL
-        );
-
-        if (!blob) throw new Error('Erro ao gerar foto');
-
-        clearInterval(intervalSimulado);
-        atualizarProgresso(35);
-
-        const timestamp = Date.now();
-        const random = Math.random().toString(36).substring(2, 8);
-        const nomeArquivo = `foto-${timestamp}-${random}.jpg`;
-
-        let progressoUpload = 35;
-        const intervalUpload = setInterval(() => {
-            progressoUpload += Math.random() * 4;
-            if (progressoUpload >= 90) {
-                progressoUpload = 90;
-                clearInterval(intervalUpload);
+        btnEnviarImpressao.addEventListener('click', async () => {
+            if (fotoJaEnviada) {
+                mostrarModal('info', 'Foto já enviada', 'Essa foto já foi enviada para impressão!');
+                return;
             }
-            atualizarProgresso(progressoUpload);
-        }, 150);
-
-        const { error } = await supabaseClient
-            .storage
-            .from(BUCKET_FOTOS)
-            .upload(nomeArquivo, blob, {
-                cacheControl: '3600',
-                upsert: false,
-                contentType: 'image/jpeg'
-            });
-
-        clearInterval(intervalUpload);
-
-        if (error) throw error;
-
-        atualizarProgresso(100);
-        await new Promise(r => setTimeout(r, 600));
-
-        fotoJaEnviada = true;
-        btnEnviarImpressao.style.display = 'none';
-        overlay.classList.remove('ativo');
-        
-        mostrarModal(
-            'sucesso',
-            'Foto enviada',
-            'Sua foto será impressa e entregue durante o evento.<br><br>Você também pode baixar ou compartilhar sua foto agora.',
-            true
-        );
-
-    } catch (err) {
-        console.error('Erro upload:', err);
-        clearInterval(intervalSimulado);
-        overlay.classList.remove('ativo');
-        btnEnviarImpressao.disabled = false;
-        btnEnviarImpressao.textContent = 'Enviar para impressão';
-        
-        mostrarModal(
-            'erro',
-            'Algo deu errado',
-            'Não foi possível enviar. Verifique sua internet e tente novamente.<br><br><small>' + err.message + '</small>'
-        );
-    }
-});
 
             const overlay = document.getElementById('overlayEnvio');
             const barraFill = document.getElementById('barraFill');
             const percentualEl = document.getElementById('envioPercentual');
             const mensagemEl = document.getElementById('envioMensagem');
 
-            // Mensagens que mudam durante o envio
             const mensagens = [
                 { pct: 0,   texto: 'Preparando sua foto...' },
                 { pct: 20,  texto: 'Otimizando qualidade...' },
@@ -1784,7 +1622,6 @@ async function redimensionarCanvasComQualidade(canvasOrigem, larguraFinal, altur
                 barraFill.style.width = pct + '%';
                 percentualEl.textContent = Math.round(pct) + '%';
                 
-                // Atualiza mensagem baseada no progresso
                 for (let i = mensagens.length - 1; i >= 0; i--) {
                     if (pct >= mensagens[i].pct) {
                         if (mensagemEl.textContent !== mensagens[i].texto) {
@@ -1799,12 +1636,10 @@ async function redimensionarCanvasComQualidade(canvasOrigem, larguraFinal, altur
                 }
             }
 
-            // Mostra o overlay
             overlay.classList.add('ativo');
             atualizarProgresso(0);
             btnEnviarImpressao.disabled = true;
 
-            // Simula progresso enquanto processa (0-30%)
             let progressoSimulado = 0;
             const intervalSimulado = setInterval(() => {
                 progressoSimulado += Math.random() * 3;
@@ -1816,12 +1651,20 @@ async function redimensionarCanvasComQualidade(canvasOrigem, larguraFinal, altur
             }, 100);
 
             try {
-                // Gera o blob (rápido)
-                const blob = await new Promise((resolve) => {
-                    canvas.toBlob(resolve, 'image/jpeg', 0.95);
-                });
+                // ⭐ REDIMENSIONAMENTO DE ALTA QUALIDADE PRA 780x1070
+                console.log('📸 Canvas original:', canvas.width, 'x', canvas.height);
+                console.log('🎯 Redimensionando pra:', LARGURA_IMPRESSAO, 'x', ALTURA_IMPRESSAO);
+                
+                const blob = await redimensionarCanvasComQualidade(
+                    canvas, 
+                    LARGURA_IMPRESSAO, 
+                    ALTURA_IMPRESSAO,
+                    QUALIDADE_JPEG
+                );
 
                 if (!blob) throw new Error('Erro ao gerar foto');
+
+                console.log('✅ Blob final:', (blob.size / 1024).toFixed(2), 'KB');
 
                 clearInterval(intervalSimulado);
                 atualizarProgresso(35);
@@ -1830,7 +1673,6 @@ async function redimensionarCanvasComQualidade(canvasOrigem, larguraFinal, altur
                 const random = Math.random().toString(36).substring(2, 8);
                 const nomeArquivo = `foto-${timestamp}-${random}.jpg`;
 
-                // Simula progresso durante upload (35-90%)
                 let progressoUpload = 35;
                 const intervalUpload = setInterval(() => {
                     progressoUpload += Math.random() * 4;
@@ -1841,7 +1683,6 @@ async function redimensionarCanvasComQualidade(canvasOrigem, larguraFinal, altur
                     atualizarProgresso(progressoUpload);
                 }, 150);
 
-                // Upload real pro Supabase
                 const { error } = await supabaseClient
                     .storage
                     .from(BUCKET_FOTOS)
@@ -1855,17 +1696,13 @@ async function redimensionarCanvasComQualidade(canvasOrigem, larguraFinal, altur
 
                 if (error) throw error;
 
-                // Completa 100% suavemente
                 atualizarProgresso(100);
-
-                // Aguarda um instante pra mostrar o 100%
                 await new Promise(r => setTimeout(r, 600));
 
                 fotoJaEnviada = true;
                 btnEnviarImpressao.style.display = 'none';
                 overlay.classList.remove('ativo');
                 
-                // Modal de sucesso
                 mostrarModal(
                     'sucesso',
                     'Foto enviada',
@@ -1889,7 +1726,7 @@ async function redimensionarCanvasComQualidade(canvasOrigem, larguraFinal, altur
         });
 
         // ============================================
-        // MODAL — Agora com opção de CTA (redes sociais)
+        // MODAL
         // ============================================
         function mostrarModal(tipo, titulo, texto, mostrarCTA = false) {
             const modalExistente = document.querySelector('.modal');
