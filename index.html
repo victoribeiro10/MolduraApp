@@ -1592,11 +1592,133 @@
             }
         });
 
-               btnEnviarImpressao.addEventListener('click', async () => {
-            if (fotoJaEnviada) {
-                mostrarModal('info', 'Foto já enviada', 'Essa foto já foi enviada para impressão!');
-                return;
+              btnEnviarImpressao.addEventListener('click', async () => {
+    if (fotoJaEnviada) {
+        mostrarModal('info', 'Foto já enviada', 'Essa foto já foi enviada para impressão!');
+        return;
+    }
+
+    const overlay = document.getElementById('overlayEnvio');
+    const barraFill = document.getElementById('barraFill');
+    const percentualEl = document.getElementById('envioPercentual');
+    const mensagemEl = document.getElementById('envioMensagem');
+
+    // Tamanho final pro Photoshop
+    const LARGURA_FINAL = 780;
+    const ALTURA_FINAL = 1070;
+
+    const mensagens = [
+        { pct: 0,   texto: 'Preparando sua foto...' },
+        { pct: 20,  texto: 'Otimizando qualidade...' },
+        { pct: 50,  texto: 'Enviando para impressão...' },
+        { pct: 80,  texto: 'Quase lá...' },
+        { pct: 95,  texto: 'Finalizando...' }
+    ];
+
+    function atualizarProgresso(pct) {
+        barraFill.style.width = pct + '%';
+        percentualEl.textContent = Math.round(pct) + '%';
+        
+        for (let i = mensagens.length - 1; i >= 0; i--) {
+            if (pct >= mensagens[i].pct) {
+                if (mensagemEl.textContent !== mensagens[i].texto) {
+                    mensagemEl.style.opacity = '0';
+                    setTimeout(() => {
+                        mensagemEl.textContent = mensagens[i].texto;
+                        mensagemEl.style.opacity = '1';
+                    }, 200);
+                }
+                break;
             }
+        }
+    }
+
+    overlay.classList.add('ativo');
+    atualizarProgresso(0);
+    btnEnviarImpressao.disabled = true;
+
+    let progressoSimulado = 0;
+    const intervalSimulado = setInterval(() => {
+        progressoSimulado += Math.random() * 3;
+        if (progressoSimulado >= 30) {
+            progressoSimulado = 30;
+            clearInterval(intervalSimulado);
+        }
+        atualizarProgresso(progressoSimulado);
+    }, 100);
+
+    try {
+        // ============================================
+        // ⭐ REDIMENSIONAMENTO DE ALTA QUALIDADE
+        // Reduz o canvas final pra 780x1070 usando 
+        // downsampling em etapas (melhor qualidade)
+        // ============================================
+        const blob = await redimensionarCanvasComQualidade(
+            canvas, 
+            LARGURA_FINAL, 
+            ALTURA_FINAL
+        );
+
+        if (!blob) throw new Error('Erro ao gerar foto');
+
+        clearInterval(intervalSimulado);
+        atualizarProgresso(35);
+
+        const timestamp = Date.now();
+        const random = Math.random().toString(36).substring(2, 8);
+        const nomeArquivo = `foto-${timestamp}-${random}.jpg`;
+
+        let progressoUpload = 35;
+        const intervalUpload = setInterval(() => {
+            progressoUpload += Math.random() * 4;
+            if (progressoUpload >= 90) {
+                progressoUpload = 90;
+                clearInterval(intervalUpload);
+            }
+            atualizarProgresso(progressoUpload);
+        }, 150);
+
+        const { error } = await supabaseClient
+            .storage
+            .from(BUCKET_FOTOS)
+            .upload(nomeArquivo, blob, {
+                cacheControl: '3600',
+                upsert: false,
+                contentType: 'image/jpeg'
+            });
+
+        clearInterval(intervalUpload);
+
+        if (error) throw error;
+
+        atualizarProgresso(100);
+        await new Promise(r => setTimeout(r, 600));
+
+        fotoJaEnviada = true;
+        btnEnviarImpressao.style.display = 'none';
+        overlay.classList.remove('ativo');
+        
+        mostrarModal(
+            'sucesso',
+            'Foto enviada',
+            'Sua foto será impressa e entregue durante o evento.<br><br>Você também pode baixar ou compartilhar sua foto agora.',
+            true
+        );
+
+    } catch (err) {
+        console.error('Erro upload:', err);
+        clearInterval(intervalSimulado);
+        overlay.classList.remove('ativo');
+        btnEnviarImpressao.disabled = false;
+        btnEnviarImpressao.textContent = 'Enviar para impressão';
+        
+        mostrarModal(
+            'erro',
+            'Algo deu errado',
+            'Não foi possível enviar. Verifique sua internet e tente novamente.<br><br><small>' + err.message + '</small>'
+        );
+    }
+});
 
             const overlay = document.getElementById('overlayEnvio');
             const barraFill = document.getElementById('barraFill');
