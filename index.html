@@ -1592,6 +1592,52 @@
             }
         });
 
+        // ============================================
+// REDIMENSIONAMENTO DE ALTA QUALIDADE
+// Reduz em etapas de 2x pra manter qualidade máxima
+// (técnica profissional de downsampling)
+// ============================================
+async function redimensionarCanvasComQualidade(canvasOrigem, larguraFinal, alturaFinal) {
+    let canvasAtual = canvasOrigem;
+    let larguraAtual = canvasOrigem.width;
+    let alturaAtual = canvasOrigem.height;
+
+    // Reduz em etapas de 50% até chegar perto do tamanho final
+    // Isso produz muito melhor qualidade que reduzir de uma vez
+    while (larguraAtual > larguraFinal * 2) {
+        const novaLargura = Math.floor(larguraAtual / 2);
+        const novaAltura = Math.floor(alturaAtual / 2);
+
+        const canvasTemp = document.createElement('canvas');
+        canvasTemp.width = novaLargura;
+        canvasTemp.height = novaAltura;
+        
+        const ctxTemp = canvasTemp.getContext('2d');
+        ctxTemp.imageSmoothingEnabled = true;
+        ctxTemp.imageSmoothingQuality = 'high';
+        ctxTemp.drawImage(canvasAtual, 0, 0, novaLargura, novaAltura);
+
+        canvasAtual = canvasTemp;
+        larguraAtual = novaLargura;
+        alturaAtual = novaAltura;
+    }
+
+    // Última etapa: redimensiona pro tamanho final exato
+    const canvasFinal = document.createElement('canvas');
+    canvasFinal.width = larguraFinal;
+    canvasFinal.height = alturaFinal;
+    
+    const ctxFinal = canvasFinal.getContext('2d');
+    ctxFinal.imageSmoothingEnabled = true;
+    ctxFinal.imageSmoothingQuality = 'high';
+    ctxFinal.drawImage(canvasAtual, 0, 0, larguraFinal, alturaFinal);
+
+    // Converte pra blob JPEG com qualidade máxima
+    return new Promise((resolve) => {
+        canvasFinal.toBlob(resolve, 'image/jpeg', 0.95);
+    });
+}
+        
               btnEnviarImpressao.addEventListener('click', async () => {
     if (fotoJaEnviada) {
         mostrarModal('info', 'Foto já enviada', 'Essa foto já foi enviada para impressão!');
