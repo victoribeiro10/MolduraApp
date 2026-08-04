@@ -10,140 +10,35 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-    :root {
-      --preto: #0a0a0a;
-      --preto-2: #141414;
-      --grafite: #1c1c1c;
-      --cinza: #2a2a2a;
-      --cinza-2: #333;
-      --dourado: #d4af7a;
-      --dourado-claro: #e8c99a;
-      --dourado-escuro: #a88855;
-      --branco: #f5f5f5;
-      --cinza-suave: #888;
-      --verde: #4ade80;
-      --vermelho: #f87171;
-      --azul: #60a5fa;
+    /* ============================================================
+       RESET & VARIÁVEIS
+    ============================================================ */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    /* ================================
-   ⭐ ABAS DE FILTRO
-================================ */
-.abas-fotos {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 20px;
-  background: var(--grafite);
-  padding: 6px;
-  border-radius: 6px;
-  border: 1px solid rgba(212, 175, 122, 0.15);
-  flex-wrap: wrap;
-}
+    :root {
+      --preto:         #0a0a0a;
+      --preto-2:       #141414;
+      --grafite:       #1c1c1c;
+      --cinza:         #2a2a2a;
+      --cinza-2:       #333;
+      --dourado:       #d4af7a;
+      --dourado-claro: #e8c99a;
+      --dourado-escuro:#a88855;
+      --branco:        #f5f5f5;
+      --cinza-suave:   #888;
+      --verde:         #4ade80;
+      --vermelho:      #f87171;
+      --azul:          #60a5fa;
+    }
 
-.aba-filtro {
-  flex: 1;
-  min-width: 100px;
-  padding: 12px 18px;
-  background: transparent;
-  border: none;
-  border-radius: 4px;
-  color: var(--cinza-suave);
-  font-family: 'Inter', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.3s;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.aba-filtro:hover:not(.ativa) {
-  background: rgba(212, 175, 122, 0.05);
-  color: var(--dourado-claro);
-}
-
-.aba-filtro.ativa {
-  background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro));
-  color: var(--preto);
-  box-shadow: 0 2px 8px rgba(212, 175, 122, 0.3);
-}
-
-.aba-filtro .contador-aba {
-  background: rgba(0, 0, 0, 0.2);
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 10px;
-  font-weight: 700;
-  min-width: 22px;
-}
-
-.aba-filtro.ativa .contador-aba {
-  background: rgba(0, 0, 0, 0.3);
-  color: var(--preto);
-}
-
-.aba-filtro:not(.ativa) .contador-aba {
-  background: rgba(212, 175, 122, 0.15);
-  color: var(--dourado);
-}
-
-/* ================================
-   ⭐ SELO BAIXADA
-================================ */
-.foto-item {
-  position: relative;
-}
-
-.foto-item.baixada {
-  opacity: 0.6;
-  transition: opacity 0.3s;
-}
-
-.foto-item.baixada:hover {
-  opacity: 1;
-}
-
-.selo-baixada {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: var(--verde);
-  color: var(--preto);
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 700;
-  z-index: 5;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  animation: fadeIn 0.3s ease;
-}
-
-.selo-baixada svg {
-  width: 16px;
-  height: 16px;
-}
-
-/* Botão desmarcar (na foto baixada) */
-.btn-desmarcar {
-  border-color: rgba(96, 165, 250, 0.3) !important;
-  color: var(--azul) !important;
-}
-
-.btn-desmarcar:hover {
-  background: var(--azul);
-  color: var(--branco) !important;
-}
-    
+    /* ============================================================
+       BASE
+    ============================================================ */
     body {
       font-family: 'Inter', sans-serif;
       background: radial-gradient(ellipse at top, #1a1a1a 0%, var(--preto) 70%), var(--preto);
@@ -153,6 +48,9 @@
       letter-spacing: 0.3px;
     }
 
+    /* ============================================================
+       TELA DE LOGIN
+    ============================================================ */
     .tela-login {
       min-height: 100vh;
       display: flex;
@@ -170,25 +68,20 @@
       left: -50%;
       width: 200%;
       height: 200%;
-      background: radial-gradient(circle, rgba(212, 175, 122, 0.08) 0%, transparent 50%);
+      background: radial-gradient(circle, rgba(212,175,122,0.08) 0%, transparent 50%);
       animation: rotateGlow 20s linear infinite;
-    }
-
-    @keyframes rotateGlow {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
     }
 
     .login-box {
       background: linear-gradient(135deg, var(--grafite), var(--preto-2));
       padding: 50px 40px 40px;
       border-radius: 8px;
-      border: 1px solid rgba(212, 175, 122, 0.2);
+      border: 1px solid rgba(212,175,122,0.2);
       max-width: 400px;
       width: 100%;
       text-align: center;
       position: relative;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
       animation: fadeInUp 0.6s ease;
       z-index: 1;
     }
@@ -256,8 +149,8 @@
     .login-box input {
       width: 100%;
       padding: 14px 18px;
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(212, 175, 122, 0.25);
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(212,175,122,0.25);
       border-radius: 4px;
       font-size: 14px;
       color: var(--branco);
@@ -269,14 +162,11 @@
       text-align: center;
     }
 
-    .login-box input::placeholder {
-      color: var(--cinza-suave);
-      letter-spacing: 1px;
-    }
+    .login-box input::placeholder { color: var(--cinza-suave); letter-spacing: 1px; }
 
     .login-box input:focus {
       border-color: var(--dourado);
-      box-shadow: 0 0 0 3px rgba(212, 175, 122, 0.1);
+      box-shadow: 0 0 0 3px rgba(212,175,122,0.1);
     }
 
     .login-box button {
@@ -312,7 +202,7 @@
 
     .login-box button:hover {
       background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
-      box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4);
+      box-shadow: 0 4px 20px rgba(212,175,122,0.4);
     }
 
     .erro-login {
@@ -325,6 +215,9 @@
       font-family: 'Playfair Display', serif;
     }
 
+    /* ============================================================
+       PAINEL
+    ============================================================ */
     .painel {
       max-width: 1400px;
       margin: 0 auto;
@@ -332,11 +225,14 @@
       animation: fadeIn 0.5s ease;
     }
 
+    /* ============================================================
+       HEADER
+    ============================================================ */
     .admin-header {
       background: linear-gradient(135deg, var(--grafite), var(--preto-2));
       padding: 20px 28px;
       border-radius: 6px;
-      border: 1px solid rgba(212, 175, 122, 0.15);
+      border: 1px solid rgba(212,175,122,0.15);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -353,14 +249,10 @@
       left: 10%;
       right: 10%;
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(212, 175, 122, 0.5), transparent);
+      background: linear-gradient(90deg, transparent, rgba(212,175,122,0.5), transparent);
     }
 
-    .header-marca {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
+    .header-marca   { display: flex; flex-direction: column; gap: 2px; }
 
     .header-titulo {
       font-family: 'Playfair Display', serif;
@@ -381,7 +273,7 @@
 
     .btn-sair {
       padding: 10px 22px;
-      border: 1px solid rgba(212, 175, 122, 0.3);
+      border: 1px solid rgba(212,175,122,0.3);
       background: transparent;
       color: var(--dourado);
       border-radius: 3px;
@@ -400,6 +292,9 @@
       color: var(--branco);
     }
 
+    /* ============================================================
+       STATS
+    ============================================================ */
     .stats {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -411,7 +306,7 @@
       background: linear-gradient(135deg, var(--grafite), var(--preto-2));
       padding: 28px 24px;
       border-radius: 6px;
-      border: 1px solid rgba(212, 175, 122, 0.15);
+      border: 1px solid rgba(212,175,122,0.15);
       display: flex;
       align-items: center;
       gap: 20px;
@@ -423,17 +318,16 @@
     .stat-card::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
+      top: 0; left: 0;
       width: 3px;
       height: 100%;
       background: linear-gradient(180deg, var(--dourado), var(--dourado-escuro));
     }
 
     .stat-card:hover {
-      border-color: rgba(212, 175, 122, 0.4);
+      border-color: rgba(212,175,122,0.4);
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
     }
 
     .stat-icone {
@@ -450,11 +344,7 @@
 
     .stat-icone svg { width: 24px; height: 24px; }
 
-    .stat-info {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
+    .stat-info     { display: flex; flex-direction: column; gap: 4px; }
 
     .stat-numero {
       font-family: 'Playfair Display', serif;
@@ -472,11 +362,14 @@
       text-transform: uppercase;
     }
 
+    /* ============================================================
+       CARD MOLDURA COMPACT
+    ============================================================ */
     .card-moldura-compact {
       background: linear-gradient(135deg, var(--grafite), var(--preto-2));
       padding: 20px 24px;
       border-radius: 6px;
-      border: 1px solid rgba(212, 175, 122, 0.15);
+      border: 1px solid rgba(212,175,122,0.15);
       margin-bottom: 24px;
       display: flex;
       align-items: center;
@@ -490,23 +383,16 @@
       border-radius: 4px;
       overflow: hidden;
       background: var(--preto);
-      border: 1px solid rgba(212, 175, 122, 0.2);
+      border: 1px solid rgba(212,175,122,0.2);
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .moldura-mini img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
+    .moldura-mini img { width: 100%; height: 100%; object-fit: contain; }
 
-    .moldura-info-compact {
-      flex: 1;
-      min-width: 200px;
-    }
+    .moldura-info-compact { flex: 1; min-width: 200px; }
 
     .moldura-info-compact h4 {
       font-family: 'Playfair Display', serif;
@@ -517,11 +403,7 @@
       letter-spacing: 1px;
     }
 
-    .moldura-info-compact p {
-      color: var(--cinza-suave);
-      font-size: 11px;
-      letter-spacing: 1px;
-    }
+    .moldura-info-compact p { color: var(--cinza-suave); font-size: 11px; letter-spacing: 1px; }
 
     .moldura-info-compact .nome-moldura {
       color: var(--dourado-claro);
@@ -531,11 +413,7 @@
       margin-bottom: 4px;
     }
 
-    .btns-moldura {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+    .btns-moldura { display: flex; gap: 10px; flex-wrap: wrap; }
 
     .btn-configurar {
       background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro));
@@ -559,7 +437,7 @@
 
     .btn-configurar:hover {
       background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
-      box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4);
+      box-shadow: 0 4px 20px rgba(212,175,122,0.4);
     }
 
     .btn-galeria-molduras {
@@ -582,11 +460,11 @@
 
     .btn-galeria-molduras svg { width: 14px; height: 14px; }
 
-    .btn-galeria-molduras:hover {
-      background: var(--dourado);
-      color: var(--preto);
-    }
+    .btn-galeria-molduras:hover { background: var(--dourado); color: var(--preto); }
 
+    /* ============================================================
+       AÇÕES
+    ============================================================ */
     .acoes {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -596,7 +474,7 @@
 
     .acoes button {
       padding: 15px 18px;
-      border: 1px solid rgba(212, 175, 122, 0.25);
+      border: 1px solid rgba(212,175,122,0.25);
       background: var(--grafite);
       border-radius: 3px;
       font-size: 11px;
@@ -614,7 +492,6 @@
     }
 
     .acoes button svg { width: 14px; height: 14px; }
-
     .acoes button:disabled { opacity: 0.4; cursor: not-allowed; }
 
     .btn-atualizar:hover:not(:disabled) {
@@ -632,20 +509,23 @@
 
     .btn-baixar:hover:not(:disabled) {
       background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
-      box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4);
+      box-shadow: 0 4px 20px rgba(212,175,122,0.4);
     }
 
     .btn-apagar:hover:not(:disabled) {
       border-color: var(--vermelho);
       color: var(--vermelho);
-      background: rgba(248, 113, 113, 0.05);
+      background: rgba(248,113,113,0.05);
     }
 
+    /* ============================================================
+       PROGRESSO
+    ============================================================ */
     .progresso {
       background: linear-gradient(135deg, var(--grafite), var(--preto-2));
       padding: 22px 24px;
       border-radius: 6px;
-      border: 1px solid rgba(212, 175, 122, 0.15);
+      border: 1px solid rgba(212,175,122,0.15);
       margin-bottom: 20px;
     }
 
@@ -661,7 +541,7 @@
     .progresso-bar {
       width: 100%;
       height: 6px;
-      background: rgba(212, 175, 122, 0.1);
+      background: rgba(212,175,122,0.1);
       border-radius: 10px;
       overflow: hidden;
     }
@@ -673,6 +553,9 @@
       transition: width 0.3s;
     }
 
+    /* ============================================================
+       MENSAGENS
+    ============================================================ */
     .msg-sucesso, .msg-erro, .msg-aviso {
       padding: 14px 18px;
       border-radius: 4px;
@@ -680,24 +563,16 @@
       font-size: 13px;
       letter-spacing: 0.5px;
       border: 1px solid;
-      background: rgba(0, 0, 0, 0.3);
+      background: rgba(0,0,0,0.3);
     }
 
-    .msg-sucesso {
-      border-color: rgba(74, 222, 128, 0.4);
-      color: var(--verde);
-    }
+    .msg-sucesso { border-color: rgba(74,222,128,0.4);  color: var(--verde);   }
+    .msg-erro    { border-color: rgba(248,113,113,0.4); color: var(--vermelho);}
+    .msg-aviso   { border-color: rgba(252,211,77,0.4);  color: #fcd34d;        }
 
-    .msg-erro {
-      border-color: rgba(248, 113, 113, 0.4);
-      color: var(--vermelho);
-    }
-
-    .msg-aviso {
-      border-color: rgba(252, 211, 77, 0.4);
-      color: #fcd34d;
-    }
-
+    /* ============================================================
+       TÍTULO DA GALERIA
+    ============================================================ */
     .galeria-titulo {
       display: flex;
       align-items: center;
@@ -723,6 +598,73 @@
       font-family: 'Playfair Display', serif;
     }
 
+    /* ============================================================
+       ABAS DE FILTRO
+    ============================================================ */
+    .abas-fotos {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 20px;
+      background: var(--grafite);
+      padding: 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(212,175,122,0.15);
+      flex-wrap: wrap;
+    }
+
+    .aba-filtro {
+      flex: 1;
+      min-width: 100px;
+      padding: 12px 18px;
+      background: transparent;
+      border: none;
+      border-radius: 4px;
+      color: var(--cinza-suave);
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .aba-filtro:hover:not(.ativa) {
+      background: rgba(212,175,122,0.05);
+      color: var(--dourado-claro);
+    }
+
+    .aba-filtro.ativa {
+      background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro));
+      color: var(--preto);
+      box-shadow: 0 2px 8px rgba(212,175,122,0.3);
+    }
+
+    .aba-filtro .contador-aba {
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 700;
+      min-width: 22px;
+    }
+
+    .aba-filtro.ativa .contador-aba {
+      background: rgba(0,0,0,0.3);
+      color: var(--preto);
+    }
+
+    .aba-filtro:not(.ativa) .contador-aba {
+      background: rgba(212,175,122,0.15);
+      color: var(--dourado);
+    }
+
+    /* ============================================================
+       GALERIA DE FOTOS
+    ============================================================ */
     .galeria {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -731,7 +673,7 @@
 
     .foto-item {
       background: var(--grafite);
-      border: 1px solid rgba(212, 175, 122, 0.15);
+      border: 1px solid rgba(212,175,122,0.15);
       border-radius: 4px;
       overflow: hidden;
       transition: all 0.3s;
@@ -741,8 +683,11 @@
     .foto-item:hover {
       transform: translateY(-4px);
       border-color: var(--dourado);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
     }
+
+    .foto-item.baixada        { opacity: 0.6; transition: opacity 0.3s; }
+    .foto-item.baixada:hover  { opacity: 1; }
 
     .foto-item img {
       width: 100%;
@@ -779,7 +724,7 @@
       display: flex;
       gap: 6px;
       background: var(--preto-2);
-      border-top: 1px solid rgba(212, 175, 122, 0.1);
+      border-top: 1px solid rgba(212,175,122,0.1);
     }
 
     .foto-acoes button {
@@ -798,26 +743,42 @@
       font-family: 'Inter', sans-serif;
     }
 
-    .btn-download-item {
-      border-color: rgba(212, 175, 122, 0.3) !important;
-      color: var(--dourado) !important;
+    .btn-download-item { border-color: rgba(212,175,122,0.3) !important; color: var(--dourado) !important; }
+    .btn-download-item:hover { background: var(--dourado); color: var(--preto) !important; }
+
+    .btn-apagar-item { border-color: rgba(248,113,113,0.3) !important; color: var(--vermelho) !important; }
+    .btn-apagar-item:hover { background: var(--vermelho); color: var(--branco) !important; }
+
+    .btn-desmarcar { border-color: rgba(96,165,250,0.3) !important; color: var(--azul) !important; }
+    .btn-desmarcar:hover { background: var(--azul); color: var(--branco) !important; }
+
+    /* ============================================================
+       SELO BAIXADA
+    ============================================================ */
+    .selo-baixada {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: var(--verde);
+      color: var(--preto);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      z-index: 5;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      animation: fadeIn 0.3s ease;
     }
 
-    .btn-download-item:hover {
-      background: var(--dourado);
-      color: var(--preto) !important;
-    }
+    .selo-baixada svg { width: 16px; height: 16px; }
 
-    .btn-apagar-item {
-      border-color: rgba(248, 113, 113, 0.3) !important;
-      color: var(--vermelho) !important;
-    }
-
-    .btn-apagar-item:hover {
-      background: var(--vermelho);
-      color: var(--branco) !important;
-    }
-
+    /* ============================================================
+       ESTADOS VAZIOS / CARREGANDO
+    ============================================================ */
     .carregando, .vazio {
       text-align: center;
       padding: 60px 20px;
@@ -831,7 +792,7 @@
 
     .vazio {
       background: linear-gradient(135deg, var(--grafite), var(--preto-2));
-      border: 1px solid rgba(212, 175, 122, 0.15);
+      border: 1px solid rgba(212,175,122,0.15);
       border-radius: 6px;
     }
 
@@ -849,13 +810,14 @@
 
     .vazio-icone svg { width: 26px; height: 26px; }
 
+    /* ============================================================
+       MODAL FOTO (preview)
+    ============================================================ */
     .modal-foto {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.95);
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.95);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       display: flex;
@@ -870,20 +832,18 @@
     .modal-foto img {
       max-width: 100%;
       max-height: 90vh;
-      border: 1px solid rgba(212, 175, 122, 0.3);
+      border: 1px solid rgba(212,175,122,0.3);
       border-radius: 4px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
     }
 
     .modal-fechar {
       position: absolute;
-      top: 20px;
-      right: 20px;
+      top: 20px; right: 20px;
       background: transparent;
       color: var(--dourado);
       border: 1px solid var(--dourado);
-      width: 44px;
-      height: 44px;
+      width: 44px; height: 44px;
       border-radius: 50%;
       font-size: 20px;
       cursor: pointer;
@@ -893,18 +853,16 @@
       justify-content: center;
     }
 
-    .modal-fechar:hover {
-      background: var(--dourado);
-      color: var(--preto);
-    }
+    .modal-fechar:hover { background: var(--dourado); color: var(--preto); }
 
+    /* ============================================================
+       MODAL BASE (config / galeria / adicionar)
+    ============================================================ */
     .modal-config {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.9);
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       display: none;
@@ -920,7 +878,7 @@
 
     .modal-config-conteudo {
       background: linear-gradient(135deg, var(--grafite), var(--preto-2));
-      border: 1px solid rgba(212, 175, 122, 0.3);
+      border: 1px solid rgba(212,175,122,0.3);
       border-radius: 6px;
       max-width: 900px;
       width: 100%;
@@ -928,22 +886,21 @@
       overflow-y: auto;
       animation: slideUp 0.4s ease;
       position: relative;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
     }
 
     .modal-config-conteudo::before {
       content: '';
       position: absolute;
       top: 0;
-      left: 20%;
-      right: 20%;
+      left: 20%; right: 20%;
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--dourado), transparent);
     }
 
     .modal-config-header {
       padding: 22px 28px;
-      border-bottom: 1px solid rgba(212, 175, 122, 0.15);
+      border-bottom: 1px solid rgba(212,175,122,0.15);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -969,9 +926,8 @@
     .btn-fechar-modal {
       background: transparent;
       color: var(--dourado);
-      border: 1px solid rgba(212, 175, 122, 0.3);
-      width: 36px;
-      height: 36px;
+      border: 1px solid rgba(212,175,122,0.3);
+      width: 36px; height: 36px;
       border-radius: 50%;
       font-size: 18px;
       cursor: pointer;
@@ -989,8 +945,11 @@
 
     .modal-config-body { padding: 24px 28px; }
 
+    /* ============================================================
+       EDITOR VISUAL DE JANELA
+    ============================================================ */
     .instrucoes-editor {
-      background: rgba(212, 175, 122, 0.08);
+      background: rgba(212,175,122,0.08);
       border-left: 2px solid var(--dourado);
       padding: 14px 18px;
       border-radius: 3px;
@@ -1001,14 +960,11 @@
       letter-spacing: 0.5px;
     }
 
-    .instrucoes-editor strong {
-      color: var(--dourado);
-      font-weight: 600;
-    }
+    .instrucoes-editor strong { color: var(--dourado); font-weight: 600; }
 
     .editor-visual {
       background: var(--preto);
-      border: 1px solid rgba(212, 175, 122, 0.15);
+      border: 1px solid rgba(212,175,122,0.15);
       border-radius: 4px;
       padding: 20px;
       margin-bottom: 20px;
@@ -1036,17 +992,16 @@
     .janela-editor {
       position: absolute;
       border: 2px solid var(--dourado);
-      background: rgba(212, 175, 122, 0.15);
+      background: rgba(212,175,122,0.15);
       cursor: move;
       box-sizing: border-box;
-      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.5);
     }
 
     .janela-editor::after {
       content: 'ÁREA DA FOTO';
       position: absolute;
-      top: 50%;
-      left: 50%;
+      top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       background: var(--dourado);
       color: var(--preto);
@@ -1061,28 +1016,27 @@
 
     .handle {
       position: absolute;
-      width: 14px;
-      height: 14px;
+      width: 14px; height: 14px;
       background: var(--preto);
       border: 2px solid var(--dourado);
       border-radius: 50%;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
     }
 
-    .handle-nw { top: -7px; left: -7px; cursor: nwse-resize; }
-    .handle-ne { top: -7px; right: -7px; cursor: nesw-resize; }
-    .handle-sw { bottom: -7px; left: -7px; cursor: nesw-resize; }
-    .handle-se { bottom: -7px; right: -7px; cursor: nwse-resize; }
-    .handle-n  { top: -7px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
-    .handle-s  { bottom: -7px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
-    .handle-w  { top: 50%; left: -7px; transform: translateY(-50%); cursor: ew-resize; }
-    .handle-e  { top: 50%; right: -7px; transform: translateY(-50%); cursor: ew-resize; }
+    .handle-nw { top: -7px;  left: -7px;              cursor: nwse-resize; }
+    .handle-ne { top: -7px;  right: -7px;             cursor: nesw-resize; }
+    .handle-sw { bottom:-7px;left: -7px;              cursor: nesw-resize; }
+    .handle-se { bottom:-7px;right: -7px;             cursor: nwse-resize; }
+    .handle-n  { top: -7px;  left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+    .handle-s  { bottom:-7px;left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+    .handle-w  { top: 50%;   left: -7px; transform: translateY(-50%); cursor: ew-resize; }
+    .handle-e  { top: 50%;   right:-7px; transform: translateY(-50%); cursor: ew-resize; }
 
     .coords-tempo-real {
       display: inline-flex;
       gap: 24px;
       background: var(--grafite);
-      border: 1px solid rgba(212, 175, 122, 0.2);
+      border: 1px solid rgba(212,175,122,0.2);
       padding: 12px 22px;
       border-radius: 3px;
       margin-top: 18px;
@@ -1095,21 +1049,13 @@
     }
 
     .coords-tempo-real span { display: flex; align-items: center; gap: 6px; }
-    .coords-tempo-real strong {
-      color: var(--dourado);
-      font-weight: 600;
-      font-style: italic;
-    }
+    .coords-tempo-real strong { color: var(--dourado); font-weight: 600; font-style: italic; }
 
     .moldura-form-simples {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 12px;
       margin-top: 20px;
-    }
-
-    @media (max-width: 700px) {
-      .moldura-form-simples { grid-template-columns: 1fr 1fr; }
     }
 
     .moldura-form-simples label {
@@ -1126,7 +1072,7 @@
       width: 100%;
       padding: 10px 12px;
       background: var(--preto);
-      border: 1px solid rgba(212, 175, 122, 0.2);
+      border: 1px solid rgba(212,175,122,0.2);
       border-radius: 3px;
       font-size: 13px;
       color: var(--branco);
@@ -1137,7 +1083,7 @@
 
     .moldura-form-simples input[type="number"]:focus {
       border-color: var(--dourado);
-      box-shadow: 0 0 0 3px rgba(212, 175, 122, 0.1);
+      box-shadow: 0 0 0 3px rgba(212,175,122,0.1);
     }
 
     .moldura-acoes {
@@ -1175,15 +1121,10 @@
 
     .btn-salvar-coords:hover:not(:disabled) {
       background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
-      box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4);
+      box-shadow: 0 4px 20px rgba(212,175,122,0.4);
     }
 
-    .btn-salvar-coords:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    #inputMoldura, #inputNovaMoldura { display: none; }
+    .btn-salvar-coords:disabled { opacity: 0.5; cursor: not-allowed; }
 
     .sem-moldura-editor {
       padding: 60px 20px;
@@ -1194,9 +1135,9 @@
       letter-spacing: 1px;
     }
 
-    /* ================================
-       ⭐ NOVO: MODAL GALERIA MOLDURAS
-    ================================ */
+    /* ============================================================
+       MODAL GALERIA DE MOLDURAS
+    ============================================================ */
     .galeria-molduras-header {
       display: flex;
       justify-content: space-between;
@@ -1235,13 +1176,10 @@
 
     .btn-adicionar-moldura:hover:not(:disabled) {
       background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
-      box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4);
+      box-shadow: 0 4px 20px rgba(212,175,122,0.4);
     }
 
-    .btn-adicionar-moldura:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    .btn-adicionar-moldura:disabled { opacity: 0.5; cursor: not-allowed; }
 
     .galeria-molduras {
       display: grid;
@@ -1251,7 +1189,7 @@
 
     .item-moldura {
       background: var(--grafite);
-      border: 1px solid rgba(212, 175, 122, 0.15);
+      border: 1px solid rgba(212,175,122,0.15);
       border-radius: 4px;
       overflow: hidden;
       transition: all 0.3s;
@@ -1261,19 +1199,18 @@
     .item-moldura:hover {
       transform: translateY(-4px);
       border-color: var(--dourado);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
     }
 
     .item-moldura.ativa {
       border-color: var(--verde);
-      box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.3);
+      box-shadow: 0 0 0 2px rgba(74,222,128,0.3);
     }
 
     .item-moldura.ativa::before {
       content: '● ATIVA';
       position: absolute;
-      top: 8px;
-      left: 8px;
+      top: 8px; left: 8px;
       background: var(--verde);
       color: var(--preto);
       padding: 4px 8px;
@@ -1292,10 +1229,7 @@
       background: var(--preto);
     }
 
-    .item-moldura-info {
-      padding: 12px;
-      background: var(--preto-2);
-    }
+    .item-moldura-info { padding: 12px; background: var(--preto-2); }
 
     .item-moldura-info h5 {
       font-family: 'Playfair Display', serif;
@@ -1308,18 +1242,14 @@
       white-space: nowrap;
     }
 
-    .item-moldura-info p {
-      color: var(--cinza-suave);
-      font-size: 10px;
-      letter-spacing: 1px;
-    }
+    .item-moldura-info p { color: var(--cinza-suave); font-size: 10px; letter-spacing: 1px; }
 
     .item-moldura-acoes {
       padding: 8px 10px;
       display: flex;
       gap: 6px;
       background: var(--preto-2);
-      border-top: 1px solid rgba(212, 175, 122, 0.1);
+      border-top: 1px solid rgba(212,175,122,0.1);
     }
 
     .item-moldura-acoes button {
@@ -1338,40 +1268,25 @@
       font-family: 'Inter', sans-serif;
     }
 
-    .btn-usar-moldura {
-      border-color: rgba(74, 222, 128, 0.4) !important;
-      color: var(--verde) !important;
-    }
-
-    .btn-usar-moldura:hover:not(:disabled) {
-      background: var(--verde);
-      color: var(--preto) !important;
-    }
-
-    .btn-usar-moldura:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
+    .btn-usar-moldura    { border-color: rgba(74,222,128,0.4) !important; color: var(--verde) !important; }
+    .btn-usar-moldura:hover:not(:disabled) { background: var(--verde); color: var(--preto) !important; }
+    .btn-usar-moldura:disabled { opacity: 0.4; cursor: not-allowed; }
 
     .btn-deletar-moldura {
-      border-color: rgba(248, 113, 113, 0.3) !important;
+      border-color: rgba(248,113,113,0.3) !important;
       color: var(--vermelho) !important;
       flex: 0 0 auto !important;
       padding: 8px 10px !important;
     }
 
-    .btn-deletar-moldura:hover:not(:disabled) {
-      background: var(--vermelho);
-      color: var(--branco) !important;
-    }
+    .btn-deletar-moldura:hover:not(:disabled) { background: var(--vermelho); color: var(--branco) !important; }
 
-    .modal-adicionar-moldura {
-      max-width: 500px !important;
-    }
+    /* ============================================================
+       MODAL ADICIONAR NOVA MOLDURA
+    ============================================================ */
+    .modal-adicionar-moldura { max-width: 500px !important; }
 
-    .form-nova-moldura {
-      padding: 24px 28px;
-    }
+    .form-nova-moldura { padding: 24px 28px; }
 
     .form-nova-moldura label {
       display: block;
@@ -1387,7 +1302,7 @@
       width: 100%;
       padding: 12px 14px;
       background: var(--preto);
-      border: 1px solid rgba(212, 175, 122, 0.2);
+      border: 1px solid rgba(212,175,122,0.2);
       border-radius: 3px;
       font-size: 13px;
       color: var(--branco);
@@ -1399,12 +1314,12 @@
 
     .form-nova-moldura input[type="text"]:focus {
       border-color: var(--dourado);
-      box-shadow: 0 0 0 3px rgba(212, 175, 122, 0.1);
+      box-shadow: 0 0 0 3px rgba(212,175,122,0.1);
     }
 
     .upload-preview {
       background: var(--preto);
-      border: 1px dashed rgba(212, 175, 122, 0.3);
+      border: 1px dashed rgba(212,175,122,0.3);
       border-radius: 4px;
       padding: 30px 20px;
       text-align: center;
@@ -1421,26 +1336,13 @@
 
     .upload-preview:hover {
       border-color: var(--dourado);
-      background: rgba(212, 175, 122, 0.03);
+      background: rgba(212,175,122,0.03);
     }
 
-    .upload-preview img {
-      max-width: 100%;
-      max-height: 250px;
-      border-radius: 4px;
-    }
+    .upload-preview img         { max-width: 100%; max-height: 250px; border-radius: 4px; }
+    .upload-preview.tem-imagem  { padding: 10px; border-style: solid; }
 
-    .upload-preview.tem-imagem {
-      padding: 10px;
-      border-style: solid;
-    }
-
-    .upload-preview svg {
-      width: 40px;
-      height: 40px;
-      color: var(--dourado);
-      opacity: 0.7;
-    }
+    .upload-preview svg         { width: 40px; height: 40px; color: var(--dourado); opacity: 0.7; }
 
     .upload-preview span {
       color: var(--cinza-suave);
@@ -1481,13 +1383,10 @@
 
     .btn-salvar-nova-moldura:hover:not(:disabled) {
       background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
-      box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4);
+      box-shadow: 0 4px 20px rgba(212,175,122,0.4);
     }
 
-    .btn-salvar-nova-moldura:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    .btn-salvar-nova-moldura:disabled { opacity: 0.5; cursor: not-allowed; }
 
     .galeria-molduras-vazia {
       text-align: center;
@@ -1500,44 +1399,45 @@
       letter-spacing: 1px;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
+    /* ============================================================
+       ANIMAÇÕES
+    ============================================================ */
+    @keyframes fadeIn    { from { opacity: 0; }              to { opacity: 1; } }
+    @keyframes fadeInUp  { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideUp   { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes rotateGlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    /* ============================================================
+       SCROLLBAR
+    ============================================================ */
+    ::-webkit-scrollbar              { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track        { background: var(--preto); }
+    ::-webkit-scrollbar-thumb        { background: rgba(212,175,122,0.3); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover  { background: var(--dourado); }
 
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: var(--preto); }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(212, 175, 122, 0.3);
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover { background: var(--dourado); }
-
+    /* ============================================================
+       RESPONSIVO
+    ============================================================ */
     @media (max-width: 700px) {
-      .acoes { grid-template-columns: 1fr; }
-      .stats { grid-template-columns: 1fr; }
-      .admin-header { flex-direction: column; text-align: center; }
-      .galeria { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
-      .card-moldura-compact { flex-direction: column; text-align: center; }
-      .btn-configurar, .btn-galeria-molduras { width: 100%; justify-content: center; }
-      .btns-moldura { width: 100%; flex-direction: column; }
-      .header-titulo { font-size: 16px; letter-spacing: 3px; }
-      .galeria-molduras { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+      .acoes                  { grid-template-columns: 1fr; }
+      .stats                  { grid-template-columns: 1fr; }
+      .admin-header           { flex-direction: column; text-align: center; }
+      .galeria                { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+      .galeria-molduras       { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+      .card-moldura-compact   { flex-direction: column; text-align: center; }
+      .btn-configurar,
+      .btn-galeria-molduras   { width: 100%; justify-content: center; }
+      .btns-moldura           { width: 100%; flex-direction: column; }
+      .header-titulo          { font-size: 16px; letter-spacing: 3px; }
+      .moldura-form-simples   { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
 <body>
 
+  <!-- ============================================================
+       TELA DE LOGIN
+  ============================================================ -->
   <div id="telaLogin" class="tela-login">
     <div class="login-box">
       <div class="login-marca">ENTRE CLICKS</div>
@@ -1545,21 +1445,27 @@
 
       <div class="login-icone">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
         </svg>
       </div>
 
       <div class="login-titulo">Acesso Restrito</div>
       <div class="login-sub">digite a senha para continuar</div>
 
-      <input type="password" id="senhaInput" placeholder="••••••" onkeypress="if(event.key==='Enter') fazerLogin()">
+      <input type="password" id="senhaInput" placeholder="••••••"
+        onkeypress="if(event.key==='Enter') fazerLogin()">
       <button onclick="fazerLogin()">Entrar</button>
       <p id="erroLogin" class="erro-login"></p>
     </div>
   </div>
 
+  <!-- ============================================================
+       PAINEL ADMIN
+  ============================================================ -->
   <div id="painelAdmin" class="painel" style="display:none">
 
+    <!-- HEADER -->
     <header class="admin-header">
       <div class="header-marca">
         <div class="header-titulo">ENTRE CLICKS</div>
@@ -1568,12 +1474,15 @@
       <button class="btn-sair" onclick="sair()">Sair</button>
     </header>
 
+    <!-- STATS -->
     <div class="stats">
       <div class="stat-card">
         <div class="stat-icone">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/>
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/>
           </svg>
         </div>
         <div class="stat-info">
@@ -1581,10 +1490,12 @@
           <span class="stat-label">fotos no servidor</span>
         </div>
       </div>
+
       <div class="stat-card">
         <div class="stat-icone">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z"/>
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z"/>
           </svg>
         </div>
         <div class="stat-info">
@@ -1594,6 +1505,7 @@
       </div>
     </div>
 
+    <!-- CARD MOLDURA -->
     <div class="card-moldura-compact">
       <div class="moldura-mini" id="molduraMini">
         <span style="font-size:11px; color:var(--cinza-suave);">⏳</span>
@@ -1606,13 +1518,15 @@
       <div class="btns-moldura">
         <button class="btn-galeria-molduras" onclick="abrirModalGaleria()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"/>
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"/>
           </svg>
           Galeria de Molduras
         </button>
         <button class="btn-configurar" onclick="abrirModalConfig()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/>
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/>
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
           </svg>
           Ajustar Janela
@@ -1620,27 +1534,34 @@
       </div>
     </div>
 
+    <!-- AÇÕES -->
     <div class="acoes">
       <button class="btn-atualizar" onclick="carregarFotos()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
         </svg>
         Atualizar Lista
       </button>
+
       <button class="btn-baixar" onclick="baixarPendentesZip()" id="btnBaixar">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
-  </svg>
-  Baixar Pendentes em ZIP
-</button>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+        </svg>
+        Baixar Pendentes em ZIP
+      </button>
+
       <button class="btn-apagar" onclick="confirmarApagar()" id="btnApagar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
         </svg>
         Apagar Todas
       </button>
     </div>
 
+    <!-- PROGRESSO -->
     <div id="progressoContainer" class="progresso" style="display:none">
       <p id="progressoTexto">Processando...</p>
       <div class="progresso-bar">
@@ -1648,45 +1569,53 @@
       </div>
     </div>
 
+    <!-- MENSAGEM -->
     <div id="mensagem"></div>
 
+    <!-- TÍTULO GALERIA + ABAS -->
     <div class="galeria-titulo">
-  <h3>Fotos Enviadas</h3>
-  <span id="contadorFotos"></span>
-</div>
+      <h3>Fotos Enviadas</h3>
+      <span id="contadorFotos"></span>
+    </div>
 
-<!-- ⭐ ABAS DE FILTRO -->
-<div class="abas-fotos">
-  <button class="aba-filtro ativa" data-filtro="pendentes" onclick="mudarAba('pendentes')">
-    Pendentes
-    <span class="contador-aba" id="contadorPendentes">0</span>
-  </button>
-  <button class="aba-filtro" data-filtro="baixadas" onclick="mudarAba('baixadas')">
-    Baixadas
-    <span class="contador-aba" id="contadorBaixadas">0</span>
-  </button>
-  <button class="aba-filtro" data-filtro="todas" onclick="mudarAba('todas')">
-    Todas
-    <span class="contador-aba" id="contadorTodas">0</span>
-  </button>
-</div>
+    <div class="abas-fotos">
+      <button class="aba-filtro ativa" data-filtro="pendentes" onclick="mudarAba('pendentes')">
+        Pendentes
+        <span class="contador-aba" id="contadorPendentes">0</span>
+      </button>
+      <button class="aba-filtro" data-filtro="baixadas" onclick="mudarAba('baixadas')">
+        Baixadas
+        <span class="contador-aba" id="contadorBaixadas">0</span>
+      </button>
+      <button class="aba-filtro" data-filtro="todas" onclick="mudarAba('todas')">
+        Todas
+        <span class="contador-aba" id="contadorTodas">0</span>
+      </button>
+    </div>
 
-<div id="galeria" class="galeria"></div>
+    <!-- GALERIA DE FOTOS -->
+    <div id="galeria" class="galeria"></div>
+
+    <!-- ESTADO VAZIO -->
     <div id="vazio" class="vazio" style="display:none">
       <div class="vazio-icone">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
         </svg>
       </div>
       <p>Nenhuma foto enviada ainda</p>
-      <p style="font-size:11px; margin-top:10px; letter-spacing:2px; text-transform:uppercase; color:var(--cinza-suave); font-style:normal; font-family:'Inter',sans-serif;">
+      <p style="font-size:11px; margin-top:10px; letter-spacing:2px; text-transform:uppercase;
+                color:var(--cinza-suave); font-style:normal; font-family:'Inter',sans-serif;">
         aguardando registros do evento
       </p>
     </div>
 
-  </div>
+  </div><!-- fim #painelAdmin -->
 
-  <!-- MODAL CONFIGURAR JANELA -->
+  <!-- ============================================================
+       MODAL — AJUSTAR JANELA
+  ============================================================ -->
   <div class="modal-config" id="modalConfig">
     <div class="modal-config-conteudo">
       <div class="modal-config-header">
@@ -1750,7 +1679,9 @@
     </div>
   </div>
 
-  <!-- ⭐ MODAL GALERIA DE MOLDURAS -->
+  <!-- ============================================================
+       MODAL — GALERIA DE MOLDURAS
+  ============================================================ -->
   <div class="modal-config" id="modalGaleriaMolduras">
     <div class="modal-config-conteudo">
       <div class="modal-config-header">
@@ -1777,7 +1708,9 @@
     </div>
   </div>
 
-  <!-- ⭐ MODAL ADICIONAR NOVA MOLDURA -->
+  <!-- ============================================================
+       MODAL — ADICIONAR NOVA MOLDURA
+  ============================================================ -->
   <div class="modal-config" id="modalAdicionarMoldura">
     <div class="modal-config-conteudo modal-adicionar-moldura">
       <div class="modal-config-header">
@@ -1785,35 +1718,42 @@
         <button class="btn-fechar-modal" onclick="fecharModalAdicionarMoldura()">×</button>
       </div>
       <div class="form-nova-moldura">
+
         <label>Nome da moldura</label>
-        <input type="text" id="nomeNovaMoldura" placeholder="Ex: Cecília 1 aninho" maxlength="80">
+        <input type="text" id="nomeNovaMoldura"
+          placeholder="Ex: Cecília 1 aninho" maxlength="80">
 
         <label>Arquivo da moldura</label>
-        <div class="upload-preview" id="uploadPreview" onclick="document.getElementById('inputNovaMoldura').click()">
+        <div class="upload-preview" id="uploadPreview"
+          onclick="document.getElementById('inputNovaMoldura').click()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
           </svg>
           <span>Clique para selecionar</span>
           <div class="arquivo-nome" id="arquivoNome" style="display:none"></div>
         </div>
 
-        <input type="file" id="inputNovaMoldura" accept="image/png,image/jpeg">
+        <input type="file" id="inputNovaMoldura" accept="image/png,image/jpeg" style="display:none">
 
-        <button class="btn-salvar-nova-moldura" id="btnSalvarNovaMoldura" onclick="salvarNovaMoldura()" disabled>
+        <button class="btn-salvar-nova-moldura" id="btnSalvarNovaMoldura"
+          onclick="salvarNovaMoldura()" disabled>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
           </svg>
           Adicionar à Galeria
         </button>
+
       </div>
     </div>
   </div>
 
-  <input type="file" id="inputMoldura" accept="image/png,image/jpeg" style="display:none">
-
+  <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
   <script src="molduras.js"></script>
+
 </body>
 </html>
