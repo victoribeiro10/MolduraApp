@@ -958,3 +958,434 @@ async function apagarTudo() {
     btnApagar.disabled = false;
   }
 }
+// ============================================================
+// ⭐ SISTEMA DE STATUS DE FOTOS (Pendentes / Baixadas)
+// ============================================================
+
+let filtroAtual = 'pendentes'; // pendentes | baixadas | todas
+let fotosCarregadas = []; // cache das fotos com status
+let statusFotos = {}; // { arquivo_nome: { baixada, data_baixada } }
+
+// ============================================================
+// CARREGAR STATUS DAS FOTOS
+// ============================================================
+async function carregarStatusFotos() {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('fotos_status')
+      .select('*');
+
+    if (error) throw error;
+
+    statusFotos = {};
+    if (data) {
+      data.forEach(item => {
+        statusFotos[item.arquivo_nome] = {
+          baixada: item.baixada,
+          data_baixada: item.data_baixada
+        };
+      });
+    }
+  } catch (err) {
+    console.error('Erro ao carregar status:', err);
+    statusFotos = {};
+  }
+}
+
+// ============================================================
+// MARCAR COMO BAIXADA
+// ============================================================
+async function marcarComoBaixada(arquivoNome) {
+  try {
+    const { error } = await supabaseAdmin
+      .from('fotos_status')
+      .upsert({
+        arquivo_nome: arquivoNome,
+        baixada: true,
+        data_baixada: new Date().toISOString()
+      }, {
+        onConflict: 'arquivo_nome'
+      });
+
+    if (error) throw error;
+
+    statusFotos[arquivoNome] = {
+      baixada: true,
+      data_baixada: new Date().toISOString()
+    };
+  } catch (err) {
+    console.error('Erro ao marcar como baixada:', err);
+  }
+}
+
+// ============================================================
+// MARCAR COMO PENDENTE (desmarcar)
+// ============================================================
+window.marcarComoPendente = async function (arquivoNome) {
+  if (!confirm(`Marcar essa foto como pendente novamente?\n\n${arquivoNome}`)) return;
+
+  try {
+    const { error } = await supabaseAdmin
+      .from('fotos_status')
+      .upsert({
+        arquivo_nome: arquivoNome,
+        baixada: false,
+        data_baixada: null
+      }, {
+        onConflict: 'arquivo_nome'
+      });
+
+    if (error) throw error;
+
+    statusFotos[arquivoNome] = { baixada: false, data_baixada: null };
+    mostrarMensagem('Foto marcada como pendente!', 'sucesso');
+    renderizarGaleria();
+  } catch (err) {
+    console.error(err);
+    mostrarMensagem('Erro ao desmarcar: ' + err.message, 'erro');
+  }
+};
+
+// ============================================================
+// MUDAR ABA
+// ============================================================
+window.mudarAba = function (filtro) {
+  filtroAtual = filtro;
+
+  document.querySelectorAll('.aba-filtro').forEach(btn => {
+    btn.classList.toggle('ativa', btn.dataset.filtro === filtro);
+  });
+
+  renderizarGaleria();
+};
+
+// ============================================================
+// RENDERIZAR GALERIA (filtrada)
+// ============================================================
+function renderizarGaleria() {
+  const galeria = document.getElementById('galeria');
+  const vazio = document.getElementById('vazio');
+
+  // Filtra as fotos conforme aba ativa
+  let fotosFiltradas = fotosCarregadas;
+
+  if (filtroAtual === 'pendentes') {
+    fotosFiltradas = fotosCarregadas.filter(f => {
+      const status = statusFotos[f.name];
+      return !status || !status.baixada;
+    });
+  } else if (filtroAtual === 'baixadas') {
+    fotosFiltradas = fotosCarregadas.filter(f => {
+      const status = statusFotos[f.name];
+      return status && status.baixada;
+    });
+  }
+
+  // Atualiza contadores
+  const totalPendentes = fotosCarregadas.filter(f => {
+    const s = statusFotos[f.name];
+    return !s || !s.baixada;
+  }).length;
+  const totalBaixadas = fotosCarregadas.filter(f => {
+    const s = statusFotos[f.name];
+    return s && s.baixada;
+  }).length;
+  const totalGeral = fotosCarregadas.length;
+
+  document.getElementById('contadorPendentes').textContent = totalPendentes;
+  document.getElementById('contadorBaixadas').textContent = totalBaixadas;
+  document.getElementById('contadorTodas').textContent = totalGeral;
+
+  // Se não há nenhuma foto no bucket
+  if (totalGeral === 0) {
+    galeria.innerHTML = '';
+    vazio.style.display = 'block';
+    return;
+  }
+
+  vazio.style.display = 'none';
+
+  // Se a aba atual está vazia
+  if (fotosFiltradas.length === 0) {
+    let msg = '';
+    if (filtroAtual === 'pendentes') {
+      msg = 'Nenhuma foto pendente. Todas já foram baixadas! 🎉';
+    } else if (filtroAtual === 'baixadas') {
+      msg = 'Nenhuma foto baixada ainda.';
+    }
+    galeria.innerHTML = `<div class="carregando">${msg}</div>`;
+    return;
+  }
+
+  // Renderiza as fotos filtradas
+  galeria.innerHTML = '';
+  fotosFiltradas.forEach((foto) => {
+    const { data } = supabaseAdmin.storage.from(BUCKET_FOTOS).getPublicUrl(foto.name);
+    const tamanhoFoto = ((foto.metadata?.size || 0) / (1024 * 1024)).toFixed(1);
+    const dataEnvio = new Date(foto.created_at).toLocaleString('pt-BR', {
+      day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+    });
+
+    const status = statusFotos[foto.name];
+    const jaBaixada = status && status.baixada;
+
+    const div = document.createElement('div');
+    div.className = 'foto-item' + (jaBaixada ? ' baixada' : '');
+
+    const seloHtml = jaBaixada ? `
+      <div class="selo-baixada" title="Já baixada">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+        </svg>
+      </div>
+    ` : '';
+
+    const acoesHtml = jaBaixada ? `
+      <button class="btn-download-item" onclick="baixarFoto('${data.publicUrl}', '${foto.name}')">Baixar de Novo</button>
+      <button class="btn-desmarcar" onclick="marcarComoPendente('${foto.name}')" title="Marcar como pendente">↻</button>
+      <button class="btn-apagar-item" onclick="apagarFoto('${foto.name}')">🗑</button>
+    ` : `
+      <button class="btn-download-item" onclick="baixarFoto('${data.publicUrl}', '${foto.name}')">Baixar</button>
+      <button class="btn-apagar-item" onclick="apagarFoto('${foto.name}')">Apagar</button>
+    `;
+
+    div.innerHTML = `
+      ${seloHtml}
+      <img src="${data.publicUrl}" alt="${foto.name}" loading="lazy" onclick="abrirModal('${data.publicUrl}')">
+      <div class="foto-info">
+        <span class="foto-tamanho">${tamanhoFoto} MB</span>
+        <span class="foto-data">${dataEnvio}</span>
+      </div>
+      <div class="foto-acoes">
+        ${acoesHtml}
+      </div>
+    `;
+    galeria.appendChild(div);
+  });
+}
+
+// ============================================================
+// SOBRESCREVE carregarFotos PRA USAR STATUS
+// ============================================================
+window.carregarFotos = async function () {
+  const galeria = document.getElementById('galeria');
+  const vazio = document.getElementById('vazio');
+  const totalFotos = document.getElementById('totalFotos');
+  const totalTamanho = document.getElementById('totalTamanho');
+  const contador = document.getElementById('contadorFotos');
+
+  galeria.innerHTML = '<div class="carregando">Carregando fotos...</div>';
+  vazio.style.display = 'none';
+
+  try {
+    // Carrega status primeiro
+    await carregarStatusFotos();
+
+    // Depois carrega as fotos do bucket
+    const { data: arquivos, error } = await supabaseAdmin
+      .storage
+      .from(BUCKET_FOTOS)
+      .list('', { limit: 1000, sortBy: { column: 'created_at', order: 'desc' } });
+
+    if (error) throw error;
+
+    if (!arquivos || arquivos.length === 0) {
+      fotosCarregadas = [];
+      renderizarGaleria();
+      totalFotos.textContent = '0';
+      totalTamanho.textContent = '0 MB';
+      contador.textContent = '';
+      return;
+    }
+
+    fotosCarregadas = arquivos.filter(f => f.name && f.metadata);
+    const total = fotosCarregadas.length;
+    const tamanhoBytes = fotosCarregadas.reduce((soma, f) => soma + (f.metadata?.size || 0), 0);
+    const tamanhoMB = (tamanhoBytes / (1024 * 1024)).toFixed(1);
+
+    totalFotos.textContent = total;
+    totalTamanho.textContent = `${tamanhoMB} MB`;
+    contador.textContent = `(${total} foto${total !== 1 ? 's' : ''})`;
+
+    // Renderiza usando o filtro atual
+    renderizarGaleria();
+
+  } catch (err) {
+    console.error(err);
+    galeria.innerHTML = '';
+    mostrarMensagem('Erro ao carregar fotos: ' + err.message, 'erro');
+  }
+};
+
+// ============================================================
+// SOBRESCREVE baixarFoto PRA MARCAR COMO BAIXADA
+// ============================================================
+window.baixarFoto = async function (url, nome) {
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    saveAs(blob, nome);
+
+    // Marca como baixada
+    await marcarComoBaixada(nome);
+
+    // Atualiza galeria
+    renderizarGaleria();
+
+  } catch (err) {
+    alert('Erro ao baixar foto: ' + err.message);
+  }
+};
+
+// ============================================================
+// ⭐ BAIXAR APENAS PENDENTES EM ZIP
+// ============================================================
+window.baixarPendentesZip = async function () {
+  const btnBaixar = document.getElementById('btnBaixar');
+  const btnApagar = document.getElementById('btnApagar');
+  const progresso = document.getElementById('progressoContainer');
+  const progressoFill = document.getElementById('progressoFill');
+  const progressoTexto = document.getElementById('progressoTexto');
+
+  try {
+    // Filtra só as pendentes
+    const pendentes = fotosCarregadas.filter(f => {
+      const s = statusFotos[f.name];
+      return !s || !s.baixada;
+    });
+
+    if (pendentes.length === 0) {
+      mostrarMensagem('Nenhuma foto pendente para baixar!', 'aviso');
+      return;
+    }
+
+    btnBaixar.disabled = true;
+    btnApagar.disabled = true;
+    limparMensagem();
+
+    progresso.style.display = 'block';
+    progressoTexto.textContent = `Baixando 0 de ${pendentes.length}...`;
+    progressoFill.style.width = '0%';
+
+    const zip = new JSZip();
+    let baixados = 0;
+    const arquivosBaixados = [];
+
+    for (const foto of pendentes) {
+      const { data, error: errDownload } = await supabaseAdmin.storage.from(BUCKET_FOTOS).download(foto.name);
+      if (!errDownload && data) {
+        zip.file(foto.name, data);
+        arquivosBaixados.push(foto.name);
+        baixados++;
+      }
+      const pct = ((baixados / pendentes.length) * 100).toFixed(0);
+      progressoFill.style.width = pct + '%';
+      progressoTexto.textContent = `Baixando ${baixados} de ${pendentes.length}...`;
+    }
+
+    progressoTexto.textContent = 'Compactando arquivo ZIP...';
+    const blob = await zip.generateAsync({ type: 'blob' }, (meta) => {
+      progressoFill.style.width = meta.percent.toFixed(0) + '%';
+    });
+
+    const agora = new Date();
+    const nomeZip = `pendentes-${agora.getFullYear()}${(agora.getMonth() + 1).toString().padStart(2, '0')}${agora.getDate().toString().padStart(2, '0')}-${agora.getHours().toString().padStart(2, '0')}${agora.getMinutes().toString().padStart(2, '0')}.zip`;
+    saveAs(blob, nomeZip);
+
+    // Marca todas as baixadas
+    progressoTexto.textContent = 'Atualizando status...';
+    for (const nomeArq of arquivosBaixados) {
+      await marcarComoBaixada(nomeArq);
+    }
+
+    progresso.style.display = 'none';
+    renderizarGaleria();
+    mostrarMensagem(`${baixados} foto(s) pendente(s) baixada(s) e marcada(s) como baixada(s)! Arquivo: ${nomeZip}`, 'sucesso');
+
+  } catch (err) {
+    console.error(err);
+    progresso.style.display = 'none';
+    mostrarMensagem('Erro ao baixar: ' + err.message, 'erro');
+  } finally {
+    btnBaixar.disabled = false;
+    btnApagar.disabled = false;
+  }
+};
+
+// ============================================================
+// SOBRESCREVE apagarFoto PRA REMOVER STATUS TAMBÉM
+// ============================================================
+window.apagarFoto = async function (nome) {
+  if (!confirm(`Tem certeza que quer apagar essa foto?\n\n${nome}\n\nEsta ação não pode ser desfeita.`)) return;
+  try {
+    // Remove do bucket
+    const { error } = await supabaseAdmin.storage.from(BUCKET_FOTOS).remove([nome]);
+    if (error) throw error;
+
+    // Remove status também
+    await supabaseAdmin.from('fotos_status').delete().eq('arquivo_nome', nome);
+    delete statusFotos[nome];
+
+    mostrarMensagem('Foto apagada com sucesso!', 'sucesso');
+    carregarFotos();
+  } catch (err) {
+    mostrarMensagem('Erro ao apagar: ' + err.message, 'erro');
+  }
+};
+
+// ============================================================
+// SOBRESCREVE apagarTudo PRA LIMPAR TABELA DE STATUS TAMBÉM
+// ============================================================
+async function apagarTudo() {
+  const btnBaixar = document.getElementById('btnBaixar');
+  const btnApagar = document.getElementById('btnApagar');
+  const progresso = document.getElementById('progressoContainer');
+  const progressoFill = document.getElementById('progressoFill');
+  const progressoTexto = document.getElementById('progressoTexto');
+
+  try {
+    btnBaixar.disabled = true;
+    btnApagar.disabled = true;
+    limparMensagem();
+
+    const { data: arquivos, error } = await supabaseAdmin.storage.from(BUCKET_FOTOS).list('', { limit: 1000 });
+    if (error) throw error;
+
+    const fotos = arquivos.filter(f => f.name && f.metadata);
+    if (fotos.length === 0) {
+      mostrarMensagem('Não há fotos para apagar.', 'aviso');
+      btnBaixar.disabled = false;
+      btnApagar.disabled = false;
+      return;
+    }
+
+    progresso.style.display = 'block';
+    progressoTexto.textContent = `Apagando ${fotos.length} foto(s)...`;
+    progressoFill.style.width = '50%';
+
+    const nomes = fotos.map(f => f.name);
+
+    // Remove do bucket
+    const { error: errRemove } = await supabaseAdmin.storage.from(BUCKET_FOTOS).remove(nomes);
+    if (errRemove) throw errRemove;
+
+    // Remove todos os status
+    await supabaseAdmin.from('fotos_status').delete().neq('id', 0);
+    statusFotos = {};
+
+    progressoFill.style.width = '100%';
+    setTimeout(() => {
+      progresso.style.display = 'none';
+      mostrarMensagem(`${fotos.length} foto(s) apagada(s)! Bucket limpo.`, 'sucesso');
+      carregarFotos();
+    }, 500);
+
+  } catch (err) {
+    console.error(err);
+    progresso.style.display = 'none';
+    mostrarMensagem('Erro ao apagar: ' + err.message, 'erro');
+  } finally {
+    btnBaixar.disabled = false;
+    btnApagar.disabled = false;
+  }
+}
