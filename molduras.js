@@ -3,23 +3,27 @@
 // ============================================================
 const SUPABASE_URL = "https://scwznirvzwrphztvopbz.supabase.co";
 const SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjd3puaXJ2endycGh6dHZvcGJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzI2NzQsImV4cCI6MjA5NTY0ODY3NH0.PLvr547bIEJwjECKxQaoR7lpazs8GbSpLYLMDiGD4Po";
-const BUCKET_FOTOS = "fotos-eventos";
+const BUCKET_FOTOS    = "fotos-eventos";
 const BUCKET_MOLDURAS = "molduras";
-const SENHA_ADMIN = "admin";
+const SENHA_ADMIN     = "admin";
 
 const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
-let configAtual = null;
-let molduraNaturalWidth = 0;
+let configAtual          = null;
+let molduraNaturalWidth  = 0;
 let molduraNaturalHeight = 0;
-let arquivoNovaMoldura = null;
+let arquivoNovaMoldura   = null;
+let filtroAtual          = 'pendentes'; // pendentes | baixadas | todas
+let fotosCarregadas      = [];          // cache das fotos com status
+let statusFotos          = {};          // { arquivo_nome: { baixada, data_baixada } }
 
 // ============================================================
 // LOGIN
 // ============================================================
 window.fazerLogin = function () {
   const senha = document.getElementById("senhaInput").value;
-  const erro = document.getElementById("erroLogin");
+  const erro  = document.getElementById("erroLogin");
+
   if (senha === SENHA_ADMIN) {
     sessionStorage.setItem("moldura_admin_logado", "sim");
     mostrarPainel();
@@ -36,7 +40,7 @@ window.sair = function () {
 };
 
 function mostrarPainel() {
-  document.getElementById("telaLogin").style.display = "none";
+  document.getElementById("telaLogin").style.display  = "none";
   document.getElementById("painelAdmin").style.display = "block";
   carregarConfiguracao();
   carregarFotos();
@@ -51,7 +55,8 @@ if (sessionStorage.getItem("moldura_admin_logado") === "sim") {
 // ============================================================
 function mostrarMensagem(texto, tipo) {
   const textoLimpo = texto.replace(/[✅❌⚠️📭⏳🖼️💾]/g, '').trim();
-  document.getElementById("mensagem").innerHTML = `<div class="msg-${tipo}">${textoLimpo}</div>`;
+  document.getElementById("mensagem").innerHTML =
+    `<div class="msg-${tipo}">${textoLimpo}</div>`;
   if (tipo === "sucesso" || tipo === "aviso") setTimeout(limparMensagem, 6000);
 }
 
@@ -72,7 +77,7 @@ async function carregarConfiguracao() {
       .single();
 
     if (error) throw error;
-    if (!data) throw new Error('Nenhuma configuração encontrada');
+    if (!data)  throw new Error('Nenhuma configuração encontrada');
 
     configAtual = data;
 
@@ -89,16 +94,16 @@ async function carregarConfiguracao() {
       if (molduraAtiva) nomeAtiva = molduraAtiva.nome;
     }
 
-    const mini = document.getElementById('molduraMini');
+    const mini    = document.getElementById('molduraMini');
     const infoTxt = document.getElementById('molduraInfoTxt');
     const nomeTxt = document.getElementById('molduraNomeAtiva');
 
     if (data.moldura_url) {
-      mini.innerHTML = `<img src="${data.moldura_url}?t=${Date.now()}" alt="Moldura">`;
+      mini.innerHTML    = `<img src="${data.moldura_url}?t=${Date.now()}" alt="Moldura">`;
       infoTxt.textContent = `Janela: ${data.janela_largura}×${data.janela_altura}px • Posição: ${data.janela_x},${data.janela_y}`;
       nomeTxt.textContent = nomeAtiva;
     } else {
-      mini.innerHTML = `<span style="font-size:11px; color:#aaa;">—</span>`;
+      mini.innerHTML      = `<span style="font-size:11px; color:#aaa;">—</span>`;
       infoTxt.textContent = 'Nenhuma moldura cadastrada';
       nomeTxt.textContent = 'Nenhuma moldura ativa';
     }
@@ -122,10 +127,10 @@ window.abrirModalConfig = function () {
   modal.classList.add('ativo');
   document.body.style.overflow = 'hidden';
 
-  document.getElementById('janelaX').value = configAtual.janela_x;
-  document.getElementById('janelaY').value = configAtual.janela_y;
+  document.getElementById('janelaX').value       = configAtual.janela_x;
+  document.getElementById('janelaY').value       = configAtual.janela_y;
   document.getElementById('janelaLargura').value = configAtual.janela_largura;
-  document.getElementById('janelaAltura').value = configAtual.janela_altura;
+  document.getElementById('janelaAltura').value  = configAtual.janela_altura;
 
   montarEditorVisual(
     configAtual.moldura_url,
@@ -137,30 +142,27 @@ window.abrirModalConfig = function () {
 };
 
 window.fecharModalConfig = function () {
-  const modal = document.getElementById('modalConfig');
-  modal.classList.remove('ativo');
+  document.getElementById('modalConfig').classList.remove('ativo');
   document.body.style.overflow = '';
 };
 
 // ============================================================
-// ⭐ MODAL GALERIA DE MOLDURAS
+// MODAL GALERIA DE MOLDURAS
 // ============================================================
 window.abrirModalGaleria = function () {
-  const modal = document.getElementById('modalGaleriaMolduras');
-  modal.classList.add('ativo');
+  document.getElementById('modalGaleriaMolduras').classList.add('ativo');
   document.body.style.overflow = 'hidden';
   carregarGaleriaMolduras();
 };
 
 window.fecharModalGaleria = function () {
-  const modal = document.getElementById('modalGaleriaMolduras');
-  modal.classList.remove('ativo');
+  document.getElementById('modalGaleriaMolduras').classList.remove('ativo');
   document.body.style.overflow = '';
 };
 
 async function carregarGaleriaMolduras() {
   const galeria = document.getElementById('galeriaMolduras');
-  const total = document.getElementById('totalMoldurasGaleria');
+  const total   = document.getElementById('totalMoldurasGaleria');
   galeria.innerHTML = '<div class="galeria-molduras-vazia">Carregando...</div>';
 
   try {
@@ -182,6 +184,7 @@ async function carregarGaleriaMolduras() {
     data.forEach(moldura => {
       const div = document.createElement('div');
       div.className = 'item-moldura' + (moldura.ativa ? ' ativa' : '');
+
       const dataFormatada = new Date(moldura.created_at).toLocaleDateString('pt-BR', {
         day: '2-digit', month: '2-digit', year: 'numeric'
       });
@@ -193,10 +196,14 @@ async function carregarGaleriaMolduras() {
           <p>${dataFormatada}</p>
         </div>
         <div class="item-moldura-acoes">
-          <button class="btn-usar-moldura" onclick="ativarMoldura(${moldura.id})" ${moldura.ativa ? 'disabled' : ''}>
+          <button class="btn-usar-moldura"
+            onclick="ativarMoldura(${moldura.id})"
+            ${moldura.ativa ? 'disabled' : ''}>
             ${moldura.ativa ? '✓ Ativa' : 'Usar'}
           </button>
-          <button class="btn-deletar-moldura" onclick="deletarMoldura(${moldura.id}, '${moldura.arquivo_nome}', '${moldura.nome.replace(/'/g, "\\'")}')" title="Deletar">
+          <button class="btn-deletar-moldura"
+            onclick="deletarMoldura(${moldura.id}, '${moldura.arquivo_nome}', '${moldura.nome.replace(/'/g, "\\'")}')"
+            title="Deletar">
             🗑
           </button>
         </div>
@@ -206,18 +213,17 @@ async function carregarGaleriaMolduras() {
 
   } catch (err) {
     console.error(err);
-    galeria.innerHTML = '<div class="galeria-molduras-vazia">Erro ao carregar: ' + err.message + '</div>';
+    galeria.innerHTML = `<div class="galeria-molduras-vazia">Erro ao carregar: ${err.message}</div>`;
   }
 }
 
 // ============================================================
-// ⭐ ATIVAR UMA MOLDURA (torna ela a ativa do app)
+// ATIVAR UMA MOLDURA
 // ============================================================
 window.ativarMoldura = async function (id) {
   if (!confirm('Ativar essa moldura? Ela será usada no app dos convidados.')) return;
 
   try {
-    // Busca dados da moldura selecionada
     const { data: moldura, error: errBusca } = await supabaseAdmin
       .from('molduras_galeria')
       .select('*')
@@ -238,28 +244,27 @@ window.ativarMoldura = async function (id) {
       .update({ ativa: true })
       .eq('id', id);
 
-    // Atualiza a configuração ativa (que o app lê)
+    // Atualiza a configuração ativa
     if (!configAtual) {
-      // Se não tem configuração, cria uma
       const { error: errInsert } = await supabaseAdmin
         .from('configuracao')
         .insert({
-          moldura_url: moldura.moldura_url,
-          janela_x: moldura.janela_x,
-          janela_y: moldura.janela_y,
+          moldura_url:    moldura.moldura_url,
+          janela_x:       moldura.janela_x,
+          janela_y:       moldura.janela_y,
           janela_largura: moldura.janela_largura,
-          janela_altura: moldura.janela_altura
+          janela_altura:  moldura.janela_altura
         });
       if (errInsert) throw errInsert;
     } else {
       const { error: errUpdate } = await supabaseAdmin
         .from('configuracao')
         .update({
-          moldura_url: moldura.moldura_url,
-          janela_x: moldura.janela_x,
-          janela_y: moldura.janela_y,
+          moldura_url:    moldura.moldura_url,
+          janela_x:       moldura.janela_x,
+          janela_y:       moldura.janela_y,
           janela_largura: moldura.janela_largura,
-          janela_altura: moldura.janela_altura
+          janela_altura:  moldura.janela_altura
         })
         .eq('id', configAtual.id);
       if (errUpdate) throw errUpdate;
@@ -276,13 +281,12 @@ window.ativarMoldura = async function (id) {
 };
 
 // ============================================================
-// ⭐ DELETAR MOLDURA DA GALERIA
+// DELETAR MOLDURA DA GALERIA
 // ============================================================
 window.deletarMoldura = async function (id, arquivoNome, nome) {
   if (!confirm(`Deletar a moldura "${nome}"?\n\nO arquivo será removido permanentemente do servidor.`)) return;
 
   try {
-    // Remove arquivo do bucket
     if (arquivoNome) {
       const { error: errStorage } = await supabaseAdmin
         .storage
@@ -292,7 +296,6 @@ window.deletarMoldura = async function (id, arquivoNome, nome) {
       if (errStorage) console.warn('Aviso storage:', errStorage);
     }
 
-    // Remove da tabela
     const { error: errDb } = await supabaseAdmin
       .from('molduras_galeria')
       .delete()
@@ -310,40 +313,42 @@ window.deletarMoldura = async function (id, arquivoNome, nome) {
 };
 
 // ============================================================
-// ⭐ MODAL ADICIONAR NOVA MOLDURA
+// MODAL ADICIONAR NOVA MOLDURA
 // ============================================================
 window.abrirModalAdicionarMoldura = function () {
-  const modal = document.getElementById('modalAdicionarMoldura');
-  modal.classList.add('ativo');
+  document.getElementById('modalAdicionarMoldura').classList.add('ativo');
   document.body.style.overflow = 'hidden';
 
   // Limpa campos
   document.getElementById('nomeNovaMoldura').value = '';
-  document.getElementById('arquivoNome').textContent = '';
-  document.getElementById('arquivoNome').style.display = 'none';
-  document.getElementById('uploadPreview').classList.remove('tem-imagem');
-  document.getElementById('uploadPreview').innerHTML = `
+  document.getElementById('inputNovaMoldura').value = '';
+  arquivoNovaMoldura = null;
+  document.getElementById('btnSalvarNovaMoldura').disabled = true;
+
+  const upload = document.getElementById('uploadPreview');
+  upload.classList.remove('tem-imagem');
+  upload.innerHTML = `
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+      <path stroke-linecap="round" stroke-linejoin="round"
+        d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
     </svg>
     <span>Clique para selecionar</span>
     <div class="arquivo-nome" id="arquivoNome" style="display:none"></div>
   `;
-  document.getElementById('uploadPreview').onclick = () => document.getElementById('inputNovaMoldura').click();
-
-  document.getElementById('inputNovaMoldura').value = '';
-  arquivoNovaMoldura = null;
-  document.getElementById('btnSalvarNovaMoldura').disabled = true;
+  upload.onclick = () => document.getElementById('inputNovaMoldura').click();
 };
 
 window.fecharModalAdicionarMoldura = function () {
-  const modal = document.getElementById('modalAdicionarMoldura');
-  modal.classList.remove('ativo');
+  document.getElementById('modalAdicionarMoldura').classList.remove('ativo');
   document.body.style.overflow = '';
 };
 
-// Preview quando escolhe arquivo
+// ============================================================
+// EVENTOS DO DOM
+// ============================================================
 document.addEventListener('DOMContentLoaded', () => {
+
+  // Preview da nova moldura
   const inputNovaMoldura = document.getElementById('inputNovaMoldura');
   if (inputNovaMoldura) {
     inputNovaMoldura.addEventListener('change', (e) => {
@@ -368,24 +373,51 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Habilita botão salvar ao digitar nome
   const nomeInput = document.getElementById('nomeNovaMoldura');
   if (nomeInput) {
     nomeInput.addEventListener('input', verificarPodeSalvarNovaMoldura);
   }
+
+  // Fecha modais ao clicar fora
+  ['modalConfig', 'modalGaleriaMolduras', 'modalAdicionarMoldura'].forEach(id => {
+    const modal = document.getElementById(id);
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('ativo');
+          document.body.style.overflow = '';
+        }
+      });
+    }
+  });
+
+  // Fecha modais com ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      ['modalConfig', 'modalGaleriaMolduras', 'modalAdicionarMoldura'].forEach(id => {
+        const m = document.getElementById(id);
+        if (m && m.classList.contains('ativo')) {
+          m.classList.remove('ativo');
+        }
+      });
+      document.body.style.overflow = '';
+    }
+  });
 });
 
 function verificarPodeSalvarNovaMoldura() {
   const nome = document.getElementById('nomeNovaMoldura').value.trim();
-  const btn = document.getElementById('btnSalvarNovaMoldura');
-  btn.disabled = !(nome.length > 0 && arquivoNovaMoldura);
+  document.getElementById('btnSalvarNovaMoldura').disabled =
+    !(nome.length > 0 && arquivoNovaMoldura);
 }
 
 // ============================================================
-// ⭐ SALVAR NOVA MOLDURA NA GALERIA
+// SALVAR NOVA MOLDURA NA GALERIA
 // ============================================================
 window.salvarNovaMoldura = async function () {
   const nome = document.getElementById('nomeNovaMoldura').value.trim();
-  const btn = document.getElementById('btnSalvarNovaMoldura');
+  const btn  = document.getElementById('btnSalvarNovaMoldura');
 
   if (!nome || !arquivoNovaMoldura) {
     mostrarMensagem("Preencha o nome e escolha um arquivo.", "aviso");
@@ -396,9 +428,8 @@ window.salvarNovaMoldura = async function () {
   btn.innerHTML = 'Enviando...';
 
   try {
-    // Upload da moldura
-    const timestamp = Date.now();
-    const ext = arquivoNovaMoldura.name.split('.').pop().toLowerCase();
+    const timestamp  = Date.now();
+    const ext        = arquivoNovaMoldura.name.split('.').pop().toLowerCase();
     const nomeArquivo = `moldura-${timestamp}.${ext}`;
 
     const { error: errUpload } = await supabaseAdmin
@@ -419,28 +450,27 @@ window.salvarNovaMoldura = async function () {
 
     const molduraUrl = urlData.publicUrl;
 
-    // Pega dimensões da imagem
+    // Obtém dimensões reais da imagem
     const dimensoes = await new Promise((resolve, reject) => {
-      const img = new Image();
+      const img  = new Image();
       img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
       img.onerror = reject;
       img.src = molduraUrl;
     });
 
-    // Salva na galeria
     const { error: errInsert } = await supabaseAdmin
       .from('molduras_galeria')
       .insert({
-        nome: nome,
-        moldura_url: molduraUrl,
-        arquivo_nome: nomeArquivo,
-        janela_x: Math.round(dimensoes.w * 0.1),
-        janela_y: Math.round(dimensoes.h * 0.03),
+        nome:           nome,
+        moldura_url:    molduraUrl,
+        arquivo_nome:   nomeArquivo,
+        janela_x:       Math.round(dimensoes.w * 0.1),
+        janela_y:       Math.round(dimensoes.h * 0.03),
         janela_largura: Math.round(dimensoes.w * 0.8),
-        janela_altura: Math.round(dimensoes.h * 0.72),
-        largura_total: dimensoes.w,
-        altura_total: dimensoes.h,
-        ativa: false
+        janela_altura:  Math.round(dimensoes.h * 0.72),
+        largura_total:  dimensoes.w,
+        altura_total:   dimensoes.h,
+        ativa:          false
       });
 
     if (errInsert) throw errInsert;
@@ -456,37 +486,16 @@ window.salvarNovaMoldura = async function () {
     btn.disabled = false;
     btn.innerHTML = `
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
       </svg>
       Adicionar à Galeria
     `;
   }
 };
 
-// Fecha modais ao clicar fora / ESC
-document.addEventListener('DOMContentLoaded', () => {
-  ['modalConfig', 'modalGaleriaMolduras', 'modalAdicionarMoldura'].forEach(id => {
-    const modal = document.getElementById(id);
-    if (modal) {
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.classList.remove('ativo');
-      });
-    }
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      ['modalConfig', 'modalGaleriaMolduras', 'modalAdicionarMoldura'].forEach(id => {
-        const m = document.getElementById(id);
-        if (m && m.classList.contains('ativo')) m.classList.remove('ativo');
-      });
-      document.body.style.overflow = '';
-    }
-  });
-});
-
 // ============================================================
-// EDITOR VISUAL (janela)
+// EDITOR VISUAL (janela de posicionamento)
 // ============================================================
 function montarEditorVisual(molduraUrl, jx, jy, jw, jh) {
   const container = document.getElementById('editorContainer');
@@ -509,7 +518,7 @@ function montarEditorVisual(molduraUrl, jx, jy, jw, jh) {
   const img = document.getElementById('imgMolduraEditor');
 
   img.onload = () => {
-    molduraNaturalWidth = img.naturalWidth;
+    molduraNaturalWidth  = img.naturalWidth;
     molduraNaturalHeight = img.naturalHeight;
     coordsBox.style.display = 'inline-flex';
     posicionarJanela(jx, jy, jw, jh);
@@ -523,15 +532,15 @@ function montarEditorVisual(molduraUrl, jx, jy, jw, jh) {
 }
 
 function posicionarJanela(xPx, yPx, wPx, hPx) {
-  const img = document.getElementById('imgMolduraEditor');
+  const img    = document.getElementById('imgMolduraEditor');
   const janela = document.getElementById('janelaEditor');
   if (!img || !janela || !molduraNaturalWidth) return;
 
   const escala = img.clientWidth / molduraNaturalWidth;
 
-  janela.style.left = (xPx * escala) + 'px';
-  janela.style.top = (yPx * escala) + 'px';
-  janela.style.width = (wPx * escala) + 'px';
+  janela.style.left   = (xPx * escala) + 'px';
+  janela.style.top    = (yPx * escala) + 'px';
+  janela.style.width  = (wPx * escala) + 'px';
   janela.style.height = (hPx * escala) + 'px';
 
   atualizarCoordsTempoReal(xPx, yPx, wPx, hPx);
@@ -542,20 +551,18 @@ function atualizarCoordsTempoReal(x, y, w, h) {
   document.getElementById('txtY').textContent = Math.round(y);
   document.getElementById('txtW').textContent = Math.round(w);
   document.getElementById('txtH').textContent = Math.round(h);
-  document.getElementById('janelaX').value = Math.round(x);
-  document.getElementById('janelaY').value = Math.round(y);
+  document.getElementById('janelaX').value       = Math.round(x);
+  document.getElementById('janelaY').value       = Math.round(y);
   document.getElementById('janelaLargura').value = Math.round(w);
-  document.getElementById('janelaAltura').value = Math.round(h);
+  document.getElementById('janelaAltura').value  = Math.round(h);
 }
 
 function ativarInteracoesEditor() {
   const janela = document.getElementById('janelaEditor');
-  const img = document.getElementById('imgMolduraEditor');
+  const img    = document.getElementById('imgMolduraEditor');
 
-  let modo = null;
-  let dirResize = null;
-  let startX, startY;
-  let startL, startT, startW, startH;
+  let modo = null, dirResize = null;
+  let startX, startY, startL, startT, startW, startH;
 
   function getPos(e) {
     if (e.touches && e.touches.length > 0) {
@@ -565,162 +572,144 @@ function ativarInteracoesEditor() {
   }
 
   function iniciar(e) {
-    const alvo = e.target;
+    const alvo     = e.target;
     const isHandle = alvo.classList.contains('handle');
 
-    if (isHandle) {
-      modo = 'resize';
-      dirResize = alvo.dataset.dir;
-    } else if (alvo === janela) {
-      modo = 'mover';
-    } else {
-      return;
-    }
+    if (isHandle)        { modo = 'resize'; dirResize = alvo.dataset.dir; }
+    else if (alvo === janela) { modo = 'mover'; }
+    else return;
 
     e.preventDefault();
     const pos = getPos(e);
-    startX = pos.x;
-    startY = pos.y;
-    startL = janela.offsetLeft;
-    startT = janela.offsetTop;
-    startW = janela.offsetWidth;
-    startH = janela.offsetHeight;
+    startX = pos.x;  startY = pos.y;
+    startL = janela.offsetLeft;  startT = janela.offsetTop;
+    startW = janela.offsetWidth; startH = janela.offsetHeight;
 
     document.addEventListener('mousemove', mover);
-    document.addEventListener('mouseup', parar);
+    document.addEventListener('mouseup',   parar);
     document.addEventListener('touchmove', mover, { passive: false });
-    document.addEventListener('touchend', parar);
+    document.addEventListener('touchend',  parar);
   }
 
   function mover(e) {
     if (!modo) return;
     e.preventDefault();
-    const pos = getPos(e);
-    const dx = pos.x - startX;
-    const dy = pos.y - startY;
 
+    const pos = getPos(e);
+    const dx  = pos.x - startX;
+    const dy  = pos.y - startY;
     const imgW = img.clientWidth;
     const imgH = img.clientHeight;
 
-    let novoL = startL;
-    let novoT = startT;
-    let novoW = startW;
-    let novoH = startH;
+    let novoL = startL, novoT = startT;
+    let novoW = startW, novoH = startH;
 
     if (modo === 'mover') {
       novoL = Math.max(0, Math.min(startL + dx, imgW - startW));
       novoT = Math.max(0, Math.min(startT + dy, imgH - startH));
+
     } else if (modo === 'resize') {
-      if (dirResize.includes('e')) {
-        novoW = Math.max(20, Math.min(startW + dx, imgW - startL));
-      }
-      if (dirResize.includes('s')) {
-        novoH = Math.max(20, Math.min(startH + dy, imgH - startT));
-      }
+      if (dirResize.includes('e')) novoW = Math.max(20, Math.min(startW + dx, imgW - startL));
+      if (dirResize.includes('s')) novoH = Math.max(20, Math.min(startH + dy, imgH - startT));
       if (dirResize.includes('w')) {
-        const maxDx = startW - 20;
-        const dxLim = Math.max(-startL, Math.min(dx, maxDx));
+        const dxLim = Math.max(-startL, Math.min(dx, startW - 20));
         novoL = startL + dxLim;
         novoW = startW - dxLim;
       }
       if (dirResize.includes('n')) {
-        const maxDy = startH - 20;
-        const dyLim = Math.max(-startT, Math.min(dy, maxDy));
+        const dyLim = Math.max(-startT, Math.min(dy, startH - 20));
         novoT = startT + dyLim;
         novoH = startH - dyLim;
       }
     }
 
-    janela.style.left = novoL + 'px';
-    janela.style.top = novoT + 'px';
-    janela.style.width = novoW + 'px';
+    janela.style.left   = novoL + 'px';
+    janela.style.top    = novoT + 'px';
+    janela.style.width  = novoW + 'px';
     janela.style.height = novoH + 'px';
 
     const escala = molduraNaturalWidth / img.clientWidth;
     atualizarCoordsTempoReal(
-      novoL * escala,
-      novoT * escala,
-      novoW * escala,
-      novoH * escala
+      novoL * escala, novoT * escala,
+      novoW * escala, novoH * escala
     );
   }
 
   function parar() {
-    modo = null;
-    dirResize = null;
+    modo = null; dirResize = null;
     document.removeEventListener('mousemove', mover);
-    document.removeEventListener('mouseup', parar);
+    document.removeEventListener('mouseup',   parar);
     document.removeEventListener('touchmove', mover);
-    document.removeEventListener('touchend', parar);
+    document.removeEventListener('touchend',  parar);
   }
 
-  janela.addEventListener('mousedown', iniciar);
+  janela.addEventListener('mousedown',  iniciar);
   janela.addEventListener('touchstart', iniciar, { passive: false });
 
+  // Inputs manuais sincronizam o editor visual
   ['janelaX', 'janelaY', 'janelaLargura', 'janelaAltura'].forEach(id => {
     document.getElementById(id).addEventListener('input', () => {
-      const x = parseInt(document.getElementById('janelaX').value) || 0;
-      const y = parseInt(document.getElementById('janelaY').value) || 0;
-      const w = parseInt(document.getElementById('janelaLargura').value) || 100;
-      const h = parseInt(document.getElementById('janelaAltura').value) || 100;
-      posicionarJanela(x, y, w, h);
+      posicionarJanela(
+        parseInt(document.getElementById('janelaX').value)       || 0,
+        parseInt(document.getElementById('janelaY').value)       || 0,
+        parseInt(document.getElementById('janelaLargura').value) || 100,
+        parseInt(document.getElementById('janelaAltura').value)  || 100
+      );
     });
   });
 }
 
 // ============================================================
-// SALVAR COORDENADAS (janela ajustada)
+// SALVAR COORDENADAS
 // ============================================================
 window.salvarCoordenadas = async function () {
-  const btn = document.getElementById('btnSalvarCoords');
-  const janelaX = parseInt(document.getElementById('janelaX').value) || 0;
-  const janelaY = parseInt(document.getElementById('janelaY').value) || 0;
+  const btn          = document.getElementById('btnSalvarCoords');
+  const janelaX      = parseInt(document.getElementById('janelaX').value)       || 0;
+  const janelaY      = parseInt(document.getElementById('janelaY').value)       || 0;
   const janelaLargura = parseInt(document.getElementById('janelaLargura').value) || 0;
-  const janelaAltura = parseInt(document.getElementById('janelaAltura').value) || 0;
+  const janelaAltura  = parseInt(document.getElementById('janelaAltura').value)  || 0;
 
   if (!configAtual) {
     mostrarMensagem("Configuração ainda não carregada.", "erro");
     return;
   }
 
-  btn.disabled = true;
-  btn.textContent = 'Salvando...';
+  btn.disabled     = true;
+  btn.textContent  = 'Salvando...';
 
   try {
-    // Atualiza configuração ativa
     const { error } = await supabaseAdmin
       .from('configuracao')
       .update({
-        janela_x: janelaX,
-        janela_y: janelaY,
+        janela_x:       janelaX,
+        janela_y:       janelaY,
         janela_largura: janelaLargura,
-        janela_altura: janelaAltura
+        janela_altura:  janelaAltura
       })
       .eq('id', configAtual.id);
 
     if (error) throw error;
 
-    // Também atualiza na galeria (moldura ativa)
+    // Sincroniza na moldura ativa também
     await supabaseAdmin
       .from('molduras_galeria')
       .update({
-        janela_x: janelaX,
-        janela_y: janelaY,
+        janela_x:       janelaX,
+        janela_y:       janelaY,
         janela_largura: janelaLargura,
-        janela_altura: janelaAltura
+        janela_altura:  janelaAltura
       })
       .eq('ativa', true);
 
-    configAtual.janela_x = janelaX;
-    configAtual.janela_y = janelaY;
+    configAtual.janela_x       = janelaX;
+    configAtual.janela_y       = janelaY;
     configAtual.janela_largura = janelaLargura;
-    configAtual.janela_altura = janelaAltura;
+    configAtual.janela_altura  = janelaAltura;
 
     document.getElementById('molduraInfoTxt').textContent =
       `Janela: ${janelaLargura}×${janelaAltura}px • Posição: ${janelaX},${janelaY}`;
 
     mostrarMensagem("Coordenadas salvas! Convidados verão as mudanças ao recarregar o site.", "sucesso");
-
     setTimeout(() => fecharModalConfig(), 1200);
 
   } catch (err) {
@@ -738,236 +727,7 @@ window.salvarCoordenadas = async function () {
 };
 
 // ============================================================
-// CARREGAR FOTOS
-// ============================================================
-window.carregarFotos = async function () {
-  const galeria = document.getElementById("galeria");
-  const vazio = document.getElementById("vazio");
-  const totalFotos = document.getElementById("totalFotos");
-  const totalTamanho = document.getElementById("totalTamanho");
-  const contador = document.getElementById("contadorFotos");
-
-  galeria.innerHTML = '<div class="carregando">Carregando fotos...</div>';
-  vazio.style.display = "none";
-
-  try {
-    const { data: arquivos, error } = await supabaseAdmin
-      .storage
-      .from(BUCKET_FOTOS)
-      .list("", { limit: 1000, sortBy: { column: "created_at", order: "desc" } });
-
-    if (error) throw error;
-
-    if (!arquivos || arquivos.length === 0) {
-      galeria.innerHTML = "";
-      vazio.style.display = "block";
-      totalFotos.textContent = "0";
-      totalTamanho.textContent = "0 MB";
-      contador.textContent = "";
-      return;
-    }
-
-    const fotos = arquivos.filter(f => f.name && f.metadata);
-    const total = fotos.length;
-    const tamanhoBytes = fotos.reduce((soma, f) => soma + (f.metadata?.size || 0), 0);
-    const tamanhoMB = (tamanhoBytes / (1024 * 1024)).toFixed(1);
-
-    totalFotos.textContent = total;
-    totalTamanho.textContent = `${tamanhoMB} MB`;
-    contador.textContent = `(${total} foto${total !== 1 ? 's' : ''})`;
-
-    galeria.innerHTML = "";
-    fotos.forEach((foto) => {
-      const { data } = supabaseAdmin.storage.from(BUCKET_FOTOS).getPublicUrl(foto.name);
-      const tamanhoFoto = ((foto.metadata?.size || 0) / (1024 * 1024)).toFixed(1);
-      const dataEnvio = new Date(foto.created_at).toLocaleString("pt-BR", {
-        day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
-      });
-
-      const div = document.createElement("div");
-      div.className = "foto-item";
-      div.innerHTML = `
-        <img src="${data.publicUrl}" alt="${foto.name}" loading="lazy" onclick="abrirModal('${data.publicUrl}')">
-        <div class="foto-info">
-          <span class="foto-tamanho">${tamanhoFoto} MB</span>
-          <span class="foto-data">${dataEnvio}</span>
-        </div>
-        <div class="foto-acoes">
-          <button class="btn-download-item" onclick="baixarFoto('${data.publicUrl}', '${foto.name}')">Baixar</button>
-          <button class="btn-apagar-item" onclick="apagarFoto('${foto.name}')">Apagar</button>
-        </div>
-      `;
-      galeria.appendChild(div);
-    });
-
-  } catch (err) {
-    console.error(err);
-    galeria.innerHTML = "";
-    mostrarMensagem("Erro ao carregar fotos: " + err.message, "erro");
-  }
-};
-
-window.abrirModal = function (url) {
-  const modal = document.createElement('div');
-  modal.className = 'modal-foto';
-  modal.innerHTML = `
-    <button class="modal-fechar" onclick="this.parentElement.remove()">×</button>
-    <img src="${url}" alt="Foto">
-  `;
-  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
-  document.body.appendChild(modal);
-};
-
-window.baixarFoto = async function (url, nome) {
-  try {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    saveAs(blob, nome);
-  } catch (err) {
-    alert('Erro ao baixar foto: ' + err.message);
-  }
-};
-
-window.apagarFoto = async function (nome) {
-  if (!confirm(`Tem certeza que quer apagar essa foto?\n\n${nome}\n\nEsta ação não pode ser desfeita.`)) return;
-  try {
-    const { error } = await supabaseAdmin.storage.from(BUCKET_FOTOS).remove([nome]);
-    if (error) throw error;
-    mostrarMensagem("Foto apagada com sucesso!", "sucesso");
-    carregarFotos();
-  } catch (err) {
-    mostrarMensagem("Erro ao apagar: " + err.message, "erro");
-  }
-};
-
-window.baixarTudo = async function () {
-  const btnBaixar = document.getElementById("btnBaixar");
-  const btnApagar = document.getElementById("btnApagar");
-  const progresso = document.getElementById("progressoContainer");
-  const progressoFill = document.getElementById("progressoFill");
-  const progressoTexto = document.getElementById("progressoTexto");
-
-  try {
-    btnBaixar.disabled = true;
-    btnApagar.disabled = true;
-    limparMensagem();
-
-    const { data: arquivos, error } = await supabaseAdmin.storage.from(BUCKET_FOTOS).list("", { limit: 1000 });
-    if (error) throw error;
-
-    const fotos = arquivos.filter(f => f.name && f.metadata);
-    if (fotos.length === 0) {
-      mostrarMensagem("Nenhuma foto para baixar.", "aviso");
-      btnBaixar.disabled = false;
-      btnApagar.disabled = false;
-      return;
-    }
-
-    progresso.style.display = "block";
-    progressoTexto.textContent = `Baixando 0 de ${fotos.length}...`;
-    progressoFill.style.width = "0%";
-
-    const zip = new JSZip();
-    let baixados = 0;
-
-    for (const foto of fotos) {
-      const { data, error: errDownload } = await supabaseAdmin.storage.from(BUCKET_FOTOS).download(foto.name);
-      if (!errDownload && data) {
-        zip.file(foto.name, data);
-        baixados++;
-      }
-      const pct = ((baixados / fotos.length) * 100).toFixed(0);
-      progressoFill.style.width = pct + "%";
-      progressoTexto.textContent = `Baixando ${baixados} de ${fotos.length}...`;
-    }
-
-    progressoTexto.textContent = "Compactando arquivo ZIP...";
-    const blob = await zip.generateAsync({ type: "blob" }, (meta) => {
-      progressoFill.style.width = meta.percent.toFixed(0) + "%";
-    });
-
-    const agora = new Date();
-    const nomeZip = `molduras-fotos-${agora.getFullYear()}${(agora.getMonth() + 1).toString().padStart(2, "0")}${agora.getDate().toString().padStart(2, "0")}-${agora.getHours().toString().padStart(2, "0")}${agora.getMinutes().toString().padStart(2, "0")}.zip`;
-    saveAs(blob, nomeZip);
-
-    progresso.style.display = "none";
-    mostrarMensagem(`${baixados} foto(s) baixada(s)! Arquivo: ${nomeZip}`, "sucesso");
-
-  } catch (err) {
-    console.error(err);
-    progresso.style.display = "none";
-    mostrarMensagem("Erro ao baixar: " + err.message, "erro");
-  } finally {
-    btnBaixar.disabled = false;
-    btnApagar.disabled = false;
-  }
-};
-
-window.confirmarApagar = function () {
-  const c1 = confirm("ATENÇÃO!\n\nIsso vai APAGAR PERMANENTEMENTE todas as fotos do servidor.\n\nVocê já baixou o ZIP com as fotos?\n\nClique em OK para APAGAR TUDO ou Cancelar para voltar.");
-  if (c1) {
-    const c2 = confirm("CONFIRMAÇÃO FINAL\n\nTem certeza absoluta que quer apagar TODAS as fotos?\n\nEsta ação NÃO PODE ser desfeita!");
-    if (c2) apagarTudo();
-  }
-};
-
-async function apagarTudo() {
-  const btnBaixar = document.getElementById("btnBaixar");
-  const btnApagar = document.getElementById("btnApagar");
-  const progresso = document.getElementById("progressoContainer");
-  const progressoFill = document.getElementById("progressoFill");
-  const progressoTexto = document.getElementById("progressoTexto");
-
-  try {
-    btnBaixar.disabled = true;
-    btnApagar.disabled = true;
-    limparMensagem();
-
-    const { data: arquivos, error } = await supabaseAdmin.storage.from(BUCKET_FOTOS).list("", { limit: 1000 });
-    if (error) throw error;
-
-    const fotos = arquivos.filter(f => f.name && f.metadata);
-    if (fotos.length === 0) {
-      mostrarMensagem("Não há fotos para apagar.", "aviso");
-      btnBaixar.disabled = false;
-      btnApagar.disabled = false;
-      return;
-    }
-
-    progresso.style.display = "block";
-    progressoTexto.textContent = `Apagando ${fotos.length} foto(s)...`;
-    progressoFill.style.width = "50%";
-
-    const nomes = fotos.map(f => f.name);
-    const { error: errRemove } = await supabaseAdmin.storage.from(BUCKET_FOTOS).remove(nomes);
-    if (errRemove) throw errRemove;
-
-    progressoFill.style.width = "100%";
-    setTimeout(() => {
-      progresso.style.display = "none";
-      mostrarMensagem(`${fotos.length} foto(s) apagada(s)! Bucket limpo.`, "sucesso");
-      carregarFotos();
-    }, 500);
-
-  } catch (err) {
-    console.error(err);
-    progresso.style.display = "none";
-    mostrarMensagem("Erro ao apagar: " + err.message, "erro");
-  } finally {
-    btnBaixar.disabled = false;
-    btnApagar.disabled = false;
-  }
-}
-// ============================================================
-// ⭐ SISTEMA DE STATUS DE FOTOS (Pendentes / Baixadas)
-// ============================================================
-
-let filtroAtual = 'pendentes'; // pendentes | baixadas | todas
-let fotosCarregadas = []; // cache das fotos com status
-let statusFotos = {}; // { arquivo_nome: { baixada, data_baixada } }
-
-// ============================================================
-// CARREGAR STATUS DAS FOTOS
+// STATUS DAS FOTOS
 // ============================================================
 async function carregarStatusFotos() {
   try {
@@ -981,7 +741,7 @@ async function carregarStatusFotos() {
     if (data) {
       data.forEach(item => {
         statusFotos[item.arquivo_nome] = {
-          baixada: item.baixada,
+          baixada:      item.baixada,
           data_baixada: item.data_baixada
         };
       });
@@ -992,25 +752,20 @@ async function carregarStatusFotos() {
   }
 }
 
-// ============================================================
-// MARCAR COMO BAIXADA
-// ============================================================
 async function marcarComoBaixada(arquivoNome) {
   try {
     const { error } = await supabaseAdmin
       .from('fotos_status')
       .upsert({
         arquivo_nome: arquivoNome,
-        baixada: true,
+        baixada:      true,
         data_baixada: new Date().toISOString()
-      }, {
-        onConflict: 'arquivo_nome'
-      });
+      }, { onConflict: 'arquivo_nome' });
 
     if (error) throw error;
 
     statusFotos[arquivoNome] = {
-      baixada: true,
+      baixada:      true,
       data_baixada: new Date().toISOString()
     };
   } catch (err) {
@@ -1018,9 +773,6 @@ async function marcarComoBaixada(arquivoNome) {
   }
 }
 
-// ============================================================
-// MARCAR COMO PENDENTE (desmarcar)
-// ============================================================
 window.marcarComoPendente = async function (arquivoNome) {
   if (!confirm(`Marcar essa foto como pendente novamente?\n\n${arquivoNome}`)) return;
 
@@ -1029,11 +781,9 @@ window.marcarComoPendente = async function (arquivoNome) {
       .from('fotos_status')
       .upsert({
         arquivo_nome: arquivoNome,
-        baixada: false,
+        baixada:      false,
         data_baixada: null
-      }, {
-        onConflict: 'arquivo_nome'
-      });
+      }, { onConflict: 'arquivo_nome' });
 
     if (error) throw error;
 
@@ -1047,15 +797,13 @@ window.marcarComoPendente = async function (arquivoNome) {
 };
 
 // ============================================================
-// MUDAR ABA
+// ABAS DE FILTRO
 // ============================================================
 window.mudarAba = function (filtro) {
   filtroAtual = filtro;
-
   document.querySelectorAll('.aba-filtro').forEach(btn => {
     btn.classList.toggle('ativa', btn.dataset.filtro === filtro);
   });
-
   renderizarGaleria();
 };
 
@@ -1064,24 +812,23 @@ window.mudarAba = function (filtro) {
 // ============================================================
 function renderizarGaleria() {
   const galeria = document.getElementById('galeria');
-  const vazio = document.getElementById('vazio');
+  const vazio   = document.getElementById('vazio');
 
-  // Filtra as fotos conforme aba ativa
   let fotosFiltradas = fotosCarregadas;
 
   if (filtroAtual === 'pendentes') {
     fotosFiltradas = fotosCarregadas.filter(f => {
-      const status = statusFotos[f.name];
-      return !status || !status.baixada;
+      const s = statusFotos[f.name];
+      return !s || !s.baixada;
     });
   } else if (filtroAtual === 'baixadas') {
     fotosFiltradas = fotosCarregadas.filter(f => {
-      const status = statusFotos[f.name];
-      return status && status.baixada;
+      const s = statusFotos[f.name];
+      return s && s.baixada;
     });
   }
 
-  // Atualiza contadores
+  // Contadores das abas
   const totalPendentes = fotosCarregadas.filter(f => {
     const s = statusFotos[f.name];
     return !s || !s.baixada;
@@ -1093,10 +840,9 @@ function renderizarGaleria() {
   const totalGeral = fotosCarregadas.length;
 
   document.getElementById('contadorPendentes').textContent = totalPendentes;
-  document.getElementById('contadorBaixadas').textContent = totalBaixadas;
-  document.getElementById('contadorTodas').textContent = totalGeral;
+  document.getElementById('contadorBaixadas').textContent  = totalBaixadas;
+  document.getElementById('contadorTodas').textContent     = totalGeral;
 
-  // Se não há nenhuma foto no bucket
   if (totalGeral === 0) {
     galeria.innerHTML = '';
     vazio.style.display = 'block';
@@ -1105,28 +851,25 @@ function renderizarGaleria() {
 
   vazio.style.display = 'none';
 
-  // Se a aba atual está vazia
   if (fotosFiltradas.length === 0) {
-    let msg = '';
-    if (filtroAtual === 'pendentes') {
-      msg = 'Nenhuma foto pendente. Todas já foram baixadas! 🎉';
-    } else if (filtroAtual === 'baixadas') {
-      msg = 'Nenhuma foto baixada ainda.';
-    }
-    galeria.innerHTML = `<div class="carregando">${msg}</div>`;
+    const msgs = {
+      pendentes: 'Nenhuma foto pendente. Todas já foram baixadas! 🎉',
+      baixadas:  'Nenhuma foto baixada ainda.'
+    };
+    galeria.innerHTML = `<div class="carregando">${msgs[filtroAtual] || ''}</div>`;
     return;
   }
 
-  // Renderiza as fotos filtradas
   galeria.innerHTML = '';
+
   fotosFiltradas.forEach((foto) => {
-    const { data } = supabaseAdmin.storage.from(BUCKET_FOTOS).getPublicUrl(foto.name);
-    const tamanhoFoto = ((foto.metadata?.size || 0) / (1024 * 1024)).toFixed(1);
-    const dataEnvio = new Date(foto.created_at).toLocaleString('pt-BR', {
+    const { data }      = supabaseAdmin.storage.from(BUCKET_FOTOS).getPublicUrl(foto.name);
+    const tamanhoFoto   = ((foto.metadata?.size || 0) / (1024 * 1024)).toFixed(1);
+    const dataEnvio     = new Date(foto.created_at).toLocaleString('pt-BR', {
       day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
     });
 
-    const status = statusFotos[foto.name];
+    const status    = statusFotos[foto.name];
     const jaBaixada = status && status.baixada;
 
     const div = document.createElement('div');
@@ -1137,51 +880,53 @@ function renderizarGaleria() {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
           <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
         </svg>
-      </div>
-    ` : '';
+      </div>` : '';
 
     const acoesHtml = jaBaixada ? `
-      <button class="btn-download-item" onclick="baixarFoto('${data.publicUrl}', '${foto.name}')">Baixar de Novo</button>
-      <button class="btn-desmarcar" onclick="marcarComoPendente('${foto.name}')" title="Marcar como pendente">↻</button>
-      <button class="btn-apagar-item" onclick="apagarFoto('${foto.name}')">🗑</button>
+      <button class="btn-download-item"
+        onclick="baixarFoto('${data.publicUrl}', '${foto.name}')">Baixar de Novo</button>
+      <button class="btn-desmarcar"
+        onclick="marcarComoPendente('${foto.name}')" title="Marcar como pendente">↻</button>
+      <button class="btn-apagar-item"
+        onclick="apagarFoto('${foto.name}')">🗑</button>
     ` : `
-      <button class="btn-download-item" onclick="baixarFoto('${data.publicUrl}', '${foto.name}')">Baixar</button>
-      <button class="btn-apagar-item" onclick="apagarFoto('${foto.name}')">Apagar</button>
+      <button class="btn-download-item"
+        onclick="baixarFoto('${data.publicUrl}', '${foto.name}')">Baixar</button>
+      <button class="btn-apagar-item"
+        onclick="apagarFoto('${foto.name}')">Apagar</button>
     `;
 
     div.innerHTML = `
       ${seloHtml}
-      <img src="${data.publicUrl}" alt="${foto.name}" loading="lazy" onclick="abrirModal('${data.publicUrl}')">
+      <img src="${data.publicUrl}" alt="${foto.name}" loading="lazy"
+        onclick="abrirModal('${data.publicUrl}')">
       <div class="foto-info">
         <span class="foto-tamanho">${tamanhoFoto} MB</span>
         <span class="foto-data">${dataEnvio}</span>
       </div>
-      <div class="foto-acoes">
-        ${acoesHtml}
-      </div>
+      <div class="foto-acoes">${acoesHtml}</div>
     `;
+
     galeria.appendChild(div);
   });
 }
 
 // ============================================================
-// SOBRESCREVE carregarFotos PRA USAR STATUS
+// CARREGAR FOTOS
 // ============================================================
 window.carregarFotos = async function () {
-  const galeria = document.getElementById('galeria');
-  const vazio = document.getElementById('vazio');
-  const totalFotos = document.getElementById('totalFotos');
+  const galeria      = document.getElementById('galeria');
+  const vazio        = document.getElementById('vazio');
+  const totalFotos   = document.getElementById('totalFotos');
   const totalTamanho = document.getElementById('totalTamanho');
-  const contador = document.getElementById('contadorFotos');
+  const contador     = document.getElementById('contadorFotos');
 
-  galeria.innerHTML = '<div class="carregando">Carregando fotos...</div>';
+  galeria.innerHTML   = '<div class="carregando">Carregando fotos...</div>';
   vazio.style.display = 'none';
 
   try {
-    // Carrega status primeiro
     await carregarStatusFotos();
 
-    // Depois carrega as fotos do bucket
     const { data: arquivos, error } = await supabaseAdmin
       .storage
       .from(BUCKET_FOTOS)
@@ -1192,22 +937,21 @@ window.carregarFotos = async function () {
     if (!arquivos || arquivos.length === 0) {
       fotosCarregadas = [];
       renderizarGaleria();
-      totalFotos.textContent = '0';
+      totalFotos.textContent   = '0';
       totalTamanho.textContent = '0 MB';
-      contador.textContent = '';
+      contador.textContent     = '';
       return;
     }
 
-    fotosCarregadas = arquivos.filter(f => f.name && f.metadata);
-    const total = fotosCarregadas.length;
-    const tamanhoBytes = fotosCarregadas.reduce((soma, f) => soma + (f.metadata?.size || 0), 0);
-    const tamanhoMB = (tamanhoBytes / (1024 * 1024)).toFixed(1);
+    fotosCarregadas     = arquivos.filter(f => f.name && f.metadata);
+    const total         = fotosCarregadas.length;
+    const tamanhoBytes  = fotosCarregadas.reduce((soma, f) => soma + (f.metadata?.size || 0), 0);
+    const tamanhoMB     = (tamanhoBytes / (1024 * 1024)).toFixed(1);
 
-    totalFotos.textContent = total;
+    totalFotos.textContent   = total;
     totalTamanho.textContent = `${tamanhoMB} MB`;
-    contador.textContent = `(${total} foto${total !== 1 ? 's' : ''})`;
+    contador.textContent     = `(${total} foto${total !== 1 ? 's' : ''})`;
 
-    // Renderiza usando o filtro atual
     renderizarGaleria();
 
   } catch (err) {
@@ -1218,37 +962,66 @@ window.carregarFotos = async function () {
 };
 
 // ============================================================
-// SOBRESCREVE baixarFoto PRA MARCAR COMO BAIXADA
+// ABRIR MODAL FOTO (preview)
+// ============================================================
+window.abrirModal = function (url) {
+  const modal = document.createElement('div');
+  modal.className = 'modal-foto';
+  modal.innerHTML = `
+    <button class="modal-fechar" onclick="this.parentElement.remove()">×</button>
+    <img src="${url}" alt="Foto">
+  `;
+  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+  document.body.appendChild(modal);
+};
+
+// ============================================================
+// BAIXAR FOTO (individual) — marca como baixada
 // ============================================================
 window.baixarFoto = async function (url, nome) {
   try {
     const response = await fetch(url);
-    const blob = await response.blob();
+    const blob     = await response.blob();
     saveAs(blob, nome);
 
-    // Marca como baixada
     await marcarComoBaixada(nome);
-
-    // Atualiza galeria
     renderizarGaleria();
-
   } catch (err) {
     alert('Erro ao baixar foto: ' + err.message);
   }
 };
 
 // ============================================================
-// ⭐ BAIXAR APENAS PENDENTES EM ZIP
+// APAGAR FOTO — remove status também
+// ============================================================
+window.apagarFoto = async function (nome) {
+  if (!confirm(`Tem certeza que quer apagar essa foto?\n\n${nome}\n\nEsta ação não pode ser desfeita.`)) return;
+
+  try {
+    const { error } = await supabaseAdmin.storage.from(BUCKET_FOTOS).remove([nome]);
+    if (error) throw error;
+
+    await supabaseAdmin.from('fotos_status').delete().eq('arquivo_nome', nome);
+    delete statusFotos[nome];
+
+    mostrarMensagem('Foto apagada com sucesso!', 'sucesso');
+    carregarFotos();
+  } catch (err) {
+    mostrarMensagem('Erro ao apagar: ' + err.message, 'erro');
+  }
+};
+
+// ============================================================
+// BAIXAR PENDENTES EM ZIP
 // ============================================================
 window.baixarPendentesZip = async function () {
-  const btnBaixar = document.getElementById('btnBaixar');
-  const btnApagar = document.getElementById('btnApagar');
-  const progresso = document.getElementById('progressoContainer');
+  const btnBaixar     = document.getElementById('btnBaixar');
+  const btnApagar     = document.getElementById('btnApagar');
+  const progresso     = document.getElementById('progressoContainer');
   const progressoFill = document.getElementById('progressoFill');
   const progressoTexto = document.getElementById('progressoTexto');
 
   try {
-    // Filtra só as pendentes
     const pendentes = fotosCarregadas.filter(f => {
       const s = statusFotos[f.name];
       return !s || !s.baixada;
@@ -1263,24 +1036,27 @@ window.baixarPendentesZip = async function () {
     btnApagar.disabled = true;
     limparMensagem();
 
-    progresso.style.display = 'block';
+    progresso.style.display  = 'block';
     progressoTexto.textContent = `Baixando 0 de ${pendentes.length}...`;
-    progressoFill.style.width = '0%';
+    progressoFill.style.width  = '0%';
 
-    const zip = new JSZip();
-    let baixados = 0;
+    const zip              = new JSZip();
+    let baixados           = 0;
     const arquivosBaixados = [];
 
     for (const foto of pendentes) {
-      const { data, error: errDownload } = await supabaseAdmin.storage.from(BUCKET_FOTOS).download(foto.name);
+      const { data, error: errDownload } = await supabaseAdmin
+        .storage.from(BUCKET_FOTOS).download(foto.name);
+
       if (!errDownload && data) {
         zip.file(foto.name, data);
         arquivosBaixados.push(foto.name);
         baixados++;
       }
+
       const pct = ((baixados / pendentes.length) * 100).toFixed(0);
-      progressoFill.style.width = pct + '%';
-      progressoTexto.textContent = `Baixando ${baixados} de ${pendentes.length}...`;
+      progressoFill.style.width   = pct + '%';
+      progressoTexto.textContent  = `Baixando ${baixados} de ${pendentes.length}...`;
     }
 
     progressoTexto.textContent = 'Compactando arquivo ZIP...';
@@ -1288,11 +1064,10 @@ window.baixarPendentesZip = async function () {
       progressoFill.style.width = meta.percent.toFixed(0) + '%';
     });
 
-    const agora = new Date();
-    const nomeZip = `pendentes-${agora.getFullYear()}${(agora.getMonth() + 1).toString().padStart(2, '0')}${agora.getDate().toString().padStart(2, '0')}-${agora.getHours().toString().padStart(2, '0')}${agora.getMinutes().toString().padStart(2, '0')}.zip`;
+    const agora   = new Date();
+    const nomeZip = `pendentes-${agora.getFullYear()}${String(agora.getMonth()+1).padStart(2,'0')}${String(agora.getDate()).padStart(2,'0')}-${String(agora.getHours()).padStart(2,'0')}${String(agora.getMinutes()).padStart(2,'0')}.zip`;
     saveAs(blob, nomeZip);
 
-    // Marca todas as baixadas
     progressoTexto.textContent = 'Atualizando status...';
     for (const nomeArq of arquivosBaixados) {
       await marcarComoBaixada(nomeArq);
@@ -1300,7 +1075,10 @@ window.baixarPendentesZip = async function () {
 
     progresso.style.display = 'none';
     renderizarGaleria();
-    mostrarMensagem(`${baixados} foto(s) pendente(s) baixada(s) e marcada(s) como baixada(s)! Arquivo: ${nomeZip}`, 'sucesso');
+    mostrarMensagem(
+      `${baixados} foto(s) pendente(s) baixada(s) e marcada(s)! Arquivo: ${nomeZip}`,
+      'sucesso'
+    );
 
   } catch (err) {
     console.error(err);
@@ -1313,34 +1091,21 @@ window.baixarPendentesZip = async function () {
 };
 
 // ============================================================
-// SOBRESCREVE apagarFoto PRA REMOVER STATUS TAMBÉM
+// CONFIRMAR + APAGAR TUDO
 // ============================================================
-window.apagarFoto = async function (nome) {
-  if (!confirm(`Tem certeza que quer apagar essa foto?\n\n${nome}\n\nEsta ação não pode ser desfeita.`)) return;
-  try {
-    // Remove do bucket
-    const { error } = await supabaseAdmin.storage.from(BUCKET_FOTOS).remove([nome]);
-    if (error) throw error;
-
-    // Remove status também
-    await supabaseAdmin.from('fotos_status').delete().eq('arquivo_nome', nome);
-    delete statusFotos[nome];
-
-    mostrarMensagem('Foto apagada com sucesso!', 'sucesso');
-    carregarFotos();
-  } catch (err) {
-    mostrarMensagem('Erro ao apagar: ' + err.message, 'erro');
+window.confirmarApagar = function () {
+  const c1 = confirm("ATENÇÃO!\n\nIsso vai APAGAR PERMANENTEMENTE todas as fotos do servidor.\n\nVocê já baixou o ZIP com as fotos?\n\nClique em OK para APAGAR TUDO ou Cancelar para voltar.");
+  if (c1) {
+    const c2 = confirm("CONFIRMAÇÃO FINAL\n\nTem certeza absoluta que quer apagar TODAS as fotos?\n\nEsta ação NÃO PODE ser desfeita!");
+    if (c2) apagarTudo();
   }
 };
 
-// ============================================================
-// SOBRESCREVE apagarTudo PRA LIMPAR TABELA DE STATUS TAMBÉM
-// ============================================================
 async function apagarTudo() {
-  const btnBaixar = document.getElementById('btnBaixar');
-  const btnApagar = document.getElementById('btnApagar');
-  const progresso = document.getElementById('progressoContainer');
-  const progressoFill = document.getElementById('progressoFill');
+  const btnBaixar      = document.getElementById('btnBaixar');
+  const btnApagar      = document.getElementById('btnApagar');
+  const progresso      = document.getElementById('progressoContainer');
+  const progressoFill  = document.getElementById('progressoFill');
   const progressoTexto = document.getElementById('progressoTexto');
 
   try {
@@ -1348,7 +1113,8 @@ async function apagarTudo() {
     btnApagar.disabled = true;
     limparMensagem();
 
-    const { data: arquivos, error } = await supabaseAdmin.storage.from(BUCKET_FOTOS).list('', { limit: 1000 });
+    const { data: arquivos, error } = await supabaseAdmin
+      .storage.from(BUCKET_FOTOS).list('', { limit: 1000 });
     if (error) throw error;
 
     const fotos = arquivos.filter(f => f.name && f.metadata);
@@ -1359,17 +1125,17 @@ async function apagarTudo() {
       return;
     }
 
-    progresso.style.display = 'block';
+    progresso.style.display    = 'block';
     progressoTexto.textContent = `Apagando ${fotos.length} foto(s)...`;
-    progressoFill.style.width = '50%';
+    progressoFill.style.width  = '50%';
 
     const nomes = fotos.map(f => f.name);
 
-    // Remove do bucket
-    const { error: errRemove } = await supabaseAdmin.storage.from(BUCKET_FOTOS).remove(nomes);
+    const { error: errRemove } = await supabaseAdmin
+      .storage.from(BUCKET_FOTOS).remove(nomes);
     if (errRemove) throw errRemove;
 
-    // Remove todos os status
+    // Limpa toda a tabela de status
     await supabaseAdmin.from('fotos_status').delete().neq('id', 0);
     statusFotos = {};
 
