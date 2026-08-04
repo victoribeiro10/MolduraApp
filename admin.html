@@ -1535,10 +1535,27 @@
     <div id="mensagem"></div>
 
     <div class="galeria-titulo">
-      <h3>Fotos Enviadas</h3>
-      <span id="contadorFotos"></span>
-    </div>
-    <div id="galeria" class="galeria"></div>
+  <h3>Fotos Enviadas</h3>
+  <span id="contadorFotos"></span>
+</div>
+
+<!-- ⭐ ABAS DE FILTRO -->
+<div class="abas-fotos">
+  <button class="aba-filtro ativa" data-filtro="pendentes" onclick="mudarAba('pendentes')">
+    Pendentes
+    <span class="contador-aba" id="contadorPendentes">0</span>
+  </button>
+  <button class="aba-filtro" data-filtro="baixadas" onclick="mudarAba('baixadas')">
+    Baixadas
+    <span class="contador-aba" id="contadorBaixadas">0</span>
+  </button>
+  <button class="aba-filtro" data-filtro="todas" onclick="mudarAba('todas')">
+    Todas
+    <span class="contador-aba" id="contadorTodas">0</span>
+  </button>
+</div>
+
+<div id="galeria" class="galeria"></div>
     <div id="vazio" class="vazio" style="display:none">
       <div class="vazio-icone">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
