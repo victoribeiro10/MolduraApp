@@ -37,9 +37,6 @@
       letter-spacing: 0.3px;
     }
 
-    /* ================================
-       TELA DE LOGIN
-    ================================ */
     .tela-login {
       min-height: 100vh;
       display: flex;
@@ -212,9 +209,6 @@
       font-family: 'Playfair Display', serif;
     }
 
-    /* ================================
-       PAINEL PRINCIPAL
-    ================================ */
     .painel {
       max-width: 1400px;
       margin: 0 auto;
@@ -222,7 +216,6 @@
       animation: fadeIn 0.5s ease;
     }
 
-    /* HEADER */
     .admin-header {
       background: linear-gradient(135deg, var(--grafite), var(--preto-2));
       padding: 20px 28px;
@@ -291,7 +284,6 @@
       color: var(--branco);
     }
 
-    /* STATS */
     .stats {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -364,7 +356,6 @@
       text-transform: uppercase;
     }
 
-    /* CARD MOLDURA */
     .card-moldura-compact {
       background: linear-gradient(135deg, var(--grafite), var(--preto-2));
       padding: 20px 24px;
@@ -416,6 +407,20 @@
       letter-spacing: 1px;
     }
 
+    .moldura-info-compact .nome-moldura {
+      color: var(--dourado-claro);
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .btns-moldura {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
     .btn-configurar {
       background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro));
       color: var(--preto);
@@ -441,7 +446,31 @@
       box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4);
     }
 
-    /* AÇÕES */
+    .btn-galeria-molduras {
+      background: transparent;
+      color: var(--dourado);
+      border: 1px solid var(--dourado);
+      padding: 12px 24px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-galeria-molduras svg { width: 14px; height: 14px; }
+
+    .btn-galeria-molduras:hover {
+      background: var(--dourado);
+      color: var(--preto);
+    }
+
     .acoes {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -496,7 +525,6 @@
       background: rgba(248, 113, 113, 0.05);
     }
 
-    /* PROGRESSO */
     .progresso {
       background: linear-gradient(135deg, var(--grafite), var(--preto-2));
       padding: 22px 24px;
@@ -529,7 +557,6 @@
       transition: width 0.3s;
     }
 
-    /* MENSAGENS */
     .msg-sucesso, .msg-erro, .msg-aviso {
       padding: 14px 18px;
       border-radius: 4px;
@@ -555,7 +582,6 @@
       color: #fcd34d;
     }
 
-    /* GALERIA */
     .galeria-titulo {
       display: flex;
       align-items: center;
@@ -707,7 +733,6 @@
 
     .vazio-icone svg { width: 26px; height: 26px; }
 
-    /* MODAL DE FOTO */
     .modal-foto {
       position: fixed;
       top: 0;
@@ -757,7 +782,6 @@
       color: var(--preto);
     }
 
-    /* MODAL DE CONFIGURAÇÃO */
     .modal-config {
       position: fixed;
       top: 0;
@@ -1028,17 +1052,6 @@
 
     .moldura-acoes button svg { width: 14px; height: 14px; }
 
-    .btn-upload-moldura {
-      background: transparent;
-      color: var(--dourado);
-      border: 1px solid var(--dourado) !important;
-    }
-
-    .btn-upload-moldura:hover:not(:disabled) {
-      background: var(--dourado);
-      color: var(--preto);
-    }
-
     .btn-salvar-coords {
       background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro));
       color: var(--preto);
@@ -1049,12 +1062,12 @@
       box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4);
     }
 
-    .btn-upload-moldura:disabled, .btn-salvar-coords:disabled {
+    .btn-salvar-coords:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
 
-    #inputMoldura { display: none; }
+    #inputMoldura, #inputNovaMoldura { display: none; }
 
     .sem-moldura-editor {
       padding: 60px 20px;
@@ -1065,7 +1078,312 @@
       letter-spacing: 1px;
     }
 
-    /* ANIMAÇÕES */
+    /* ================================
+       ⭐ NOVO: MODAL GALERIA MOLDURAS
+    ================================ */
+    .galeria-molduras-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .galeria-molduras-header p {
+      color: var(--cinza-suave);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .btn-adicionar-moldura {
+      background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro));
+      color: var(--preto);
+      border: none;
+      padding: 12px 22px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-adicionar-moldura svg { width: 14px; height: 14px; }
+
+    .btn-adicionar-moldura:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
+      box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4);
+    }
+
+    .btn-adicionar-moldura:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .galeria-molduras {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .item-moldura {
+      background: var(--grafite);
+      border: 1px solid rgba(212, 175, 122, 0.15);
+      border-radius: 4px;
+      overflow: hidden;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .item-moldura:hover {
+      transform: translateY(-4px);
+      border-color: var(--dourado);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .item-moldura.ativa {
+      border-color: var(--verde);
+      box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.3);
+    }
+
+    .item-moldura.ativa::before {
+      content: '● ATIVA';
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: var(--verde);
+      color: var(--preto);
+      padding: 4px 8px;
+      border-radius: 2px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      z-index: 5;
+    }
+
+    .item-moldura img {
+      width: 100%;
+      aspect-ratio: 2000 / 2666;
+      object-fit: contain;
+      display: block;
+      background: var(--preto);
+    }
+
+    .item-moldura-info {
+      padding: 12px;
+      background: var(--preto-2);
+    }
+
+    .item-moldura-info h5 {
+      font-family: 'Playfair Display', serif;
+      color: var(--dourado);
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .item-moldura-info p {
+      color: var(--cinza-suave);
+      font-size: 10px;
+      letter-spacing: 1px;
+    }
+
+    .item-moldura-acoes {
+      padding: 8px 10px;
+      display: flex;
+      gap: 6px;
+      background: var(--preto-2);
+      border-top: 1px solid rgba(212, 175, 122, 0.1);
+    }
+
+    .item-moldura-acoes button {
+      flex: 1;
+      padding: 8px 6px;
+      border: 1px solid transparent;
+      background: transparent;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--branco);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-usar-moldura {
+      border-color: rgba(74, 222, 128, 0.4) !important;
+      color: var(--verde) !important;
+    }
+
+    .btn-usar-moldura:hover:not(:disabled) {
+      background: var(--verde);
+      color: var(--preto) !important;
+    }
+
+    .btn-usar-moldura:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-deletar-moldura {
+      border-color: rgba(248, 113, 113, 0.3) !important;
+      color: var(--vermelho) !important;
+      flex: 0 0 auto !important;
+      padding: 8px 10px !important;
+    }
+
+    .btn-deletar-moldura:hover:not(:disabled) {
+      background: var(--vermelho);
+      color: var(--branco) !important;
+    }
+
+    .modal-adicionar-moldura {
+      max-width: 500px !important;
+    }
+
+    .form-nova-moldura {
+      padding: 24px 28px;
+    }
+
+    .form-nova-moldura label {
+      display: block;
+      font-size: 10px;
+      color: var(--cinza-suave);
+      font-weight: 500;
+      margin-bottom: 6px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .form-nova-moldura input[type="text"] {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--preto);
+      border: 1px solid rgba(212, 175, 122, 0.2);
+      border-radius: 3px;
+      font-size: 13px;
+      color: var(--branco);
+      outline: none;
+      font-family: 'Inter', sans-serif;
+      margin-bottom: 20px;
+      transition: all 0.3s;
+    }
+
+    .form-nova-moldura input[type="text"]:focus {
+      border-color: var(--dourado);
+      box-shadow: 0 0 0 3px rgba(212, 175, 122, 0.1);
+    }
+
+    .upload-preview {
+      background: var(--preto);
+      border: 1px dashed rgba(212, 175, 122, 0.3);
+      border-radius: 4px;
+      padding: 30px 20px;
+      text-align: center;
+      margin-bottom: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .upload-preview:hover {
+      border-color: var(--dourado);
+      background: rgba(212, 175, 122, 0.03);
+    }
+
+    .upload-preview img {
+      max-width: 100%;
+      max-height: 250px;
+      border-radius: 4px;
+    }
+
+    .upload-preview.tem-imagem {
+      padding: 10px;
+      border-style: solid;
+    }
+
+    .upload-preview svg {
+      width: 40px;
+      height: 40px;
+      color: var(--dourado);
+      opacity: 0.7;
+    }
+
+    .upload-preview span {
+      color: var(--cinza-suave);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .upload-preview .arquivo-nome {
+      color: var(--dourado);
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    .btn-salvar-nova-moldura {
+      width: 100%;
+      background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro));
+      color: var(--preto);
+      border: none;
+      padding: 14px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      font-family: 'Inter', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-salvar-nova-moldura svg { width: 14px; height: 14px; }
+
+    .btn-salvar-nova-moldura:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
+      box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4);
+    }
+
+    .btn-salvar-nova-moldura:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .galeria-molduras-vazia {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--cinza-suave);
+      grid-column: 1 / -1;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 14px;
+      letter-spacing: 1px;
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -1081,7 +1399,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* SCROLLBAR */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: var(--preto); }
     ::-webkit-scrollbar-thumb {
@@ -1090,21 +1407,21 @@
     }
     ::-webkit-scrollbar-thumb:hover { background: var(--dourado); }
 
-    /* RESPONSIVO */
     @media (max-width: 700px) {
       .acoes { grid-template-columns: 1fr; }
       .stats { grid-template-columns: 1fr; }
       .admin-header { flex-direction: column; text-align: center; }
       .galeria { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
       .card-moldura-compact { flex-direction: column; text-align: center; }
-      .btn-configurar { width: 100%; justify-content: center; }
+      .btn-configurar, .btn-galeria-molduras { width: 100%; justify-content: center; }
+      .btns-moldura { width: 100%; flex-direction: column; }
       .header-titulo { font-size: 16px; letter-spacing: 3px; }
+      .galeria-molduras { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
     }
   </style>
 </head>
 <body>
 
-  <!-- TELA DE LOGIN -->
   <div id="telaLogin" class="tela-login">
     <div class="login-box">
       <div class="login-marca">ENTRE CLICKS</div>
@@ -1125,7 +1442,6 @@
     </div>
   </div>
 
-  <!-- PAINEL PRINCIPAL -->
   <div id="painelAdmin" class="painel" style="display:none">
 
     <header class="admin-header">
@@ -1136,7 +1452,6 @@
       <button class="btn-sair" onclick="sair()">Sair</button>
     </header>
 
-    <!-- STATS -->
     <div class="stats">
       <div class="stat-card">
         <div class="stat-icone">
@@ -1163,25 +1478,32 @@
       </div>
     </div>
 
-    <!-- CARD MOLDURA -->
     <div class="card-moldura-compact">
       <div class="moldura-mini" id="molduraMini">
         <span style="font-size:11px; color:var(--cinza-suave);">⏳</span>
       </div>
       <div class="moldura-info-compact">
         <h4>Moldura Ativa</h4>
+        <div class="nome-moldura" id="molduraNomeAtiva">—</div>
         <p id="molduraInfoTxt">Carregando...</p>
       </div>
-      <button class="btn-configurar" onclick="abrirModalConfig()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/>
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-        </svg>
-        Configurar Moldura
-      </button>
+      <div class="btns-moldura">
+        <button class="btn-galeria-molduras" onclick="abrirModalGaleria()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"/>
+          </svg>
+          Galeria de Molduras
+        </button>
+        <button class="btn-configurar" onclick="abrirModalConfig()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          Ajustar Janela
+        </button>
+      </div>
     </div>
 
-    <!-- AÇÕES -->
     <div class="acoes">
       <button class="btn-atualizar" onclick="carregarFotos()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1231,11 +1553,11 @@
 
   </div>
 
-  <!-- MODAL DE CONFIGURAÇÃO -->
+  <!-- MODAL CONFIGURAR JANELA -->
   <div class="modal-config" id="modalConfig">
     <div class="modal-config-conteudo">
       <div class="modal-config-header">
-        <h3>Configurar Moldura</h3>
+        <h3>Ajustar Janela da Moldura</h3>
         <button class="btn-fechar-modal" onclick="fecharModalConfig()">×</button>
       </div>
       <div class="modal-config-body">
@@ -1263,8 +1585,6 @@
           </div>
         </div>
 
-        <input type="file" id="inputMoldura" accept="image/png,image/jpeg">
-
         <div class="moldura-form-simples">
           <div>
             <label>Janela X</label>
@@ -1285,12 +1605,6 @@
         </div>
 
         <div class="moldura-acoes">
-          <button class="btn-upload-moldura" onclick="document.getElementById('inputMoldura').click()" id="btnEscolherMoldura">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
-            </svg>
-            Trocar Moldura
-          </button>
           <button class="btn-salvar-coords" onclick="salvarCoordenadas()" id="btnSalvarCoords">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
@@ -1302,6 +1616,67 @@
       </div>
     </div>
   </div>
+
+  <!-- ⭐ MODAL GALERIA DE MOLDURAS -->
+  <div class="modal-config" id="modalGaleriaMolduras">
+    <div class="modal-config-conteudo">
+      <div class="modal-config-header">
+        <h3>Galeria de Molduras</h3>
+        <button class="btn-fechar-modal" onclick="fecharModalGaleria()">×</button>
+      </div>
+      <div class="modal-config-body">
+
+        <div class="galeria-molduras-header">
+          <p><span id="totalMoldurasGaleria">0</span> molduras salvas</p>
+          <button class="btn-adicionar-moldura" onclick="abrirModalAdicionarMoldura()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+            </svg>
+            Adicionar Nova Moldura
+          </button>
+        </div>
+
+        <div id="galeriaMolduras" class="galeria-molduras">
+          <div class="galeria-molduras-vazia">Carregando molduras...</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ⭐ MODAL ADICIONAR NOVA MOLDURA -->
+  <div class="modal-config" id="modalAdicionarMoldura">
+    <div class="modal-config-conteudo modal-adicionar-moldura">
+      <div class="modal-config-header">
+        <h3>Nova Moldura</h3>
+        <button class="btn-fechar-modal" onclick="fecharModalAdicionarMoldura()">×</button>
+      </div>
+      <div class="form-nova-moldura">
+        <label>Nome da moldura</label>
+        <input type="text" id="nomeNovaMoldura" placeholder="Ex: Cecília 1 aninho" maxlength="80">
+
+        <label>Arquivo da moldura</label>
+        <div class="upload-preview" id="uploadPreview" onclick="document.getElementById('inputNovaMoldura').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+          </svg>
+          <span>Clique para selecionar</span>
+          <div class="arquivo-nome" id="arquivoNome" style="display:none"></div>
+        </div>
+
+        <input type="file" id="inputNovaMoldura" accept="image/png,image/jpeg">
+
+        <button class="btn-salvar-nova-moldura" id="btnSalvarNovaMoldura" onclick="salvarNovaMoldura()" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+          </svg>
+          Adicionar à Galeria
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="inputMoldura" accept="image/png,image/jpeg" style="display:none">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
