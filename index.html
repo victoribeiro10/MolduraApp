@@ -19,18 +19,19 @@
         }
 
         :root {
-            --preto: #0a0a0a;
-            --preto-2: #141414;
-            --grafite: #1c1c1c;
-            --cinza: #2a2a2a;
-            --dourado: #d4af7a;
+            --preto:         #0a0a0a;
+            --preto-2:       #141414;
+            --grafite:       #1c1c1c;
+            --cinza:         #2a2a2a;
+            --dourado:       #d4af7a;
             --dourado-claro: #e8c99a;
-            --dourado-escuro: #a88855;
-            --branco: #f5f5f5;
-            --cinza-suave: #888;
-            --whatsapp: #25D366;
-            --instagram: #E4405F;
-            --erro: #e74c3c;
+            --dourado-escuro:#a88855;
+            --branco:        #f5f5f5;
+            --cinza-suave:   #888;
+            --whatsapp:      #25D366;
+            --instagram:     #E4405F;
+            --erro:          #e74c3c;
+            --vermelho:      #f87171;
         }
 
         html, body {
@@ -41,7 +42,7 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: 
+            background:
                 radial-gradient(ellipse at top, #1a1a1a 0%, var(--preto) 70%),
                 var(--preto);
             color: var(--branco);
@@ -55,6 +56,9 @@
             overflow-y: auto;
         }
 
+        /* ============================================================
+           MARCA
+        ============================================================ */
         .marca {
             text-align: center;
             margin: 8px 0 12px 0;
@@ -88,6 +92,9 @@
             text-transform: lowercase;
         }
 
+        /* ============================================================
+           TELA ESCOLHA
+        ============================================================ */
         .tela-escolha {
             display: flex;
             flex-direction: column;
@@ -129,6 +136,135 @@
             font-weight: 400;
         }
 
+        /* ============================================================
+           ⭐ AVISO DO EVENTO
+        ============================================================ */
+        .aviso-evento {
+            width: 100%;
+            background: linear-gradient(135deg,
+                rgba(212, 175, 122, 0.12),
+                rgba(212, 175, 122, 0.06));
+            border: 1px solid rgba(212, 175, 122, 0.5);
+            border-radius: 6px;
+            padding: 18px 16px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.7s ease 0.2s both;
+        }
+
+        /* linha dourada no topo */
+        .aviso-evento::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 15%;
+            right: 15%;
+            height: 1px;
+            background: linear-gradient(90deg,
+                transparent, var(--dourado), transparent);
+        }
+
+        /* borda lateral */
+        .aviso-evento::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg,
+                var(--dourado), var(--dourado-escuro));
+            border-radius: 6px 0 0 6px;
+        }
+
+        .aviso-evento-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .aviso-evento-icone {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--dourado);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dourado);
+            flex-shrink: 0;
+        }
+
+        .aviso-evento-icone svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .aviso-evento-titulo {
+            font-family: 'Playfair Display', serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dourado);
+            letter-spacing: 1px;
+            line-height: 1.3;
+        }
+
+        .aviso-evento-titulo small {
+            display: block;
+            font-family: 'Inter', sans-serif;
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--dourado-escuro);
+            margin-top: 1px;
+        }
+
+        .aviso-evento-corpo {
+            font-size: 12px;
+            color: var(--dourado-claro);
+            line-height: 1.7;
+            padding-left: 46px;
+            font-weight: 300;
+        }
+
+        .aviso-evento-corpo strong {
+            color: var(--dourado);
+            font-weight: 600;
+        }
+
+        .aviso-evento-regras {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            margin-top: 10px;
+            padding-left: 46px;
+        }
+
+        .aviso-regra {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 11px;
+            color: var(--cinza-suave);
+            line-height: 1.5;
+        }
+
+        .aviso-regra-icone {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .aviso-regra.ok .aviso-regra-icone { color: var(--dourado); }
+        .aviso-regra.nao .aviso-regra-icone { color: var(--vermelho); }
+        .aviso-regra.nao { color: rgba(248, 113, 113, 0.8); }
+
+        /* ============================================================
+           BOTÕES DE ESCOLHA
+        ============================================================ */
         .btn-escolha {
             width: 100%;
             padding: 18px 18px;
@@ -152,14 +288,13 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(212, 175, 122, 0.1), transparent);
+            background: linear-gradient(90deg,
+                transparent, rgba(212, 175, 122, 0.1), transparent);
             transition: left 0.6s;
         }
 
         .btn-escolha:hover::before,
-        .btn-escolha:active::before {
-            left: 100%;
-        }
+        .btn-escolha:active::before { left: 100%; }
 
         .btn-escolha:hover,
         .btn-escolha:active {
@@ -186,10 +321,7 @@
             color: var(--preto);
         }
 
-        .btn-escolha .icone svg {
-            width: 20px;
-            height: 20px;
-        }
+        .btn-escolha .icone svg { width: 20px; height: 20px; }
 
         .btn-escolha .texto {
             display: flex;
@@ -216,7 +348,9 @@
 
         .btn-escolha.destaque {
             border-color: var(--dourado);
-            background: linear-gradient(135deg, rgba(212, 175, 122, 0.08), rgba(212, 175, 122, 0.02));
+            background: linear-gradient(135deg,
+                rgba(212, 175, 122, 0.08),
+                rgba(212, 175, 122, 0.02));
         }
 
         .btn-escolha.destaque .titulo-btn::after {
@@ -234,6 +368,9 @@
             vertical-align: middle;
         }
 
+        /* ============================================================
+           CONTAINER (câmera / ajuste / resultado)
+        ============================================================ */
         .container {
             position: relative;
             width: 100%;
@@ -257,10 +394,8 @@
 
         #canvasResultado {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             object-fit: contain;
             display: block;
         }
@@ -277,8 +412,7 @@
 
         #fotoAjuste {
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 0; left: 0;
             transform-origin: 0 0;
             will-change: transform;
             pointer-events: none;
@@ -288,14 +422,15 @@
 
         .moldura-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             pointer-events: none;
             z-index: 10;
         }
 
+        /* ============================================================
+           BOTÕES GERAIS
+        ============================================================ */
         .botoes {
             display: flex;
             gap: 8px;
@@ -334,11 +469,7 @@
             color: var(--dourado);
         }
 
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn svg { width: 14px; height: 14px; }
 
         .btn-voltar {
@@ -386,17 +517,14 @@
         .btn-enviar-impressao::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg,
+                transparent, rgba(255,255,255,0.3), transparent);
             transition: left 0.7s;
         }
 
-        .btn-enviar-impressao:hover::before {
-            left: 100%;
-        }
+        .btn-enviar-impressao:hover::before { left: 100%; }
 
         .btn-enviar-impressao:hover:not(:disabled) {
             background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
@@ -433,9 +561,9 @@
             margin: 0 8px;
         }
 
-        /* ================================
-           NOVO: TELA DE LOTE
-        ================================ */
+        /* ============================================================
+           TELA DE LOTE
+        ============================================================ */
         .tela-lote {
             width: 100%;
             max-width: 380px;
@@ -494,20 +622,17 @@
         }
 
         .item-lote img {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             object-fit: cover;
             display: block;
         }
 
         .item-lote-btn-remover {
             position: absolute;
-            top: 4px;
-            right: 4px;
-            width: 22px;
-            height: 22px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            top: 4px; right: 4px;
+            width: 22px; height: 22px;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.3);
             border-radius: 50%;
             color: var(--branco);
             display: flex;
@@ -529,10 +654,8 @@
 
         .item-lote-numero {
             position: absolute;
-            top: 4px;
-            left: 4px;
-            width: 22px;
-            height: 22px;
+            top: 4px; left: 4px;
+            width: 22px; height: 22px;
             background: rgba(212, 175, 122, 0.95);
             color: var(--preto);
             border-radius: 50%;
@@ -546,9 +669,7 @@
 
         .item-lote-editar {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 0; left: 0; right: 0;
             background: linear-gradient(180deg, transparent, rgba(0,0,0,0.8));
             color: var(--dourado);
             font-size: 8px;
@@ -581,10 +702,7 @@
             transform: translateY(-2px);
         }
 
-        .item-lote-adicionar svg {
-            width: 24px;
-            height: 24px;
-        }
+        .item-lote-adicionar svg { width: 24px; height: 24px; }
 
         .item-lote-adicionar span {
             font-size: 9px;
@@ -599,9 +717,7 @@
             color: var(--dourado);
         }
 
-        .lote-processando .loading-spinner {
-            margin: 0 auto 16px;
-        }
+        .lote-processando .loading-spinner { margin: 0 auto 16px; }
 
         .lote-processando p {
             font-family: 'Playfair Display', serif;
@@ -609,9 +725,9 @@
             font-size: 14px;
         }
 
-        /* ================================
+        /* ============================================================
            LOADING INICIAL
-        ================================ */
+        ============================================================ */
         .loading-inicial {
             position: fixed;
             top: 0; left: 0;
@@ -626,19 +742,14 @@
         }
 
         .loading-spinner {
-            width: 50px;
-            height: 50px;
+            width: 50px; height: 50px;
             border: 1px solid rgba(212, 175, 122, 0.15);
             border-top: 1px solid var(--dourado);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
 
-        .loading-inicial .marca-logo {
-            font-size: 18px;
-            letter-spacing: 8px;
-            opacity: 0.9;
-        }
+        .loading-inicial .marca-logo { font-size: 18px; letter-spacing: 8px; opacity: 0.9; }
 
         .loading-inicial p {
             color: var(--cinza-suave);
@@ -648,16 +759,14 @@
             font-weight: 300;
         }
 
-        /* ================================
+        /* ============================================================
            MODAL
-        ================================ */
+        ============================================================ */
         .modal {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
             display: flex;
@@ -679,22 +788,20 @@
             width: 100%;
             animation: slideUp 0.4s ease;
             position: relative;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
         }
 
         .modal-conteudo::before {
             content: '';
             position: absolute;
             top: 0;
-            left: 20%;
-            right: 20%;
+            left: 20%; right: 20%;
             height: 1px;
             background: linear-gradient(90deg, transparent, var(--dourado), transparent);
         }
 
         .modal-icone {
-            width: 60px;
-            height: 60px;
+            width: 60px; height: 60px;
             margin: 0 auto 20px;
             border: 1px solid var(--dourado);
             border-radius: 50%;
@@ -773,8 +880,7 @@
         }
 
         .modal-cta-botoes a {
-            width: 44px;
-            height: 44px;
+            width: 44px; height: 44px;
             border: 1px solid rgba(212, 175, 122, 0.3);
             border-radius: 50%;
             display: flex;
@@ -801,13 +907,17 @@
             transform: translateY(-2px);
         }
 
+        /* ============================================================
+           RODAPÉ
+        ============================================================ */
         .rodape {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 0; left: 0; right: 0;
             padding: 10px 12px;
-            background: linear-gradient(180deg, transparent, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0.95));
+            background: linear-gradient(180deg,
+                transparent,
+                rgba(0,0,0,0.7) 50%,
+                rgba(0,0,0,0.95));
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
             display: flex;
@@ -834,8 +944,7 @@
         }
 
         .rodape-redes a {
-            width: 30px;
-            height: 30px;
+            width: 30px; height: 30px;
             border: 1px solid rgba(212, 175, 122, 0.25);
             border-radius: 50%;
             display: flex;
@@ -863,13 +972,14 @@
             transform: translateY(-2px);
         }
 
+        /* ============================================================
+           OVERLAY DE ENVIO
+        ============================================================ */
         .overlay-envio {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.92);
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.92);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             display: none;
@@ -890,8 +1000,7 @@
         }
 
         .envio-icone {
-            width: 60px;
-            height: 60px;
+            width: 60px; height: 60px;
             margin: 0 auto 24px;
             border: 1px solid var(--dourado);
             border-radius: 50%;
@@ -899,7 +1008,6 @@
             align-items: center;
             justify-content: center;
             color: var(--dourado);
-            position: relative;
             animation: pulseGlow 2s ease-in-out infinite;
         }
 
@@ -928,14 +1036,14 @@
             background: rgba(212, 175, 122, 0.1);
             border-radius: 10px;
             overflow: hidden;
-            position: relative;
             margin-bottom: 16px;
         }
 
         .barra-progresso-fill {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, var(--dourado-escuro), var(--dourado), var(--dourado-claro));
+            background: linear-gradient(90deg,
+                var(--dourado-escuro), var(--dourado), var(--dourado-claro));
             border-radius: 10px;
             transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
@@ -945,11 +1053,10 @@
         .barra-progresso-fill::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg,
+                transparent, rgba(255,255,255,0.4), transparent);
             animation: shimmer 1.8s infinite;
         }
 
@@ -981,6 +1088,9 @@
             font-weight: 400;
         }
 
+        /* ============================================================
+           ANIMAÇÕES
+        ============================================================ */
         @keyframes shimmer {
             0%   { left: -100%; }
             100% { left: 100%; }
@@ -988,45 +1098,57 @@
 
         @keyframes pulseGlow {
             0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 122, 0.4); }
-            50% { box-shadow: 0 0 0 15px rgba(212, 175, 122, 0); }
+            50%       { box-shadow: 0 0 0 15px rgba(212, 175, 122, 0); }
         }
 
         @keyframes fadeIn {
             from { opacity: 0; }
-            to { opacity: 1; }
+            to   { opacity: 1; }
         }
 
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-15px); }
-            to { opacity: 1; transform: translateY(0); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
+            0%   { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
+        /* ============================================================
+           RESPONSIVO
+        ============================================================ */
         @media (max-width: 360px) {
-            .marca-logo { font-size: 18px; letter-spacing: 4px; }
-            .titulo-secao h1 { font-size: 20px; }
-            .btn-escolha { padding: 15px 14px; }
+            .marca-logo          { font-size: 18px; letter-spacing: 4px; }
+            .titulo-secao h1     { font-size: 20px; }
+            .btn-escolha         { padding: 15px 14px; }
             .btn-escolha .titulo-btn { font-size: 13px; }
+            .aviso-evento-corpo,
+            .aviso-evento-regras { padding-left: 0; }
         }
     </style>
 </head>
 <body>
 
+    <!-- LOADING INICIAL -->
     <div id="loadingInicial" class="loading-inicial">
         <div class="marca-logo">ENTRE CLICKS</div>
         <div class="loading-spinner"></div>
         <p>Carregando</p>
     </div>
 
+    <!-- MARCA -->
     <div class="marca">
         <div class="marca-logo">ENTRE CLICKS</div>
         <div class="marca-linha">
@@ -1034,17 +1156,74 @@
         </div>
     </div>
 
+    <!-- TELA ESCOLHA -->
     <div class="tela-escolha hidden" id="telaEscolha">
+
         <div class="titulo-secao">
             <h1>Eternize <em>este</em> momento</h1>
             <p>escolha como registrar</p>
         </div>
 
+        <!-- ⭐ AVISO DO EVENTO -->
+        <div class="aviso-evento">
+            <div class="aviso-evento-header">
+                <div class="aviso-evento-icone">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                    </svg>
+                </div>
+                <div class="aviso-evento-titulo">
+                    Atenção, convidado!
+                    <small>leia antes de enviar</small>
+                </div>
+            </div>
+
+            <p class="aviso-evento-corpo">
+                Este espaço é exclusivo para fotos
+                <strong>tiradas aqui, neste evento.</strong>
+            </p>
+
+            <div class="aviso-evento-regras">
+                <div class="aviso-regra ok">
+                    <svg class="aviso-regra-icone" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                    </svg>
+                    Fotos tiradas agora, neste evento
+                </div>
+                <div class="aviso-regra ok">
+                    <svg class="aviso-regra-icone" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                    </svg>
+                    Fotos da câmera do seu celular (deste momento)
+                </div>
+                <div class="aviso-regra nao">
+                    <svg class="aviso-regra-icone" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    Fotos de outros eventos ou datas
+                </div>
+                <div class="aviso-regra nao">
+                    <svg class="aviso-regra-icone" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    Fotos aleatórias da galeria do celular
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTÕES DE ESCOLHA -->
         <button class="btn-escolha" id="btnAbrirCamera">
             <div class="icone">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z"/>
                 </svg>
             </div>
             <div class="texto">
@@ -1056,7 +1235,8 @@
         <button class="btn-escolha" id="btnAbrirGaleria">
             <div class="icone">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
                 </svg>
             </div>
             <div class="texto">
@@ -1068,7 +1248,8 @@
         <button class="btn-escolha destaque" id="btnAbrirGaleriaLote">
             <div class="icone">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" d="M8 3v3M16 3v3"/>
                 </svg>
             </div>
@@ -1080,7 +1261,8 @@
 
         <input type="file" id="inputFoto" accept="image/*">
         <input type="file" id="inputFotoLote" accept="image/*" multiple>
-    </div>
+
+    </div><!-- fim .tela-escolha -->
 
     <!-- TELA LOTE -->
     <div class="tela-lote hidden" id="telaLote">
@@ -1098,7 +1280,9 @@
 
         <div class="botoes hidden" id="botoesLote">
             <button class="btn btn-voltar" id="btnVoltarLote">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+                </svg>
                 Voltar
             </button>
             <button class="btn btn-enviar-impressao" id="btnEnviarLote">
@@ -1107,11 +1291,13 @@
         </div>
     </div>
 
+    <!-- ÁREA CÂMERA -->
     <div class="container hidden" id="areaCamera">
         <video id="video" autoplay playsinline muted></video>
         <img class="moldura-overlay" id="molduraCamera" alt="Moldura">
     </div>
 
+    <!-- ÁREA AJUSTE -->
     <div class="container hidden" id="areaAjuste">
         <div class="area-ajuste" id="areaFoto">
             <img id="fotoAjuste" alt="Sua foto">
@@ -1119,56 +1305,86 @@
         <img class="moldura-overlay" id="molduraAjuste" alt="Moldura">
     </div>
 
+    <!-- ÁREA RESULTADO -->
     <div class="container hidden" id="areaResultado">
         <canvas id="canvasResultado"></canvas>
     </div>
 
     <div id="mensagem"></div>
 
+    <!-- BOTÕES CÂMERA -->
     <div class="botoes hidden" id="botoesCamera">
         <button class="btn btn-voltar" id="btnVoltarCamera">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+            </svg>
             Voltar
         </button>
         <button class="btn btn-primario" id="btnTirarFoto">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="4"/><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="13" r="4"/>
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/>
+            </svg>
             Capturar
         </button>
         <button class="btn" id="btnVirarCamera">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
+            </svg>
             Virar
         </button>
     </div>
 
+    <!-- BOTÕES AJUSTE -->
     <div class="botoes hidden" id="botoesAjuste">
         <button class="btn btn-voltar" id="btnVoltarAjuste">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+            </svg>
             Voltar
         </button>
         <button class="btn" id="btnResetAjuste">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
+            </svg>
             Resetar
         </button>
         <button class="btn btn-primario" id="btnConfirmarAjuste">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+            </svg>
             Confirmar
         </button>
     </div>
+
     <div class="dica-ajuste hidden" id="dicaAjuste">
         Arraste <span class="separador">•</span> pinça para zoom
     </div>
 
+    <!-- BOTÕES RESULTADO -->
     <div class="botoes hidden" id="botoesResultado">
         <button class="btn btn-voltar" id="btnRefazer">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/>
+            </svg>
             Refazer
         </button>
         <button class="btn" id="btnBaixar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+            </svg>
             Baixar
         </button>
         <button class="btn" id="btnCompartilhar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"/>
+            </svg>
             Compartilhar
         </button>
         <button class="btn btn-enviar-impressao" id="btnEnviarImpressao">
@@ -1176,15 +1392,18 @@
         </button>
     </div>
 
+    <!-- RODAPÉ -->
     <div class="rodape">
         <div class="rodape-marca">· Entre Clicks ·</div>
         <div class="rodape-redes">
-            <a href="https://wa.me/5528999281772" target="_blank" rel="noopener" class="whats" title="WhatsApp">
+            <a href="https://wa.me/5528999281772" target="_blank" rel="noopener"
+                class="whats" title="WhatsApp">
                 <svg viewBox="0 0 24 24" fill="currentColor">
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
                 </svg>
             </a>
-            <a href="https://instagram.com/entreclicks.oficial" target="_blank" rel="noopener" class="insta" title="Instagram">
+            <a href="https://instagram.com/entreclicks.oficial" target="_blank" rel="noopener"
+                class="insta" title="Instagram">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                     <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
                     <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
@@ -1194,11 +1413,13 @@
         </div>
     </div>
 
+    <!-- OVERLAY DE ENVIO -->
     <div class="overlay-envio" id="overlayEnvio">
         <div class="envio-conteudo">
             <div class="envio-icone">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/>
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/>
                 </svg>
             </div>
             <div class="envio-titulo">Enviando sua memória</div>
@@ -1211,7 +1432,7 @@
             <div class="envio-contador hidden" id="envioContador"></div>
         </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
@@ -1221,124 +1442,120 @@
         const SUPABASE_URL = "https://scwznirvzwrphztvopbz.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjd3puaXJ2endycGh6dHZvcGJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzI2NzQsImV4cCI6MjA5NTY0ODY3NH0.PLvr547bIEJwjECKxQaoR7lpazs8GbSpLYLMDiGD4Po";
         const BUCKET_FOTOS = "fotos-eventos";
-        
+
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // ============================================
         // CONFIGURAÇÕES DE EXPORTAÇÃO
         // ============================================
         const LARGURA_IMPRESSAO = 1560;
-        const ALTURA_IMPRESSAO = 2140;
-        const QUALIDADE_JPEG = 0.98;
-        const LIMITE_LOTE = 5;
+        const ALTURA_IMPRESSAO  = 2140;
+        const QUALIDADE_JPEG    = 0.98;
+        const LIMITE_LOTE       = 5;
 
         const ICONES_MODAL = {
             sucesso: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>',
-            erro: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>',
-            info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>'
+            erro:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>',
+            info:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>'
         };
 
         const ICONE_WHATS = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>';
         const ICONE_INSTA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
 
         let MOLDURA = {
-            larguraTotal: 2000,
-            alturaTotal: 2666,
-            janelaX: 200,
-            janelaY: 87,
+            larguraTotal:  2000,
+            alturaTotal:   2666,
+            janelaX:       200,
+            janelaY:       87,
             janelaLargura: 1600,
-            janelaAltura: 1936,
-            arquivo: ''
+            janelaAltura:  1936,
+            arquivo:       ''
         };
 
         // ELEMENTOS
-        const loadingInicial = document.getElementById('loadingInicial');
-        const telaEscolha = document.getElementById('telaEscolha');
-        const telaLote = document.getElementById('telaLote');
-        const areaCamera = document.getElementById('areaCamera');
-        const areaAjuste = document.getElementById('areaAjuste');
-        const areaResultado = document.getElementById('areaResultado');
-        const botoesCamera = document.getElementById('botoesCamera');
-        const botoesAjuste = document.getElementById('botoesAjuste');
+        const loadingInicial  = document.getElementById('loadingInicial');
+        const telaEscolha     = document.getElementById('telaEscolha');
+        const telaLote        = document.getElementById('telaLote');
+        const areaCamera      = document.getElementById('areaCamera');
+        const areaAjuste      = document.getElementById('areaAjuste');
+        const areaResultado   = document.getElementById('areaResultado');
+        const botoesCamera    = document.getElementById('botoesCamera');
+        const botoesAjuste    = document.getElementById('botoesAjuste');
         const botoesResultado = document.getElementById('botoesResultado');
-        const botoesLote = document.getElementById('botoesLote');
-        const dicaAjuste = document.getElementById('dicaAjuste');
-        
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvasResultado');
-        const ctx = canvas.getContext('2d');
-        const areaFoto = document.getElementById('areaFoto');
-        const fotoAjuste = document.getElementById('fotoAjuste');
+        const botoesLote      = document.getElementById('botoesLote');
+        const dicaAjuste      = document.getElementById('dicaAjuste');
+
+        const video       = document.getElementById('video');
+        const canvas      = document.getElementById('canvasResultado');
+        const ctx         = canvas.getContext('2d');
+        const areaFoto    = document.getElementById('areaFoto');
+        const fotoAjuste  = document.getElementById('fotoAjuste');
         const molduraCamera = document.getElementById('molduraCamera');
         const molduraAjuste = document.getElementById('molduraAjuste');
-        
-        const btnAbrirCamera = document.getElementById('btnAbrirCamera');
-        const btnAbrirGaleria = document.getElementById('btnAbrirGaleria');
+
+        const btnAbrirCamera      = document.getElementById('btnAbrirCamera');
+        const btnAbrirGaleria     = document.getElementById('btnAbrirGaleria');
         const btnAbrirGaleriaLote = document.getElementById('btnAbrirGaleriaLote');
-        const btnVoltarCamera = document.getElementById('btnVoltarCamera');
-        const btnTirarFoto = document.getElementById('btnTirarFoto');
-        const btnVirarCamera = document.getElementById('btnVirarCamera');
-        const btnVoltarAjuste = document.getElementById('btnVoltarAjuste');
-        const btnResetAjuste = document.getElementById('btnResetAjuste');
-        const btnConfirmarAjuste = document.getElementById('btnConfirmarAjuste');
-        const btnRefazer = document.getElementById('btnRefazer');
-        const btnBaixar = document.getElementById('btnBaixar');
-        const btnCompartilhar = document.getElementById('btnCompartilhar');
-        const btnEnviarImpressao = document.getElementById('btnEnviarImpressao');
-        const btnVoltarLote = document.getElementById('btnVoltarLote');
-        const btnEnviarLote = document.getElementById('btnEnviarLote');
-        const inputFoto = document.getElementById('inputFoto');
-        const inputFotoLote = document.getElementById('inputFotoLote');
-        const mensagem = document.getElementById('mensagem');
-        const gradeLote = document.getElementById('gradeLote');
-        const contadorLote = document.getElementById('contadorLote');
-        const qtdEnvio = document.getElementById('qtdEnvio');
-        const loteProcessando = document.getElementById('loteProcessando');
+        const btnVoltarCamera     = document.getElementById('btnVoltarCamera');
+        const btnTirarFoto        = document.getElementById('btnTirarFoto');
+        const btnVirarCamera      = document.getElementById('btnVirarCamera');
+        const btnVoltarAjuste     = document.getElementById('btnVoltarAjuste');
+        const btnResetAjuste      = document.getElementById('btnResetAjuste');
+        const btnConfirmarAjuste  = document.getElementById('btnConfirmarAjuste');
+        const btnRefazer          = document.getElementById('btnRefazer');
+        const btnBaixar           = document.getElementById('btnBaixar');
+        const btnCompartilhar     = document.getElementById('btnCompartilhar');
+        const btnEnviarImpressao  = document.getElementById('btnEnviarImpressao');
+        const btnVoltarLote       = document.getElementById('btnVoltarLote');
+        const btnEnviarLote       = document.getElementById('btnEnviarLote');
+        const inputFoto           = document.getElementById('inputFoto');
+        const inputFotoLote       = document.getElementById('inputFotoLote');
+        const mensagem            = document.getElementById('mensagem');
+        const gradeLote           = document.getElementById('gradeLote');
+        const contadorLote        = document.getElementById('contadorLote');
+        const qtdEnvio            = document.getElementById('qtdEnvio');
+        const loteProcessando     = document.getElementById('loteProcessando');
 
         const moldura = new Image();
         moldura.crossOrigin = 'anonymous';
 
-        let cameraAtual = 'environment';
-        let streamAtual = null;
-        let imagemOriginal = null;
-        let fotoJaEnviada = false;
-        
+        let cameraAtual      = 'environment';
+        let streamAtual      = null;
+        let imagemOriginal   = null;
+        let fotoJaEnviada    = false;
+
         let ajuste = { x: 0, y: 0, scale: 1, initialScale: 1 };
 
-        // ⭐ Estado do LOTE
-        let fotosLote = []; // [{ blob, dataUrl, imagem, ajuste }, ...]
-        let indiceEditandoLote = -1; // -1 = não está editando lote
+        // Estado do LOTE
+        let fotosLote          = [];
+        let indiceEditandoLote = -1;
 
         // ============================================
         // REDIMENSIONAMENTO DE ALTA QUALIDADE
         // ============================================
         async function redimensionarCanvasComQualidade(canvasOrigem, larguraFinal, alturaFinal, qualidade = 0.98) {
-            let canvasAtual = canvasOrigem;
+            let canvasAtual  = canvasOrigem;
             let larguraAtual = canvasOrigem.width;
-            let alturaAtual = canvasOrigem.height;
+            let alturaAtual  = canvasOrigem.height;
 
             while (larguraAtual > larguraFinal * 2) {
                 const novaLargura = Math.floor(larguraAtual / 2);
-                const novaAltura = Math.floor(alturaAtual / 2);
-
-                const canvasTemp = document.createElement('canvas');
-                canvasTemp.width = novaLargura;
+                const novaAltura  = Math.floor(alturaAtual / 2);
+                const canvasTemp  = document.createElement('canvas');
+                canvasTemp.width  = novaLargura;
                 canvasTemp.height = novaAltura;
-                
                 const ctxTemp = canvasTemp.getContext('2d');
                 ctxTemp.imageSmoothingEnabled = true;
                 ctxTemp.imageSmoothingQuality = 'high';
                 ctxTemp.drawImage(canvasAtual, 0, 0, novaLargura, novaAltura);
-
-                canvasAtual = canvasTemp;
+                canvasAtual  = canvasTemp;
                 larguraAtual = novaLargura;
-                alturaAtual = novaAltura;
+                alturaAtual  = novaAltura;
             }
 
-            const canvasFinal = document.createElement('canvas');
-            canvasFinal.width = larguraFinal;
+            const canvasFinal  = document.createElement('canvas');
+            canvasFinal.width  = larguraFinal;
             canvasFinal.height = alturaFinal;
-            
             const ctxFinal = canvasFinal.getContext('2d');
             ctxFinal.imageSmoothingEnabled = true;
             ctxFinal.imageSmoothingQuality = 'high';
@@ -1362,27 +1579,27 @@
                     .single();
 
                 if (error) throw error;
-                if (!data) throw new Error('Sem configuração cadastrada');
+                if (!data)  throw new Error('Sem configuração cadastrada');
 
-                MOLDURA.janelaX = data.janela_x;
-                MOLDURA.janelaY = data.janela_y;
+                MOLDURA.janelaX       = data.janela_x;
+                MOLDURA.janelaY       = data.janela_y;
                 MOLDURA.janelaLargura = data.janela_largura;
-                MOLDURA.janelaAltura = data.janela_altura;
-                MOLDURA.arquivo = data.moldura_url;
+                MOLDURA.janelaAltura  = data.janela_altura;
+                MOLDURA.arquivo       = data.moldura_url;
 
                 molduraCamera.src = data.moldura_url;
                 molduraAjuste.src = data.moldura_url;
-                moldura.src = data.moldura_url;
+                moldura.src       = data.moldura_url;
 
                 await new Promise((resolve, reject) => {
                     if (moldura.complete && moldura.naturalWidth > 0) {
                         MOLDURA.larguraTotal = moldura.naturalWidth;
-                        MOLDURA.alturaTotal = moldura.naturalHeight;
+                        MOLDURA.alturaTotal  = moldura.naturalHeight;
                         resolve();
                     } else {
                         moldura.onload = () => {
                             MOLDURA.larguraTotal = moldura.naturalWidth;
-                            MOLDURA.alturaTotal = moldura.naturalHeight;
+                            MOLDURA.alturaTotal  = moldura.naturalHeight;
                             resolve();
                         };
                         moldura.onerror = () => reject(new Error('Falha ao carregar imagem da moldura'));
@@ -1393,31 +1610,29 @@
                 aplicarPosicoesJanela();
                 dimensionarContainers();
 
-                console.log('✅ Configuração carregada');
+                console.log('Configuração carregada');
                 return true;
             } catch (err) {
                 console.error('Erro ao carregar configuração:', err);
-                mostrarModal('erro', 'Erro', 
+                mostrarModal('erro', 'Erro',
                     'Não foi possível carregar a configuração. Recarregue a página.<br><br><small>' + err.message + '</small>');
                 return false;
             }
         }
 
         function aplicarProporcaoMoldura() {
-            const containers = document.querySelectorAll('.container');
             const proporcao = `${MOLDURA.larguraTotal} / ${MOLDURA.alturaTotal}`;
-            containers.forEach(c => c.style.aspectRatio = proporcao);
-
+            document.querySelectorAll('.container').forEach(c => c.style.aspectRatio = proporcao);
             document.querySelectorAll('.item-lote, .item-lote-adicionar').forEach(el => {
                 el.style.aspectRatio = proporcao;
             });
         }
 
         function aplicarPosicoesJanela() {
-            const topPct = (MOLDURA.janelaY / MOLDURA.alturaTotal) * 100;
-            const leftPct = (MOLDURA.janelaX / MOLDURA.larguraTotal) * 100;
-            const widthPct = (MOLDURA.janelaLargura / MOLDURA.larguraTotal) * 100;
-            const heightPct = (MOLDURA.janelaAltura / MOLDURA.alturaTotal) * 100;
+            const topPct    = (MOLDURA.janelaY / MOLDURA.alturaTotal)   * 100;
+            const leftPct   = (MOLDURA.janelaX / MOLDURA.larguraTotal)  * 100;
+            const widthPct  = (MOLDURA.janelaLargura / MOLDURA.larguraTotal) * 100;
+            const heightPct = (MOLDURA.janelaAltura  / MOLDURA.alturaTotal)  * 100;
 
             video.style.cssText = `
                 position: absolute;
@@ -1447,12 +1662,11 @@
             const prop = MOLDURA.larguraTotal / MOLDURA.alturaTotal;
             if (!prop) return;
 
-            const larguraMax = Math.min(window.innerWidth - 24, 380);
-
-            const marcaEl = document.querySelector('.marca');
+            const larguraMax  = Math.min(window.innerWidth - 24, 380);
+            const marcaEl     = document.querySelector('.marca');
             const botoesVisiveis =
-                (!botoesCamera.classList.contains('hidden') ? botoesCamera.offsetHeight : 0) +
-                (!botoesAjuste.classList.contains('hidden') ? botoesAjuste.offsetHeight : 0) +
+                (!botoesCamera.classList.contains('hidden')    ? botoesCamera.offsetHeight    : 0) +
+                (!botoesAjuste.classList.contains('hidden')    ? botoesAjuste.offsetHeight    : 0) +
                 (!botoesResultado.classList.contains('hidden') ? botoesResultado.offsetHeight : 0);
 
             const chromeH =
@@ -1460,11 +1674,10 @@
                 (marcaEl ? marcaEl.offsetHeight : 0) +
                 mensagem.offsetHeight +
                 (!dicaAjuste.classList.contains('hidden') ? dicaAjuste.offsetHeight : 0) +
-                botoesVisiveis +
-                40;
+                botoesVisiveis + 40;
 
             const alturaMax = window.innerHeight - chromeH;
-            const largura = Math.max(200, Math.min(larguraMax, alturaMax * prop));
+            const largura   = Math.max(200, Math.min(larguraMax, alturaMax * prop));
 
             document.querySelectorAll('.container').forEach(c => {
                 c.style.width = largura + 'px';
@@ -1486,7 +1699,7 @@
             if (tela === 'escolha') {
                 telaEscolha.classList.remove('hidden');
                 pararCamera();
-                fotoJaEnviada = false;
+                fotoJaEnviada    = false;
                 indiceEditandoLote = -1;
             } else if (tela === 'camera') {
                 areaCamera.classList.remove('hidden');
@@ -1500,8 +1713,8 @@
                 areaResultado.classList.remove('hidden');
                 botoesResultado.classList.remove('hidden');
                 pararCamera();
-                btnEnviarImpressao.disabled = false;
-                btnEnviarImpressao.textContent = 'Enviar para impressão';
+                btnEnviarImpressao.disabled     = false;
+                btnEnviarImpressao.textContent  = 'Enviar para impressão';
                 btnEnviarImpressao.style.display = fotoJaEnviada ? 'none' : 'inline-flex';
             } else if (tela === 'lote') {
                 telaLote.classList.remove('hidden');
@@ -1520,28 +1733,24 @@
             iniciarCamera();
         });
 
-        btnAbrirGaleria.addEventListener('click', () => {
-            inputFoto.click();
-        });
+        btnAbrirGaleria.addEventListener('click', () => inputFoto.click());
 
-        btnAbrirGaleriaLote.addEventListener('click', () => {
-            inputFotoLote.click();
-        });
+        btnAbrirGaleriaLote.addEventListener('click', () => inputFotoLote.click());
 
         // ============================================
-        // INPUT FOTO ÚNICA (fluxo normal)
+        // INPUT FOTO ÚNICA
         // ============================================
         inputFoto.addEventListener('change', (e) => {
             const arquivo = e.target.files[0];
             if (!arquivo) return;
 
-            indiceEditandoLote = -1;
+            indiceEditandoLote  = -1;
             mensagem.textContent = 'Carregando foto...';
-            
+
             const reader = new FileReader();
             reader.onload = (event) => {
-                const img = new Image();
-                img.onload = () => {
+                const img   = new Image();
+                img.onload  = () => {
                     imagemOriginal = img;
                     mostrarTela('ajuste');
                     setTimeout(() => {
@@ -1555,22 +1764,23 @@
         });
 
         // ============================================
-        // INPUT LOTE (várias fotos)
+        // INPUT LOTE
         // ============================================
         inputFotoLote.addEventListener('change', async (e) => {
             const arquivos = Array.from(e.target.files);
             if (arquivos.length === 0) return;
 
-            // Verifica limite
             const totalDepois = fotosLote.length + arquivos.length;
             if (totalDepois > LIMITE_LOTE) {
                 const podeAdicionar = LIMITE_LOTE - fotosLote.length;
                 if (podeAdicionar <= 0) {
-                    mostrarModal('info', 'Limite atingido', `Você já atingiu o limite de ${LIMITE_LOTE} fotos por envio. Envie essas primeiro e depois pode enviar mais.`);
+                    mostrarModal('info', 'Limite atingido',
+                        `Você já atingiu o limite de ${LIMITE_LOTE} fotos por envio.`);
                     inputFotoLote.value = '';
                     return;
                 }
-                mostrarModal('info', 'Limite de fotos', `Você pode adicionar no máximo ${LIMITE_LOTE} fotos por vez. Vamos processar apenas as ${podeAdicionar} primeiras.`);
+                mostrarModal('info', 'Limite de fotos',
+                    `Você pode adicionar no máximo ${LIMITE_LOTE} fotos por vez. Vamos processar apenas as ${podeAdicionar} primeiras.`);
                 arquivos.splice(podeAdicionar);
             }
 
@@ -1579,20 +1789,15 @@
             gradeLote.classList.add('hidden');
             botoesLote.classList.add('hidden');
 
-            // Processa cada arquivo
             for (const arquivo of arquivos) {
-                try {
-                    await adicionarFotoAoLote(arquivo);
-                } catch (err) {
-                    console.error('Erro ao processar foto:', err);
-                }
+                try { await adicionarFotoAoLote(arquivo); }
+                catch (err) { console.error('Erro ao processar foto:', err); }
             }
 
             inputFotoLote.value = '';
             loteProcessando.classList.add('hidden');
             gradeLote.classList.remove('hidden');
             botoesLote.classList.remove('hidden');
-            
             renderizarGradeLote();
         });
 
@@ -1602,17 +1807,15 @@
                 reader.onload = (event) => {
                     const img = new Image();
                     img.onload = async () => {
-                        // Cria canvas com moldura aplicada automaticamente (centralizado)
-                        const canvasTemp = document.createElement('canvas');
-                        canvasTemp.width = MOLDURA.larguraTotal;
-                        canvasTemp.height = MOLDURA.alturaTotal;
+                        const canvasTemp   = document.createElement('canvas');
+                        canvasTemp.width   = MOLDURA.larguraTotal;
+                        canvasTemp.height  = MOLDURA.alturaTotal;
                         const ctxTemp = canvasTemp.getContext('2d');
                         ctxTemp.fillStyle = '#FFFFFF';
                         ctxTemp.fillRect(0, 0, canvasTemp.width, canvasTemp.height);
 
-                        // Calcula "cover" - preenche a janela mantendo proporção
                         const propJanela = MOLDURA.janelaLargura / MOLDURA.janelaAltura;
-                        const propImg = img.width / img.height;
+                        const propImg    = img.width / img.height;
                         let sx, sy, sW, sH;
 
                         if (propImg > propJanela) {
@@ -1628,25 +1831,26 @@
                         }
 
                         ctxTemp.drawImage(img, sx, sy, sW, sH,
-                            MOLDURA.janelaX, MOLDURA.janelaY,
+                            MOLDURA.janelaX,      MOLDURA.janelaY,
                             MOLDURA.janelaLargura, MOLDURA.janelaAltura);
 
                         if (moldura.complete && moldura.naturalWidth > 0) {
-                            ctxTemp.drawImage(moldura, 0, 0, MOLDURA.larguraTotal, MOLDURA.alturaTotal);
+                            ctxTemp.drawImage(moldura, 0, 0,
+                                MOLDURA.larguraTotal, MOLDURA.alturaTotal);
                         }
 
-                        // Gera preview (menor)
-                        const canvasPreview = document.createElement('canvas');
-                        canvasPreview.width = 300;
+                        const canvasPreview  = document.createElement('canvas');
+                        canvasPreview.width  = 300;
                         canvasPreview.height = (300 * MOLDURA.alturaTotal) / MOLDURA.larguraTotal;
                         const ctxPreview = canvasPreview.getContext('2d');
                         ctxPreview.imageSmoothingQuality = 'high';
-                        ctxPreview.drawImage(canvasTemp, 0, 0, canvasPreview.width, canvasPreview.height);
+                        ctxPreview.drawImage(canvasTemp, 0, 0,
+                            canvasPreview.width, canvasPreview.height);
 
                         fotosLote.push({
-                            imagemOriginal: img,
-                            canvasCompleto: canvasTemp,
-                            previewUrl: canvasPreview.toDataURL('image/jpeg', 0.7),
+                            imagemOriginal:   img,
+                            canvasCompleto:   canvasTemp,
+                            previewUrl:       canvasPreview.toDataURL('image/jpeg', 0.7),
                             editadaManualmente: false
                         });
 
@@ -1665,8 +1869,8 @@
             const proporcao = `${MOLDURA.larguraTotal} / ${MOLDURA.alturaTotal}`;
 
             fotosLote.forEach((foto, index) => {
-                const item = document.createElement('div');
-                item.className = 'item-lote';
+                const item        = document.createElement('div');
+                item.className    = 'item-lote';
                 item.style.aspectRatio = proporcao;
                 item.innerHTML = `
                     <img src="${foto.previewUrl}" alt="Foto ${index + 1}">
@@ -1674,7 +1878,6 @@
                     <button class="item-lote-btn-remover" data-index="${index}">×</button>
                     <div class="item-lote-editar">✎ Editar</div>
                 `;
-                
                 item.addEventListener('click', (e) => {
                     if (e.target.classList.contains('item-lote-btn-remover')) {
                         e.stopPropagation();
@@ -1683,14 +1886,12 @@
                         editarFotoDoLote(index);
                     }
                 });
-
                 gradeLote.appendChild(item);
             });
 
-            // Botão adicionar mais
             if (fotosLote.length < LIMITE_LOTE) {
-                const btnAdd = document.createElement('div');
-                btnAdd.className = 'item-lote-adicionar';
+                const btnAdd       = document.createElement('div');
+                btnAdd.className   = 'item-lote-adicionar';
                 btnAdd.style.aspectRatio = proporcao;
                 btnAdd.innerHTML = `
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -1702,13 +1903,11 @@
                 gradeLote.appendChild(btnAdd);
             }
 
-            contadorLote.textContent = fotosLote.length;
-            qtdEnvio.textContent = fotosLote.length;
-            btnEnviarLote.disabled = fotosLote.length === 0;
+            contadorLote.textContent   = fotosLote.length;
+            qtdEnvio.textContent       = fotosLote.length;
+            btnEnviarLote.disabled     = fotosLote.length === 0;
 
-            if (fotosLote.length === 0) {
-                mostrarTela('escolha');
-            }
+            if (fotosLote.length === 0) mostrarTela('escolha');
         }
 
         function removerFotoDoLote(index) {
@@ -1718,11 +1917,9 @@
 
         function editarFotoDoLote(index) {
             indiceEditandoLote = index;
-            imagemOriginal = fotosLote[index].imagemOriginal;
+            imagemOriginal     = fotosLote[index].imagemOriginal;
             mostrarTela('ajuste');
-            setTimeout(() => {
-                iniciarAjuste();
-            }, 100);
+            setTimeout(() => iniciarAjuste(), 100);
         }
 
         btnVoltarLote.addEventListener('click', () => {
@@ -1740,39 +1937,38 @@
         // AJUSTE
         // ============================================
         function iniciarAjuste() {
-            fotoAjuste.src = imagemOriginal.src;
-            fotoAjuste.style.width = imagemOriginal.width + 'px';
+            fotoAjuste.src    = imagemOriginal.src;
+            fotoAjuste.style.width  = imagemOriginal.width  + 'px';
             fotoAjuste.style.height = imagemOriginal.height + 'px';
 
             const rectArea = areaFoto.getBoundingClientRect();
-            
             if (rectArea.width === 0 || rectArea.height === 0) {
                 setTimeout(iniciarAjuste, 100);
                 return;
             }
 
-            const scaleX = rectArea.width / imagemOriginal.width;
-            const scaleY = rectArea.height / imagemOriginal.height;
+            const scaleX     = rectArea.width  / imagemOriginal.width;
+            const scaleY     = rectArea.height / imagemOriginal.height;
             const scaleCover = Math.max(scaleX, scaleY);
 
-            ajuste.scale = scaleCover;
+            ajuste.scale        = scaleCover;
             ajuste.initialScale = scaleCover;
-            ajuste.x = (rectArea.width - imagemOriginal.width * scaleCover) / 2;
+            ajuste.x = (rectArea.width  - imagemOriginal.width  * scaleCover) / 2;
             ajuste.y = (rectArea.height - imagemOriginal.height * scaleCover) / 2;
 
             aplicarTransform();
         }
 
         function aplicarTransform() {
-            fotoAjuste.style.transform = 
+            fotoAjuste.style.transform =
                 `translate(${ajuste.x}px, ${ajuste.y}px) scale(${ajuste.scale})`;
         }
 
         // GESTOS
-        let toqueInicial = null;
+        let toqueInicial    = null;
         let distanciaInicial = 0;
-        let scaleInicial = 1;
-        let ajusteInicial = { x: 0, y: 0 };
+        let scaleInicial    = 1;
+        let ajusteInicial   = { x: 0, y: 0 };
 
         function getDistancia(t) {
             const dx = t[0].clientX - t[1].clientX;
@@ -1790,13 +1986,13 @@
         areaFoto.addEventListener('touchstart', (e) => {
             e.preventDefault();
             if (e.touches.length === 1) {
-                toqueInicial = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                toqueInicial  = { x: e.touches[0].clientX, y: e.touches[0].clientY };
                 ajusteInicial = { x: ajuste.x, y: ajuste.y };
             } else if (e.touches.length === 2) {
                 distanciaInicial = getDistancia(e.touches);
-                scaleInicial = ajuste.scale;
-                toqueInicial = getCentro(e.touches);
-                ajusteInicial = { x: ajuste.x, y: ajuste.y };
+                scaleInicial     = ajuste.scale;
+                toqueInicial     = getCentro(e.touches);
+                ajusteInicial    = { x: ajuste.x, y: ajuste.y };
             }
         }, { passive: false });
 
@@ -1810,62 +2006,57 @@
                 aplicarTransform();
             } else if (e.touches.length === 2 && distanciaInicial > 0) {
                 const novaDistancia = getDistancia(e.touches);
-                const escalaFator = novaDistancia / distanciaInicial;
-                const novoScale = Math.max(
+                const escalaFator   = novaDistancia / distanciaInicial;
+                const novoScale     = Math.max(
                     ajuste.initialScale * 0.5,
                     Math.min(scaleInicial * escalaFator, ajuste.initialScale * 5)
                 );
-                
                 const centroAtual = getCentro(e.touches);
-                const rectArea = areaFoto.getBoundingClientRect();
+                const rectArea    = areaFoto.getBoundingClientRect();
                 const cx = centroAtual.x - rectArea.left;
                 const cy = centroAtual.y - rectArea.top;
-                
                 const scaleDiff = novoScale / scaleInicial;
-                ajuste.x = cx - (cx - ajusteInicial.x) * scaleDiff;
-                ajuste.y = cy - (cy - ajusteInicial.y) * scaleDiff;
+                ajuste.x     = cx - (cx - ajusteInicial.x) * scaleDiff;
+                ajuste.y     = cy - (cy - ajusteInicial.y) * scaleDiff;
                 ajuste.scale = novoScale;
-                
                 aplicarTransform();
             }
         }, { passive: false });
 
         areaFoto.addEventListener('touchend', (e) => {
             if (e.touches.length === 0) {
-                toqueInicial = null;
+                toqueInicial     = null;
                 distanciaInicial = 0;
             }
         });
 
         let mouseDown = false;
         areaFoto.addEventListener('mousedown', (e) => {
-            mouseDown = true;
-            toqueInicial = { x: e.clientX, y: e.clientY };
-            ajusteInicial = { x: ajuste.x, y: ajuste.y };
+            mouseDown     = true;
+            toqueInicial  = { x: e.clientX, y: e.clientY };
+            ajusteInicial = { x: ajuste.x,  y: ajuste.y  };
         });
         areaFoto.addEventListener('mousemove', (e) => {
             if (!mouseDown) return;
-            const dx = e.clientX - toqueInicial.x;
-            const dy = e.clientY - toqueInicial.y;
-            ajuste.x = ajusteInicial.x + dx;
-            ajuste.y = ajusteInicial.y + dy;
+            ajuste.x = ajusteInicial.x + (e.clientX - toqueInicial.x);
+            ajuste.y = ajusteInicial.y + (e.clientY - toqueInicial.y);
             aplicarTransform();
         });
-        areaFoto.addEventListener('mouseup', () => { mouseDown = false; });
+        areaFoto.addEventListener('mouseup',    () => { mouseDown = false; });
         areaFoto.addEventListener('mouseleave', () => { mouseDown = false; });
         areaFoto.addEventListener('wheel', (e) => {
             e.preventDefault();
-            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            const delta    = e.deltaY > 0 ? 0.9 : 1.1;
             const novoScale = Math.max(
                 ajuste.initialScale * 0.5,
                 Math.min(ajuste.scale * delta, ajuste.initialScale * 5)
             );
-            const rectArea = areaFoto.getBoundingClientRect();
-            const cx = e.clientX - rectArea.left;
-            const cy = e.clientY - rectArea.top;
+            const rectArea  = areaFoto.getBoundingClientRect();
+            const cx        = e.clientX - rectArea.left;
+            const cy        = e.clientY - rectArea.top;
             const scaleDiff = novoScale / ajuste.scale;
-            ajuste.x = cx - (cx - ajuste.x) * scaleDiff;
-            ajuste.y = cy - (cy - ajuste.y) * scaleDiff;
+            ajuste.x     = cx - (cx - ajuste.x) * scaleDiff;
+            ajuste.y     = cy - (cy - ajuste.y) * scaleDiff;
             ajuste.scale = novoScale;
             aplicarTransform();
         }, { passive: false });
@@ -1883,17 +2074,18 @@
         btnResetAjuste.addEventListener('click', iniciarAjuste);
 
         btnConfirmarAjuste.addEventListener('click', () => {
-            canvas.width = MOLDURA.larguraTotal;
+            canvas.width  = MOLDURA.larguraTotal;
             canvas.height = MOLDURA.alturaTotal;
             ctx.fillStyle = '#FFFFFF';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             const rectArea = areaFoto.getBoundingClientRect();
-            const prop = MOLDURA.janelaLargura / rectArea.width;
+            const prop     = MOLDURA.janelaLargura / rectArea.width;
 
             ctx.save();
             ctx.beginPath();
-            ctx.rect(MOLDURA.janelaX, MOLDURA.janelaY, MOLDURA.janelaLargura, MOLDURA.janelaAltura);
+            ctx.rect(MOLDURA.janelaX, MOLDURA.janelaY,
+                     MOLDURA.janelaLargura, MOLDURA.janelaAltura);
             ctx.clip();
             ctx.translate(MOLDURA.janelaX, MOLDURA.janelaY);
             ctx.translate(ajuste.x * prop, ajuste.y * prop);
@@ -1905,22 +2097,22 @@
                 ctx.drawImage(moldura, 0, 0, MOLDURA.larguraTotal, MOLDURA.alturaTotal);
             }
 
-            // Se está editando uma foto do lote, atualiza e volta
             if (indiceEditandoLote >= 0) {
-                const canvasCopia = document.createElement('canvas');
-                canvasCopia.width = canvas.width;
-                canvasCopia.height = canvas.height;
+                const canvasCopia   = document.createElement('canvas');
+                canvasCopia.width   = canvas.width;
+                canvasCopia.height  = canvas.height;
                 canvasCopia.getContext('2d').drawImage(canvas, 0, 0);
 
-                const canvasPreview = document.createElement('canvas');
-                canvasPreview.width = 300;
+                const canvasPreview  = document.createElement('canvas');
+                canvasPreview.width  = 300;
                 canvasPreview.height = (300 * MOLDURA.alturaTotal) / MOLDURA.larguraTotal;
                 const ctxPreview = canvasPreview.getContext('2d');
                 ctxPreview.imageSmoothingQuality = 'high';
-                ctxPreview.drawImage(canvasCopia, 0, 0, canvasPreview.width, canvasPreview.height);
+                ctxPreview.drawImage(canvasCopia, 0, 0,
+                    canvasPreview.width, canvasPreview.height);
 
-                fotosLote[indiceEditandoLote].canvasCompleto = canvasCopia;
-                fotosLote[indiceEditandoLote].previewUrl = canvasPreview.toDataURL('image/jpeg', 0.7);
+                fotosLote[indiceEditandoLote].canvasCompleto     = canvasCopia;
+                fotosLote[indiceEditandoLote].previewUrl         = canvasPreview.toDataURL('image/jpeg', 0.7);
                 fotosLote[indiceEditandoLote].editadaManualmente = true;
 
                 indiceEditandoLote = -1;
@@ -1943,22 +2135,16 @@
                     streamAtual = null;
                 }
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { 
+                    video: {
                         facingMode: cameraAtual,
-                        width: { ideal: 1920 },
+                        width:  { ideal: 1920 },
                         height: { ideal: 2322 }
                     },
                     audio: false
                 });
-                streamAtual = stream;
+                streamAtual    = stream;
                 video.srcObject = stream;
-                
-                if (cameraAtual === 'user') {
-                    video.style.transform = 'scaleX(-1)';
-                } else {
-                    video.style.transform = 'none';
-                }
-                
+                video.style.transform = cameraAtual === 'user' ? 'scaleX(-1)' : 'none';
                 video.onloadedmetadata = () => {
                     video.play();
                     mensagem.textContent = '';
@@ -1976,6 +2162,7 @@
         }
 
         btnVoltarCamera.addEventListener('click', () => mostrarTela('escolha'));
+
         btnVirarCamera.addEventListener('click', () => {
             cameraAtual = cameraAtual === 'environment' ? 'user' : 'environment';
             iniciarCamera();
@@ -1986,7 +2173,7 @@
                 alert('Câmera ainda não está pronta.');
                 return;
             }
-            canvas.width = MOLDURA.larguraTotal;
+            canvas.width  = MOLDURA.larguraTotal;
             canvas.height = MOLDURA.alturaTotal;
             ctx.fillStyle = '#FFFFFF';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -2014,6 +2201,7 @@
             if (moldura.complete && moldura.naturalWidth > 0) {
                 ctx.drawImage(moldura, 0, 0, MOLDURA.larguraTotal, MOLDURA.alturaTotal);
             }
+
             fotoJaEnviada = false;
             mostrarTela('resultado');
         });
@@ -2029,9 +2217,9 @@
         });
 
         btnBaixar.addEventListener('click', () => {
-            const link = document.createElement('a');
-            link.download = 'entreclicks-' + Date.now() + '.jpg';
-            link.href = canvas.toDataURL('image/jpeg', 0.95);
+            const link      = document.createElement('a');
+            link.download   = 'entreclicks-' + Date.now() + '.jpg';
+            link.href       = canvas.toDataURL('image/jpeg', 0.95);
             link.click();
         });
 
@@ -2039,16 +2227,15 @@
             try {
                 canvas.toBlob(async (blob) => {
                     const arquivo = new File(
-                        [blob], 
+                        [blob],
                         'entreclicks-' + Date.now() + '.jpg',
                         { type: 'image/jpeg' }
                     );
-
                     if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
                         await navigator.share({
                             files: [arquivo],
                             title: 'Entre Clicks',
-                            text: 'Eternize esse momento'
+                            text:  'Eternize esse momento'
                         });
                     } else {
                         alert('Seu navegador não suporta compartilhamento direto. Vamos baixar a foto pra você compartilhar manualmente.');
@@ -2072,31 +2259,30 @@
                 return;
             }
 
-            const overlay = document.getElementById('overlayEnvio');
-            const barraFill = document.getElementById('barraFill');
+            const overlay      = document.getElementById('overlayEnvio');
+            const barraFill    = document.getElementById('barraFill');
             const percentualEl = document.getElementById('envioPercentual');
-            const mensagemEl = document.getElementById('envioMensagem');
-            const contadorEl = document.getElementById('envioContador');
+            const mensagemEl   = document.getElementById('envioMensagem');
+            const contadorEl   = document.getElementById('envioContador');
             contadorEl.classList.add('hidden');
 
             const mensagens = [
-                { pct: 0, texto: 'Preparando sua foto...' },
-                { pct: 20, texto: 'Otimizando qualidade...' },
+                { pct:  0, texto: 'Preparando sua foto...'     },
+                { pct: 20, texto: 'Otimizando qualidade...'    },
                 { pct: 50, texto: 'Enviando para impressão...' },
-                { pct: 80, texto: 'Quase lá...' },
-                { pct: 95, texto: 'Finalizando...' }
+                { pct: 80, texto: 'Quase lá...'                },
+                { pct: 95, texto: 'Finalizando...'             }
             ];
 
             function atualizarProgresso(pct) {
-                barraFill.style.width = pct + '%';
-                percentualEl.textContent = Math.round(pct) + '%';
-                
+                barraFill.style.width      = pct + '%';
+                percentualEl.textContent   = Math.round(pct) + '%';
                 for (let i = mensagens.length - 1; i >= 0; i--) {
                     if (pct >= mensagens[i].pct) {
                         if (mensagemEl.textContent !== mensagens[i].texto) {
                             mensagemEl.style.opacity = '0';
                             setTimeout(() => {
-                                mensagemEl.textContent = mensagens[i].texto;
+                                mensagemEl.textContent   = mensagens[i].texto;
                                 mensagemEl.style.opacity = '1';
                             }, 200);
                         }
@@ -2120,14 +2306,15 @@
             }, 100);
 
             try {
-                const blob = await redimensionarCanvasComQualidade(canvas, LARGURA_IMPRESSAO, ALTURA_IMPRESSAO, QUALIDADE_JPEG);
+                const blob = await redimensionarCanvasComQualidade(
+                    canvas, LARGURA_IMPRESSAO, ALTURA_IMPRESSAO, QUALIDADE_JPEG);
                 if (!blob) throw new Error('Erro ao gerar foto');
 
                 clearInterval(intervalSimulado);
                 atualizarProgresso(35);
 
-                const timestamp = Date.now();
-                const random = Math.random().toString(36).substring(2, 8);
+                const timestamp   = Date.now();
+                const random      = Math.random().toString(36).substring(2, 8);
                 const nomeArquivo = `foto-${timestamp}-${random}.jpg`;
 
                 let progressoUpload = 35;
@@ -2145,8 +2332,8 @@
                     .from(BUCKET_FOTOS)
                     .upload(nomeArquivo, blob, {
                         cacheControl: '3600',
-                        upsert: false,
-                        contentType: 'image/jpeg'
+                        upsert:       false,
+                        contentType:  'image/jpeg'
                     });
 
                 clearInterval(intervalUpload);
@@ -2158,7 +2345,7 @@
                 fotoJaEnviada = true;
                 btnEnviarImpressao.style.display = 'none';
                 overlay.classList.remove('ativo');
-                
+
                 mostrarModal('sucesso', 'Foto enviada',
                     'Sua foto será impressa e entregue durante o evento.<br><br>Você também pode baixar ou compartilhar sua foto agora.',
                     true);
@@ -2167,41 +2354,40 @@
                 console.error('Erro upload:', err);
                 clearInterval(intervalSimulado);
                 overlay.classList.remove('ativo');
-                btnEnviarImpressao.disabled = false;
+                btnEnviarImpressao.disabled    = false;
                 btnEnviarImpressao.textContent = 'Enviar para impressão';
-                
                 mostrarModal('erro', 'Algo deu errado',
                     'Não foi possível enviar. Verifique sua internet e tente novamente.<br><br><small>' + err.message + '</small>');
             }
         });
 
         // ============================================
-        // ⭐ ENVIAR LOTE (várias fotos)
+        // ENVIAR LOTE
         // ============================================
         btnEnviarLote.addEventListener('click', async () => {
             if (fotosLote.length === 0) return;
 
-            const overlay = document.getElementById('overlayEnvio');
-            const barraFill = document.getElementById('barraFill');
+            const overlay      = document.getElementById('overlayEnvio');
+            const barraFill    = document.getElementById('barraFill');
             const percentualEl = document.getElementById('envioPercentual');
-            const mensagemEl = document.getElementById('envioMensagem');
-            const contadorEl = document.getElementById('envioContador');
-            
+            const mensagemEl   = document.getElementById('envioMensagem');
+            const contadorEl   = document.getElementById('envioContador');
+
             contadorEl.classList.remove('hidden');
             overlay.classList.add('ativo');
             btnEnviarLote.disabled = true;
 
-            const total = fotosLote.length;
-            let enviadas = 0;
-            let erros = 0;
+            const total   = fotosLote.length;
+            let enviadas  = 0;
+            let erros     = 0;
 
             function atualizarProgresso(pct, msg, contador) {
-                barraFill.style.width = pct + '%';
+                barraFill.style.width    = pct + '%';
                 percentualEl.textContent = Math.round(pct) + '%';
                 if (msg) {
                     mensagemEl.style.opacity = '0';
                     setTimeout(() => {
-                        mensagemEl.textContent = msg;
+                        mensagemEl.textContent   = msg;
                         mensagemEl.style.opacity = '1';
                     }, 200);
                 }
@@ -2209,25 +2395,23 @@
             }
 
             for (let i = 0; i < fotosLote.length; i++) {
-                const foto = fotosLote[i];
-                const numero = i + 1;
+                const foto     = fotosLote[i];
+                const numero   = i + 1;
                 const pctInicio = (i / total) * 100;
-                const pctFim = ((i + 1) / total) * 100;
+                const pctFim    = ((i + 1) / total) * 100;
 
                 try {
-                    atualizarProgresso(pctInicio, `Enviando foto ${numero}...`, `${numero} de ${total}`);
+                    atualizarProgresso(pctInicio,
+                        `Enviando foto ${numero}...`, `${numero} de ${total}`);
 
                     const blob = await redimensionarCanvasComQualidade(
                         foto.canvasCompleto,
-                        LARGURA_IMPRESSAO,
-                        ALTURA_IMPRESSAO,
-                        QUALIDADE_JPEG
-                    );
+                        LARGURA_IMPRESSAO, ALTURA_IMPRESSAO, QUALIDADE_JPEG);
 
                     if (!blob) throw new Error('Erro ao gerar foto');
 
-                    const timestamp = Date.now();
-                    const random = Math.random().toString(36).substring(2, 8);
+                    const timestamp   = Date.now();
+                    const random      = Math.random().toString(36).substring(2, 8);
                     const nomeArquivo = `foto-${timestamp}-${random}.jpg`;
 
                     const { error } = await supabaseClient
@@ -2235,14 +2419,15 @@
                         .from(BUCKET_FOTOS)
                         .upload(nomeArquivo, blob, {
                             cacheControl: '3600',
-                            upsert: false,
-                            contentType: 'image/jpeg'
+                            upsert:       false,
+                            contentType:  'image/jpeg'
                         });
 
                     if (error) throw error;
 
                     enviadas++;
-                    atualizarProgresso(pctFim, `Foto ${numero} enviada!`, `${numero} de ${total}`);
+                    atualizarProgresso(pctFim,
+                        `Foto ${numero} enviada!`, `${numero} de ${total}`);
                     await new Promise(r => setTimeout(r, 300));
 
                 } catch (err) {
@@ -2288,15 +2473,12 @@
                     <div class="modal-cta-titulo">Gostou da experiência?</div>
                     <div class="modal-cta-subtitulo">conheça a Entre Clicks</div>
                     <div class="modal-cta-botoes">
-                        <a href="https://wa.me/5528999281772" target="_blank" rel="noopener" class="whats" title="WhatsApp">
-                            ${ICONE_WHATS}
-                        </a>
-                        <a href="https://instagram.com/entreclicks.oficial" target="_blank" rel="noopener" class="insta" title="Instagram">
-                            ${ICONE_INSTA}
-                        </a>
+                        <a href="https://wa.me/5528999281772" target="_blank" rel="noopener"
+                            class="whats" title="WhatsApp">${ICONE_WHATS}</a>
+                        <a href="https://instagram.com/entreclicks.oficial" target="_blank" rel="noopener"
+                            class="insta" title="Instagram">${ICONE_INSTA}</a>
                     </div>
-                </div>
-            ` : '';
+                </div>` : '';
 
             const modal = document.createElement('div');
             modal.className = 'modal';
@@ -2323,6 +2505,7 @@
             }
         })();
     </script>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f"}' crossorigin="anonymous"></script>
+
+    <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f"}' crossorigin="anonymous"></script>
 </body>
 </html>
