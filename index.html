@@ -2222,33 +2222,149 @@
             link.click();
         });
 
-        btnCompartilhar.addEventListener('click', async () => {
-            try {
-                canvas.toBlob(async (blob) => {
-                    const arquivo = new File(
-                        [blob],
-                        'entreclicks-' + Date.now() + '.jpg',
-                        { type: 'image/jpeg' }
-                    );
-                    if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
-                        await navigator.share({
-                            files: [arquivo],
-                            title: 'Entre Clicks',
-                            text:  'Eternize esse momento'
-                        });
-                    } else {
-                        alert('Seu navegador não suporta compartilhamento direto. Vamos baixar a foto pra você compartilhar manualmente.');
-                        btnBaixar.click();
-                    }
-                }, 'image/jpeg', 0.95);
-            } catch (err) {
-                if (err.name !== 'AbortError') {
-                    console.error(err);
-                    alert('Não foi possível compartilhar. Tente baixar a foto.');
-                }
-            }
-        });
+       // ============================================
+// GERA VERSÃO 9:16 COM FUNDO DESFOCADO PRA COMPARTILHAR
+// ============================================
+async function gerarCanvasParaCompartilhamento() {
+    // Formato ideal pra Stories (9:16)
+    const LARGURA_SHARE = 1080;
+    const ALTURA_SHARE  = 1920;
 
+    const canvasShare  = document.createElement('canvas');
+    canvasShare.width  = LARGURA_SHARE;
+    canvasShare.height = ALTURA_SHARE;
+    const ctxShare = canvasShare.getContext('2d');
+    ctxShare.imageSmoothingEnabled = true;
+    ctxShare.imageSmoothingQuality = 'high';
+
+    // ============ 1. FUNDO DESFOCADO ============
+    // Desenha a foto original ampliada preenchendo todo o canvas 9:16
+    // e aplica blur pra criar o efeito de fundo estilo Spotify/Instagram
+
+    const propCanvas = canvas.width / canvas.height;
+    const propShare  = LARGURA_SHARE / ALTURA_SHARE;
+
+    // Calcula "cover" - preenche todo o canvas de share
+    let bgW, bgH, bgX, bgY;
+    if (propCanvas > propShare) {
+        // foto mais larga que 9:16
+        bgH = ALTURA_SHARE;
+        bgW = ALTURA_SHARE * propCanvas;
+        bgX = (LARGURA_SHARE - bgW) / 2;
+        bgY = 0;
+    } else {
+        // foto mais alta que 9:16 (nosso caso: 3:4)
+        bgW = LARGURA_SHARE;
+        bgH = LARGURA_SHARE / propCanvas;
+        bgX = 0;
+        bgY = (ALTURA_SHARE - bgH) / 2;
+    }
+
+    // Aplica o blur usando filtro do canvas
+    ctxShare.filter = 'blur(40px) brightness(0.55) saturate(1.3)';
+    ctxShare.drawImage(canvas, bgX, bgY, bgW, bgH);
+    ctxShare.filter = 'none';
+
+    // Camada escura suave por cima pra dar mais elegância
+    ctxShare.fillStyle = 'rgba(10, 10, 10, 0.35)';
+    ctxShare.fillRect(0, 0, LARGURA_SHARE, ALTURA_SHARE);
+
+    // ============ 2. FOTO PRINCIPAL CENTRALIZADA ============
+    // Calcula "contain" - foto inteira aparece sem cortar
+    let fgW, fgH, fgX, fgY;
+
+    // Deixa uma margem lateral pra respirar
+    const MARGEM = 60; // px
+    const larguraDisponivel = LARGURA_SHARE - (MARGEM * 2);
+    const alturaDisponivel  = ALTURA_SHARE  - (MARGEM * 2);
+
+    if (propCanvas > (larguraDisponivel / alturaDisponivel)) {
+        fgW = larguraDisponivel;
+        fgH = larguraDisponivel / propCanvas;
+    } else {
+        fgH = alturaDisponivel;
+        fgW = alturaDisponivel * propCanvas;
+    }
+
+    fgX = (LARGURA_SHARE - fgW) / 2;
+    fgY = (ALTURA_SHARE  - fgH) / 2;
+
+    // Sombra sutil embaixo da foto
+    ctxShare.shadowColor   = 'rgba(0, 0, 0, 0.5)';
+    ctxShare.shadowBlur    = 30;
+    ctxShare.shadowOffsetX = 0;
+    ctxShare.shadowOffsetY = 10;
+
+    ctxShare.drawImage(canvas, fgX, fgY, fgW, fgH);
+
+    // Remove a sombra pras próximas operações
+    ctxShare.shadowColor   = 'transparent';
+    ctxShare.shadowBlur    = 0;
+    ctxShare.shadowOffsetY = 0;
+
+    return canvasShare;
+}
+
+// ============================================
+// COMPARTILHAR (usa versão 9:16 pra stories/feed)
+// ============================================
+btnCompartilhar.addEventListener('click', async () => {
+    try {
+        // Feedback visual imediato
+        const textoOriginal = btnCompartilhar.innerHTML;
+        btnCompartilhar.disabled = true;
+        btnCompartilhar.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
+            </svg>
+            Preparando...
+        `;
+
+        // Gera a versão 9:16 com fundo desfocado
+        const canvasCompartilhar = await gerarCanvasParaCompartilhamento();
+
+        canvasCompartilhar.toBlob(async (blob) => {
+            btnCompartilhar.disabled = false;
+            btnCompartilhar.innerHTML = textoOriginal;
+
+            if (!blob) {
+                alert('Erro ao gerar imagem. Tente baixar a foto.');
+                return;
+            }
+
+            const arquivo = new File(
+                [blob],
+                'entreclicks-' + Date.now() + '.jpg',
+                { type: 'image/jpeg' }
+            );
+
+            if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+                try {
+                    await navigator.share({
+                        files: [arquivo],
+                        title: 'Entre Clicks',
+                        text:  'Eternize esse momento'
+                    });
+                } catch (err) {
+                    if (err.name !== 'AbortError') throw err;
+                }
+            } else {
+                alert('Seu navegador não suporta compartilhamento direto. Vamos baixar a foto pra você compartilhar manualmente.');
+                // Baixa a versão 9:16 mesmo
+                const link      = document.createElement('a');
+                link.download   = 'entreclicks-share-' + Date.now() + '.jpg';
+                link.href       = canvasCompartilhar.toDataURL('image/jpeg', 0.95);
+                link.click();
+            }
+        }, 'image/jpeg', 0.95);
+
+    } catch (err) {
+        btnCompartilhar.disabled = false;
+        console.error(err);
+        alert('Não foi possível compartilhar. Tente baixar a foto.');
+    }
+});
         // ============================================
         // ENVIAR FOTO ÚNICA
         // ============================================
