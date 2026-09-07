@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Entre Clicks — Eternize esse momento</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,10 +34,12 @@
             --vermelho:      #f87171;
         }
 
+        /* Ajuste DVH para corrigir barra de navegação no Safari/Chrome Mobile */
         html, body {
             width: 100%;
-            height: 100%;
-            overflow: hidden;
+            height: 100dvh; 
+            overflow-x: hidden;
+            background: var(--preto);
         }
 
         body {
@@ -49,11 +51,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 16px 12px 60px 12px;
+            padding: 16px 12px 70px 12px; /* Margem extra no rodapé */
             font-weight: 300;
             letter-spacing: 0.3px;
-            min-height: 100vh;
-            overflow-y: auto;
+            min-height: 100dvh;
+            overflow-y: auto; /* Garante que sempre role se a tela for pequena */
         }
 
         /* ============================================================
@@ -63,6 +65,7 @@
             text-align: center;
             margin: 8px 0 12px 0;
             animation: fadeInDown 0.8s ease;
+            flex-shrink: 0;
         }
 
         .marca-logo {
@@ -104,7 +107,7 @@
             flex: 1;
             width: 100%;
             max-width: 380px;
-            padding: 20px 10px;
+            padding: 20px 10px 40px;
             animation: fadeIn 0.6s ease;
         }
 
@@ -194,10 +197,7 @@
             flex-shrink: 0;
         }
 
-        .aviso-evento-icone svg {
-            width: 18px;
-            height: 18px;
-        }
+        .aviso-evento-icone svg { width: 18px; height: 18px; }
 
         .aviso-evento-titulo {
             font-family: 'Playfair Display', serif;
@@ -219,7 +219,6 @@
             margin-top: 1px;
         }
 
-        /* ⭐ Destaque clean — uma linha só */
         .aviso-destaque {
             margin-top: 14px;
             padding: 10px 12px;
@@ -240,12 +239,7 @@
             white-space: nowrap;
         }
 
-        .aviso-destaque svg {
-            width: 15px;
-            height: 15px;
-            flex-shrink: 0;
-            color: var(--dourado);
-        }
+        .aviso-destaque svg { width: 15px; height: 15px; flex-shrink: 0; color: var(--dourado); }
 
         /* ============================================================
            BOTÕES DE ESCOLHA
@@ -269,88 +263,41 @@
         .btn-escolha::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg,
-                transparent, rgba(212, 175, 122, 0.1), transparent);
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 122, 0.1), transparent);
             transition: left 0.6s;
         }
 
-        .btn-escolha:hover::before,
-        .btn-escolha:active::before { left: 100%; }
+        .btn-escolha:hover::before, .btn-escolha:active::before { left: 100%; }
 
-        .btn-escolha:hover,
-        .btn-escolha:active {
+        .btn-escolha:hover, .btn-escolha:active {
             border-color: var(--dourado);
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(212, 175, 122, 0.15);
         }
 
         .btn-escolha .icone {
-            width: 40px;
-            height: 40px;
-            border: 1px solid var(--dourado);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            color: var(--dourado);
-            transition: all 0.3s ease;
+            width: 40px; height: 40px;
+            border: 1px solid var(--dourado); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; color: var(--dourado); transition: all 0.3s ease;
         }
 
-        .btn-escolha:hover .icone {
-            background: var(--dourado);
-            color: var(--preto);
-        }
-
+        .btn-escolha:hover .icone { background: var(--dourado); color: var(--preto); }
         .btn-escolha .icone svg { width: 20px; height: 20px; }
-
-        .btn-escolha .texto {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-            text-align: left;
-            flex: 1;
-        }
-
-        .btn-escolha .titulo-btn {
-            font-family: 'Playfair Display', serif;
-            font-size: 15px;
-            font-weight: 500;
-            letter-spacing: 1px;
-            color: var(--branco);
-        }
-
-        .btn-escolha .desc {
-            font-size: 10px;
-            color: var(--cinza-suave);
-            letter-spacing: 0.5px;
-            font-weight: 300;
-        }
+        .btn-escolha .texto { display: flex; flex-direction: column; gap: 3px; text-align: left; flex: 1; }
+        .btn-escolha .titulo-btn { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 500; letter-spacing: 1px; color: var(--branco); }
+        .btn-escolha .desc { font-size: 10px; color: var(--cinza-suave); letter-spacing: 0.5px; font-weight: 300; }
 
         .btn-escolha.destaque {
             border-color: var(--dourado);
-            background: linear-gradient(135deg,
-                rgba(212, 175, 122, 0.08),
-                rgba(212, 175, 122, 0.02));
+            background: linear-gradient(135deg, rgba(212, 175, 122, 0.08), rgba(212, 175, 122, 0.02));
         }
 
         .btn-escolha.destaque .titulo-btn::after {
-            content: 'NOVO';
-            display: inline-block;
-            margin-left: 6px;
-            font-family: 'Inter', sans-serif;
-            font-size: 8px;
-            background: var(--dourado);
-            color: var(--preto);
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            vertical-align: middle;
+            content: 'NOVO'; display: inline-block; margin-left: 6px;
+            font-family: 'Inter', sans-serif; font-size: 8px; background: var(--dourado); color: var(--preto);
+            padding: 2px 6px; border-radius: 3px; font-weight: 700; letter-spacing: 1px; vertical-align: middle;
         }
 
         /* ============================================================
@@ -371,47 +318,12 @@
             flex-shrink: 0;
         }
 
-        #video {
-            position: absolute;
-            object-fit: cover;
-            display: block;
-        }
-
-        #canvasResultado {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            object-fit: contain;
-            display: block;
-        }
-
-        .area-ajuste {
-            position: absolute;
-            overflow: hidden;
-            background: var(--cinza);
-            touch-action: none;
-            cursor: grab;
-        }
-
+        #video { position: absolute; object-fit: cover; display: block; }
+        #canvasResultado { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; display: block; }
+        .area-ajuste { position: absolute; overflow: hidden; background: var(--cinza); touch-action: none; cursor: grab; }
         .area-ajuste:active { cursor: grabbing; }
-
-        #fotoAjuste {
-            position: absolute;
-            top: 0; left: 0;
-            transform-origin: 0 0;
-            will-change: transform;
-            pointer-events: none;
-            max-width: none;
-            max-height: none;
-        }
-
-        .moldura-overlay {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 10;
-        }
+        #fotoAjuste { position: absolute; top: 0; left: 0; transform-origin: 0 0; will-change: transform; pointer-events: none; max-width: none; max-height: none; }
+        .moldura-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
 
         /* ============================================================
            BOTÕES GERAIS
@@ -423,7 +335,7 @@
             justify-content: center;
             width: 100%;
             max-width: 380px;
-            padding: 5px 0;
+            padding: 5px 0 20px; /* Mais padding inferior pra não grudar no rodapé */
         }
 
         .btn {
@@ -447,679 +359,144 @@
             gap: 6px;
         }
 
-        .btn:hover:not(:disabled),
-        .btn:active {
-            background: var(--preto-2);
-            border-color: var(--dourado);
-            color: var(--dourado);
-        }
-
+        .btn:hover:not(:disabled), .btn:active { background: var(--preto-2); border-color: var(--dourado); color: var(--dourado); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn svg { width: 14px; height: 14px; }
 
-        .btn-voltar {
-            background: transparent;
-            border-color: rgba(255,255,255,0.15);
-            color: var(--cinza-suave);
-            flex: 0 0 auto;
-            min-width: 90px;
-        }
-
-        .btn-voltar:hover:not(:disabled) {
-            border-color: rgba(255,255,255,0.4);
-            color: var(--branco);
-            background: transparent;
-        }
-
-        .btn-primario {
-            background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro));
-            color: var(--preto);
-            border: none;
-            font-weight: 600;
-        }
-
-        .btn-primario:hover:not(:disabled) {
-            background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
-            color: var(--preto);
-            box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4);
-        }
+        .btn-voltar { background: transparent; border-color: rgba(255,255,255,0.15); color: var(--cinza-suave); flex: 0 0 auto; min-width: 90px; }
+        .btn-voltar:hover:not(:disabled) { border-color: rgba(255,255,255,0.4); color: var(--branco); background: transparent; }
+        .btn-primario { background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro)); color: var(--preto); border: none; font-weight: 600; }
+        .btn-primario:hover:not(:disabled) { background: linear-gradient(135deg, var(--dourado-claro), var(--dourado)); color: var(--preto); box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4); }
 
         .btn-enviar-impressao {
             background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro));
-            color: var(--preto);
-            border: none;
-            width: 100%;
-            padding: 15px;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            flex: 1 1 100%;
-            box-shadow: 0 4px 20px rgba(212, 175, 122, 0.25);
-            position: relative;
-            overflow: hidden;
+            color: var(--preto); border: none; width: 100%; padding: 15px; font-size: 12px; font-weight: 700;
+            letter-spacing: 2px; flex: 1 1 100%; box-shadow: 0 4px 20px rgba(212, 175, 122, 0.25);
+            position: relative; overflow: hidden;
         }
-
         .btn-enviar-impressao::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg,
-                transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.7s;
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); transition: left 0.7s;
         }
-
         .btn-enviar-impressao:hover::before { left: 100%; }
-
-        .btn-enviar-impressao:hover:not(:disabled) {
-            background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
-            box-shadow: 0 6px 30px rgba(212, 175, 122, 0.5);
-        }
+        .btn-enviar-impressao:hover:not(:disabled) { background: linear-gradient(135deg, var(--dourado-claro), var(--dourado)); box-shadow: 0 6px 30px rgba(212, 175, 122, 0.5); }
 
         .hidden { display: none !important; }
-
-        #mensagem {
-            padding: 5px;
-            text-align: center;
-            color: var(--dourado);
-            font-size: 11px;
-            min-height: 20px;
-            letter-spacing: 1px;
-            font-style: italic;
-            font-family: 'Playfair Display', serif;
-        }
-
+        #mensagem { padding: 5px; text-align: center; color: var(--dourado); font-size: 11px; min-height: 20px; letter-spacing: 1px; font-style: italic; font-family: 'Playfair Display', serif; }
         #inputFoto, #inputFotoLote { display: none; }
-
-        .dica-ajuste {
-            text-align: center;
-            color: var(--cinza-suave);
-            font-size: 10px;
-            margin-top: 4px;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            font-weight: 400;
-        }
-
-        .dica-ajuste .separador {
-            color: var(--dourado);
-            margin: 0 8px;
-        }
+        .dica-ajuste { text-align: center; color: var(--cinza-suave); font-size: 10px; margin-top: 4px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 400; }
+        .dica-ajuste .separador { color: var(--dourado); margin: 0 8px; }
 
         /* ============================================================
            TELA DE LOTE
         ============================================================ */
-        .tela-lote {
-            width: 100%;
-            max-width: 380px;
-            padding: 10px;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .lote-titulo {
-            text-align: center;
-            margin-bottom: 16px;
-        }
-
-        .lote-titulo h2 {
-            font-family: 'Playfair Display', serif;
-            font-weight: 500;
-            font-size: 20px;
-            color: var(--branco);
-            margin-bottom: 4px;
-        }
-
-        .lote-titulo p {
-            font-size: 10px;
-            color: var(--cinza-suave);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .lote-titulo p span {
-            color: var(--dourado);
-            font-weight: 600;
-        }
-
-        .grade-lote {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .item-lote {
-            position: relative;
-            aspect-ratio: 2000 / 2666;
-            background: var(--preto-2);
-            border: 1px solid rgba(212, 175, 122, 0.2);
-            border-radius: 4px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .item-lote:hover,
-        .item-lote:active {
-            border-color: var(--dourado);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(212, 175, 122, 0.2);
-        }
-
-        .item-lote img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .item-lote-btn-remover {
-            position: absolute;
-            top: 4px; right: 4px;
-            width: 22px; height: 22px;
-            background: rgba(0,0,0,0.8);
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            color: var(--branco);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            z-index: 5;
-            transition: all 0.2s ease;
-        }
-
-        .item-lote-btn-remover:hover,
-        .item-lote-btn-remover:active {
-            background: var(--erro);
-            border-color: var(--erro);
-            transform: scale(1.1);
-        }
-
-        .item-lote-numero {
-            position: absolute;
-            top: 4px; left: 4px;
-            width: 22px; height: 22px;
-            background: rgba(212, 175, 122, 0.95);
-            color: var(--preto);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: 700;
-            font-family: 'Playfair Display', serif;
-        }
-
-        .item-lote-editar {
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            background: linear-gradient(180deg, transparent, rgba(0,0,0,0.8));
-            color: var(--dourado);
-            font-size: 8px;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            text-align: center;
-            padding: 8px 4px 4px;
-            font-weight: 500;
-        }
-
-        .item-lote-adicionar {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            background: transparent;
-            border: 1px dashed rgba(212, 175, 122, 0.4);
-            color: var(--dourado);
-            aspect-ratio: 2000 / 2666;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .item-lote-adicionar:hover,
-        .item-lote-adicionar:active {
-            border-color: var(--dourado);
-            background: rgba(212, 175, 122, 0.05);
-            transform: translateY(-2px);
-        }
-
+        .tela-lote { width: 100%; max-width: 380px; padding: 10px; animation: fadeIn 0.4s ease; flex: 1; }
+        .lote-titulo { text-align: center; margin-bottom: 16px; }
+        .lote-titulo h2 { font-family: 'Playfair Display', serif; font-weight: 500; font-size: 20px; color: var(--branco); margin-bottom: 4px; }
+        .lote-titulo p { font-size: 10px; color: var(--cinza-suave); letter-spacing: 2px; text-transform: uppercase; }
+        .lote-titulo p span { color: var(--dourado); font-weight: 600; }
+        
+        .grade-lote { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+        .item-lote { position: relative; aspect-ratio: 2000 / 2666; background: var(--preto-2); border: 1px solid rgba(212, 175, 122, 0.2); border-radius: 4px; overflow: hidden; cursor: pointer; transition: all 0.3s ease; }
+        .item-lote:hover, .item-lote:active { border-color: var(--dourado); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(212, 175, 122, 0.2); }
+        .item-lote img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        
+        .item-lote-btn-remover { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; color: var(--branco); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; font-weight: bold; z-index: 5; transition: all 0.2s ease; }
+        .item-lote-btn-remover:hover, .item-lote-btn-remover:active { background: var(--erro); border-color: var(--erro); transform: scale(1.1); }
+        .item-lote-numero { position: absolute; top: 4px; left: 4px; width: 22px; height: 22px; background: rgba(212, 175, 122, 0.95); color: var(--preto); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; font-family: 'Playfair Display', serif; }
+        .item-lote-editar { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(180deg, transparent, rgba(0,0,0,0.8)); color: var(--dourado); font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; text-align: center; padding: 8px 4px 4px; font-weight: 500; }
+        .item-lote-adicionar { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; background: transparent; border: 1px dashed rgba(212, 175, 122, 0.4); color: var(--dourado); aspect-ratio: 2000 / 2666; border-radius: 4px; cursor: pointer; transition: all 0.3s ease; }
+        .item-lote-adicionar:hover, .item-lote-adicionar:active { border-color: var(--dourado); background: rgba(212, 175, 122, 0.05); transform: translateY(-2px); }
         .item-lote-adicionar svg { width: 24px; height: 24px; }
-
-        .item-lote-adicionar span {
-            font-size: 9px;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            font-weight: 500;
-        }
-
-        .lote-processando {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--dourado);
-        }
-
+        .item-lote-adicionar span { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 500; }
+        .lote-processando { text-align: center; padding: 40px 20px; color: var(--dourado); }
         .lote-processando .loading-spinner { margin: 0 auto 16px; }
-
-        .lote-processando p {
-            font-family: 'Playfair Display', serif;
-            font-style: italic;
-            font-size: 14px;
-        }
+        .lote-processando p { font-family: 'Playfair Display', serif; font-style: italic; font-size: 14px; }
 
         /* ============================================================
            LOADING INICIAL
         ============================================================ */
-        .loading-inicial {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: var(--preto);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            gap: 24px;
-        }
-
-        .loading-spinner {
-            width: 50px; height: 50px;
-            border: 1px solid rgba(212, 175, 122, 0.15);
-            border-top: 1px solid var(--dourado);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
+        .loading-inicial { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--preto); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; gap: 24px; }
+        .loading-spinner { width: 50px; height: 50px; border: 1px solid rgba(212, 175, 122, 0.15); border-top: 1px solid var(--dourado); border-radius: 50%; animation: spin 1s linear infinite; }
         .loading-inicial .marca-logo { font-size: 18px; letter-spacing: 8px; opacity: 0.9; }
-
-        .loading-inicial p {
-            color: var(--cinza-suave);
-            font-size: 10px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            font-weight: 300;
-        }
+        .loading-inicial p { color: var(--cinza-suave); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; font-weight: 300; }
 
         /* ============================================================
            MODAL
         ============================================================ */
-        .modal {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 20px;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-conteudo {
-            background: linear-gradient(135deg, var(--grafite), var(--preto-2));
-            color: var(--branco);
-            padding: 40px 30px 30px 30px;
-            border: 1px solid rgba(212, 175, 122, 0.3);
-            border-radius: 6px;
-            text-align: center;
-            max-width: 360px;
-            width: 100%;
-            animation: slideUp 0.4s ease;
-            position: relative;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-        }
-
-        .modal-conteudo::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 20%; right: 20%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--dourado), transparent);
-        }
-
-        .modal-icone {
-            width: 60px; height: 60px;
-            margin: 0 auto 20px;
-            border: 1px solid var(--dourado);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--dourado);
-        }
-
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; animation: fadeIn 0.3s ease; }
+        .modal-conteudo { background: linear-gradient(135deg, var(--grafite), var(--preto-2)); color: var(--branco); padding: 40px 30px 30px 30px; border: 1px solid rgba(212, 175, 122, 0.3); border-radius: 6px; text-align: center; max-width: 360px; width: 100%; animation: slideUp 0.4s ease; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
+        .modal-conteudo::before { content: ''; position: absolute; top: 0; left: 20%; right: 20%; height: 1px; background: linear-gradient(90deg, transparent, var(--dourado), transparent); }
+        .modal-icone { width: 60px; height: 60px; margin: 0 auto 20px; border: 1px solid var(--dourado); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--dourado); }
         .modal-icone svg { width: 28px; height: 28px; }
-
-        .modal-titulo {
-            font-family: 'Playfair Display', serif;
-            font-size: 22px;
-            font-weight: 500;
-            margin-bottom: 12px;
-            color: var(--branco);
-        }
-
-        .modal-texto {
-            font-size: 13px;
-            color: var(--cinza-suave);
-            line-height: 1.7;
-            margin-bottom: 24px;
-            font-weight: 300;
-        }
-
+        .modal-titulo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 500; margin-bottom: 12px; color: var(--branco); }
+        .modal-texto { font-size: 13px; color: var(--cinza-suave); line-height: 1.7; margin-bottom: 24px; font-weight: 300; }
         .modal-texto small { font-size: 10px; opacity: 0.6; }
-
-        .modal button.btn-ok {
-            background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro));
-            color: var(--preto);
-            padding: 12px 40px;
-            border-radius: 3px;
-            border: none;
-            font-weight: 600;
-            font-size: 11px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: all 0.3s ease;
-        }
-
-        .modal button.btn-ok:hover {
-            background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
-            box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4);
-        }
-
-        .modal-cta {
-            margin-top: 24px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(212, 175, 122, 0.15);
-        }
-
-        .modal-cta-titulo {
-            font-family: 'Playfair Display', serif;
-            font-style: italic;
-            font-size: 13px;
-            color: var(--dourado-claro);
-            margin-bottom: 4px;
-        }
-
-        .modal-cta-subtitulo {
-            font-size: 10px;
-            color: var(--cinza-suave);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 14px;
-        }
-
-        .modal-cta-botoes {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        .modal-cta-botoes a {
-            width: 44px; height: 44px;
-            border: 1px solid rgba(212, 175, 122, 0.3);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--dourado);
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
+        .modal button.btn-ok { background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro)); color: var(--preto); padding: 12px 40px; border-radius: 3px; border: none; font-weight: 600; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.3s ease; }
+        .modal button.btn-ok:hover { background: linear-gradient(135deg, var(--dourado-claro), var(--dourado)); box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4); }
+        .modal-cta { margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(212, 175, 122, 0.15); }
+        .modal-cta-titulo { font-family: 'Playfair Display', serif; font-style: italic; font-size: 13px; color: var(--dourado-claro); margin-bottom: 4px; }
+        .modal-cta-subtitulo { font-size: 10px; color: var(--cinza-suave); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+        .modal-cta-botoes { display: flex; gap: 10px; justify-content: center; }
+        .modal-cta-botoes a { width: 44px; height: 44px; border: 1px solid rgba(212, 175, 122, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--dourado); text-decoration: none; transition: all 0.3s ease; }
         .modal-cta-botoes a svg { width: 20px; height: 20px; }
-
-        .modal-cta-botoes a.whats:hover {
-            background: var(--whatsapp);
-            border-color: var(--whatsapp);
-            color: var(--branco);
-            transform: translateY(-2px);
-        }
-
-        .modal-cta-botoes a.insta:hover {
-            background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCB045);
-            border-color: transparent;
-            color: var(--branco);
-            transform: translateY(-2px);
-        }
+        .modal-cta-botoes a.whats:hover { background: var(--whatsapp); border-color: var(--whatsapp); color: var(--branco); transform: translateY(-2px); }
+        .modal-cta-botoes a.insta:hover { background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCB045); border-color: transparent; color: var(--branco); transform: translateY(-2px); }
 
         /* ============================================================
-           RODAPÉ
+           RODAPÉ (Ajustado pra não sobrepor conteúdo)
         ============================================================ */
         .rodape {
             position: fixed;
             bottom: 0; left: 0; right: 0;
-            padding: 10px 12px;
-            background: linear-gradient(180deg,
-                transparent,
-                rgba(0,0,0,0.7) 50%,
-                rgba(0,0,0,0.95));
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            padding: 10px 12px 14px; /* Mais padding inferior pra iPhones */
+            background: linear-gradient(180deg, transparent, rgba(0,0,0,0.8) 40%, rgba(0,0,0,1));
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 6px;
-            z-index: 100;
+            z-index: 50; /* Z-index menor pra não travar clicks na tela */
             pointer-events: none;
         }
 
-        .rodape-marca {
-            font-family: 'Playfair Display', serif;
-            font-size: 9px;
-            color: rgba(212, 175, 122, 0.5);
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            font-weight: 400;
-        }
-
-        .rodape-redes {
-            display: flex;
-            gap: 8px;
-            pointer-events: auto;
-        }
-
-        .rodape-redes a {
-            width: 30px; height: 30px;
-            border: 1px solid rgba(212, 175, 122, 0.25);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgba(212, 175, 122, 0.7);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            background: rgba(20, 20, 20, 0.6);
-        }
-
+        .rodape-marca { font-family: 'Playfair Display', serif; font-size: 9px; color: rgba(212, 175, 122, 0.5); letter-spacing: 5px; text-transform: uppercase; font-weight: 400; }
+        .rodape-redes { display: flex; gap: 8px; pointer-events: auto; }
+        .rodape-redes a { width: 30px; height: 30px; border: 1px solid rgba(212, 175, 122, 0.25); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: rgba(212, 175, 122, 0.7); text-decoration: none; transition: all 0.3s ease; background: rgba(20, 20, 20, 0.6); }
         .rodape-redes a svg { width: 14px; height: 14px; }
-
-        .rodape-redes a.whats:hover {
-            background: var(--whatsapp);
-            border-color: var(--whatsapp);
-            color: var(--branco);
-            transform: translateY(-2px);
-        }
-
-        .rodape-redes a.insta:hover {
-            background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCB045);
-            border-color: transparent;
-            color: var(--branco);
-            transform: translateY(-2px);
-        }
+        .rodape-redes a.whats:hover { background: var(--whatsapp); border-color: var(--whatsapp); color: var(--branco); transform: translateY(-2px); }
+        .rodape-redes a.insta:hover { background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCB045); border-color: transparent; color: var(--branco); transform: translateY(-2px); }
 
         /* ============================================================
            OVERLAY DE ENVIO
         ============================================================ */
-        .overlay-envio {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.92);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            padding: 20px;
-            animation: fadeIn 0.3s ease;
-        }
-
+        .overlay-envio { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; padding: 20px; animation: fadeIn 0.3s ease; }
         .overlay-envio.ativo { display: flex; }
-
-        .envio-conteudo {
-            max-width: 340px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .envio-icone {
-            width: 60px; height: 60px;
-            margin: 0 auto 24px;
-            border: 1px solid var(--dourado);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--dourado);
-            animation: pulseGlow 2s ease-in-out infinite;
-        }
-
+        .envio-conteudo { max-width: 340px; width: 100%; text-align: center; }
+        .envio-icone { width: 60px; height: 60px; margin: 0 auto 24px; border: 1px solid var(--dourado); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--dourado); animation: pulseGlow 2s ease-in-out infinite; }
         .envio-icone svg { width: 28px; height: 28px; }
+        .envio-titulo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 500; color: var(--branco); margin-bottom: 6px; }
+        .envio-subtitulo { font-size: 10px; color: var(--cinza-suave); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 32px; font-weight: 400; }
+        .barra-progresso { width: 100%; height: 6px; background: rgba(212, 175, 122, 0.1); border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
+        .barra-progresso-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--dourado-escuro), var(--dourado), var(--dourado-claro)); border-radius: 10px; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+        .barra-progresso-fill::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); animation: shimmer 1.8s infinite; }
+        .envio-percentual { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 400; color: var(--dourado); margin-bottom: 20px; letter-spacing: 2px; }
+        .envio-mensagem { font-family: 'Playfair Display', serif; font-style: italic; font-size: 13px; color: var(--dourado-claro); letter-spacing: 1px; min-height: 22px; transition: opacity 0.3s ease; }
+        .envio-contador { font-size: 11px; color: var(--cinza-suave); letter-spacing: 2px; text-transform: uppercase; margin-top: 8px; font-weight: 400; }
 
-        .envio-titulo {
-            font-family: 'Playfair Display', serif;
-            font-size: 22px;
-            font-weight: 500;
-            color: var(--branco);
-            margin-bottom: 6px;
-        }
+        @keyframes shimmer { 0% { left: -100%; } 100% { left: 100%; } }
+        @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 122, 0.4); } 50% { box-shadow: 0 0 0 15px rgba(212, 175, 122, 0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .envio-subtitulo {
-            font-size: 10px;
-            color: var(--cinza-suave);
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 32px;
-            font-weight: 400;
-        }
-
-        .barra-progresso {
-            width: 100%;
-            height: 6px;
-            background: rgba(212, 175, 122, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 16px;
-        }
-
-        .barra-progresso-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg,
-                var(--dourado-escuro), var(--dourado), var(--dourado-claro));
-            border-radius: 10px;
-            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .barra-progresso-fill::after {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg,
-                transparent, rgba(255,255,255,0.4), transparent);
-            animation: shimmer 1.8s infinite;
-        }
-
-        .envio-percentual {
-            font-family: 'Playfair Display', serif;
-            font-size: 32px;
-            font-weight: 400;
-            color: var(--dourado);
-            margin-bottom: 20px;
-            letter-spacing: 2px;
-        }
-
-        .envio-mensagem {
-            font-family: 'Playfair Display', serif;
-            font-style: italic;
-            font-size: 13px;
-            color: var(--dourado-claro);
-            letter-spacing: 1px;
-            min-height: 22px;
-            transition: opacity 0.3s ease;
-        }
-
-        .envio-contador {
-            font-size: 11px;
-            color: var(--cinza-suave);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-top: 8px;
-            font-weight: 400;
-        }
-
-        /* ============================================================
-           ANIMAÇÕES
-        ============================================================ */
-        @keyframes shimmer {
-            0%   { left: -100%; }
-            100% { left: 100%; }
-        }
-
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 122, 0.4); }
-            50%      { box-shadow: 0 0 0 15px rgba(212, 175, 122, 0); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to   { opacity: 1; }
-        }
-
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-15px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(15px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes spin {
-            0%   { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* ============================================================
-           RESPONSIVO
-        ============================================================ */
         @media (max-width: 360px) {
-            .marca-logo              { font-size: 18px; letter-spacing: 4px; }
-            .titulo-secao h1         { font-size: 20px; }
-            .btn-escolha             { padding: 15px 14px; }
+            .marca-logo { font-size: 18px; letter-spacing: 4px; }
+            .titulo-secao h1 { font-size: 20px; }
+            .btn-escolha { padding: 15px 14px; }
             .btn-escolha .titulo-btn { font-size: 13px; }
-            .aviso-destaque          { font-size: 9.5px; letter-spacing: 1px; padding: 10px 8px; }
+            .aviso-destaque { font-size: 9.5px; letter-spacing: 1px; padding: 10px 8px; }
         }
     </style>
 </head>
@@ -1148,7 +525,6 @@
             <p>escolha como registrar</p>
         </div>
 
-        <!-- ⭐ AVISO DO EVENTO -->
         <div class="aviso-evento">
             <div class="aviso-evento-header">
                 <div class="aviso-evento-icone">
@@ -1162,7 +538,6 @@
                     <small>envie fotos apenas deste evento</small>
                 </div>
             </div>
-
             <div class="aviso-destaque">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
@@ -1170,9 +545,7 @@
                 Somente fotos tiradas durante o evento
             </div>
         </div>
-        <!-- fim .aviso-evento -->
 
-        <!-- BOTÕES DE ESCOLHA -->
         <button class="btn-escolha" id="btnAbrirCamera">
             <div class="icone">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -1217,8 +590,7 @@
 
         <input type="file" id="inputFoto" accept="image/*">
         <input type="file" id="inputFotoLote" accept="image/*" multiple>
-
-    </div><!-- fim .tela-escolha -->
+    </div>
 
     <!-- TELA LOTE -->
     <div class="tela-lote hidden" id="telaLote">
@@ -1279,15 +651,13 @@
         <button class="btn btn-primario" id="btnTirarFoto">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="13" r="4"/>
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/>
             </svg>
             Capturar
         </button>
         <button class="btn" id="btnVirarCamera">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
             </svg>
             Virar
         </button>
@@ -1303,8 +673,7 @@
         </button>
         <button class="btn" id="btnResetAjuste">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
             </svg>
             Resetar
         </button>
@@ -1324,22 +693,19 @@
     <div class="botoes hidden" id="botoesResultado">
         <button class="btn btn-voltar" id="btnRefazer">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/>
             </svg>
             Refazer
         </button>
         <button class="btn" id="btnBaixar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
             </svg>
             Baixar
         </button>
         <button class="btn" id="btnCompartilhar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"/>
             </svg>
             Compartilhar
         </button>
@@ -1352,14 +718,12 @@
     <div class="rodape">
         <div class="rodape-marca">· Entre Clicks ·</div>
         <div class="rodape-redes">
-            <a href="https://wa.me/5528999281772" target="_blank" rel="noopener"
-                class="whats" title="WhatsApp">
+            <a href="https://wa.me/5528999281772" target="_blank" rel="noopener" class="whats" title="WhatsApp">
                 <svg viewBox="0 0 24 24" fill="currentColor">
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
                 </svg>
             </a>
-            <a href="https://instagram.com/entreclicks.oficial" target="_blank" rel="noopener"
-                class="insta" title="Instagram">
+            <a href="https://instagram.com/entreclicks.oficial" target="_blank" rel="noopener" class="insta" title="Instagram">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                     <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
                     <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
@@ -1374,15 +738,12 @@
         <div class="envio-conteudo">
             <div class="envio-icone">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/>
                 </svg>
             </div>
             <div class="envio-titulo">Enviando sua memória</div>
             <div class="envio-subtitulo">momento sendo eternizado</div>
-            <div class="barra-progresso">
-                <div class="barra-progresso-fill" id="barraFill"></div>
-            </div>
+            <div class="barra-progresso"><div class="barra-progresso-fill" id="barraFill"></div></div>
             <div class="envio-percentual" id="envioPercentual">0%</div>
             <div class="envio-mensagem" id="envioMensagem">Preparando sua foto...</div>
             <div class="envio-contador hidden" id="envioContador"></div>
@@ -1406,7 +767,7 @@
         // ============================================
         const LARGURA_IMPRESSAO = 1560;
         const ALTURA_IMPRESSAO  = 2140;
-        const QUALIDADE_JPEG    = 0.98;
+        const QUALIDADE_JPEG    = 0.85; // <- REDUZIDO DE 0.98 PARA 0.85 (Muito mais leve e sem perda visível)
         const LIMITE_LOTE       = 5;
 
         const ICONES_MODAL = {
@@ -1482,14 +843,13 @@
 
         let ajuste = { x: 0, y: 0, scale: 1, initialScale: 1 };
 
-        // Estado do LOTE
         let fotosLote          = [];
         let indiceEditandoLote = -1;
 
         // ============================================
         // REDIMENSIONAMENTO DE ALTA QUALIDADE
         // ============================================
-        async function redimensionarCanvasComQualidade(canvasOrigem, larguraFinal, alturaFinal, qualidade = 0.98) {
+        async function redimensionarCanvasComQualidade(canvasOrigem, larguraFinal, alturaFinal, qualidade = 0.85) {
             let canvasAtual  = canvasOrigem;
             let larguraAtual = canvasOrigem.width;
             let alturaAtual  = canvasOrigem.height;
@@ -1690,7 +1050,6 @@
         });
 
         btnAbrirGaleria.addEventListener('click', () => inputFoto.click());
-
         btnAbrirGaleriaLote.addEventListener('click', () => inputFotoLote.click());
 
         // ============================================
@@ -2255,8 +1614,7 @@
                 btnCompartilhar.disabled  = true;
                 btnCompartilhar.innerHTML = `
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
                     </svg>
                     Preparando...
                 `;
@@ -2360,6 +1718,7 @@
             }, 100);
 
             try {
+                // REDUZIDO A QUALIDADE AQUI (QUALIDADE_JPEG) PARA NÃO TRAVAR O CELULAR
                 const blob = await redimensionarCanvasComQualidade(
                     canvas, LARGURA_IMPRESSAO, ALTURA_IMPRESSAO, QUALIDADE_JPEG);
                 if (!blob) throw new Error('Erro ao gerar foto');
@@ -2416,7 +1775,7 @@
         });
 
         // ============================================
-        // ENVIAR LOTE
+        // ENVIAR LOTE (Processamento mais suave para evitar crash)
         // ============================================
         btnEnviarLote.addEventListener('click', async () => {
             if (fotosLote.length === 0) return;
@@ -2455,14 +1814,18 @@
                 const pctFim    = ((i + 1) / total) * 100;
 
                 try {
-                    atualizarProgresso(pctInicio,
-                        `Enviando foto ${numero}...`, `${numero} de ${total}`);
+                    atualizarProgresso(pctInicio, `Preparando foto ${numero}...`, `${numero} de ${total}`);
+
+                    // Pausa de 300ms entre as fotos pro processador do celular respirar
+                    await new Promise(r => setTimeout(r, 300)); 
 
                     const blob = await redimensionarCanvasComQualidade(
                         foto.canvasCompleto,
                         LARGURA_IMPRESSAO, ALTURA_IMPRESSAO, QUALIDADE_JPEG);
 
                     if (!blob) throw new Error('Erro ao gerar foto');
+
+                    atualizarProgresso(pctInicio + ((pctFim - pctInicio) / 2), `Enviando foto ${numero}...`, `${numero} de ${total}`);
 
                     const timestamp   = Date.now();
                     const random      = Math.random().toString(36).substring(2, 8);
@@ -2480,9 +1843,7 @@
                     if (error) throw error;
 
                     enviadas++;
-                    atualizarProgresso(pctFim,
-                        `Foto ${numero} enviada!`, `${numero} de ${total}`);
-                    await new Promise(r => setTimeout(r, 300));
+                    atualizarProgresso(pctFim, `Foto ${numero} enviada!`, `${numero} de ${total}`);
 
                 } catch (err) {
                     console.error(`Erro ao enviar foto ${numero}:`, err);
@@ -2504,7 +1865,7 @@
                     true);
             } else if (enviadas > 0) {
                 mostrarModal('info', 'Envio parcial',
-                    `${enviadas} foto(s) enviada(s) com sucesso.<br>${erros} não conseguiram ser enviadas. Tente enviar novamente.`);
+                    `${enviadas} foto(s) enviada(s) com sucesso.<br>${erros} não conseguiram ser enviadas. Pode ter sido instabilidade na internet.`);
                 btnEnviarLote.disabled = false;
             } else {
                 mostrarModal('erro', 'Falha no envio',
@@ -2527,10 +1888,8 @@
                     <div class="modal-cta-titulo">Gostou da experiência?</div>
                     <div class="modal-cta-subtitulo">conheça a Entre Clicks</div>
                     <div class="modal-cta-botoes">
-                        <a href="https://wa.me/5528999281772" target="_blank" rel="noopener"
-                            class="whats" title="WhatsApp">${ICONE_WHATS}</a>
-                        <a href="https://instagram.com/entreclicks.oficial" target="_blank" rel="noopener"
-                            class="insta" title="Instagram">${ICONE_INSTA}</a>
+                        <a href="https://wa.me/5528999281772" target="_blank" rel="noopener" class="whats" title="WhatsApp">${ICONE_WHATS}</a>
+                        <a href="https://instagram.com/entreclicks.oficial" target="_blank" rel="noopener" class="insta" title="Instagram">${ICONE_INSTA}</a>
                     </div>
                 </div>` : '';
 
