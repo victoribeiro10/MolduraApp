@@ -927,10 +927,13 @@ window.carregarFotos = async function () {
   try {
     await carregarStatusFotos();
 
+    // =============== A SOLUÇÃO ESTÁ NESTA LINHA AQUI ABAIXO ===============
     const { data: arquivos, error } = await supabaseAdmin
       .storage
       .from(BUCKET_FOTOS)
-      .list('', { limit: 1000, sortBy: { column: 'created_at', order: 'desc' } });
+      .list('', { limit: 1000, sortBy: { column: 'created_at', order: 'asc' } }); 
+    // Mudado de 'desc' para 'asc'. Agora a primeira foto enviada aparece primeiro.
+    // =======================================================================
 
     if (error) throw error;
 
