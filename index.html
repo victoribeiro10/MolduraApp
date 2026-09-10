@@ -34,7 +34,6 @@
             --vermelho:      #f87171;
         }
 
-        /* Ajuste DVH para corrigir barra de navegação no Safari/Chrome Mobile */
         html, body {
             width: 100%;
             height: 100dvh; 
@@ -51,16 +50,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 16px 12px 70px 12px; /* Margem extra no rodapé */
+            padding: 16px 12px 70px 12px;
             font-weight: 300;
             letter-spacing: 0.3px;
             min-height: 100dvh;
-            overflow-y: auto; /* Garante que sempre role se a tela for pequena */
+            overflow-y: auto;
         }
 
-        /* ============================================================
-           MARCA
-        ============================================================ */
         .marca {
             text-align: center;
             margin: 8px 0 12px 0;
@@ -95,9 +91,6 @@
             text-transform: lowercase;
         }
 
-        /* ============================================================
-           TELA ESCOLHA
-        ============================================================ */
         .tela-escolha {
             display: flex;
             flex-direction: column;
@@ -139,9 +132,6 @@
             font-weight: 400;
         }
 
-        /* ============================================================
-           ⭐ AVISO DO EVENTO
-        ============================================================ */
         .aviso-evento {
             width: 100%;
             background: linear-gradient(135deg,
@@ -241,9 +231,6 @@
 
         .aviso-destaque svg { width: 15px; height: 15px; flex-shrink: 0; color: var(--dourado); }
 
-        /* ============================================================
-           BOTÕES DE ESCOLHA
-        ============================================================ */
         .btn-escolha {
             width: 100%;
             padding: 18px 18px;
@@ -300,9 +287,6 @@
             padding: 2px 6px; border-radius: 3px; font-weight: 700; letter-spacing: 1px; vertical-align: middle;
         }
 
-        /* ============================================================
-           CONTAINER (câmera / ajuste / resultado)
-        ============================================================ */
         .container {
             position: relative;
             width: 100%;
@@ -325,9 +309,6 @@
         #fotoAjuste { position: absolute; top: 0; left: 0; transform-origin: 0 0; will-change: transform; pointer-events: none; max-width: none; max-height: none; }
         .moldura-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
 
-        /* ============================================================
-           BOTÕES GERAIS
-        ============================================================ */
         .botoes {
             display: flex;
             gap: 8px;
@@ -335,7 +316,7 @@
             justify-content: center;
             width: 100%;
             max-width: 380px;
-            padding: 5px 0 20px; /* Mais padding inferior pra não grudar no rodapé */
+            padding: 5px 0 20px;
         }
 
         .btn {
@@ -387,9 +368,6 @@
         .dica-ajuste { text-align: center; color: var(--cinza-suave); font-size: 10px; margin-top: 4px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 400; }
         .dica-ajuste .separador { color: var(--dourado); margin: 0 8px; }
 
-        /* ============================================================
-           TELA DE LOTE
-        ============================================================ */
         .tela-lote { width: 100%; max-width: 380px; padding: 10px; animation: fadeIn 0.4s ease; flex: 1; }
         .lote-titulo { text-align: center; margin-bottom: 16px; }
         .lote-titulo h2 { font-family: 'Playfair Display', serif; font-weight: 500; font-size: 20px; color: var(--branco); margin-bottom: 4px; }
@@ -413,17 +391,11 @@
         .lote-processando .loading-spinner { margin: 0 auto 16px; }
         .lote-processando p { font-family: 'Playfair Display', serif; font-style: italic; font-size: 14px; }
 
-        /* ============================================================
-           LOADING INICIAL
-        ============================================================ */
         .loading-inicial { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--preto); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; gap: 24px; }
         .loading-spinner { width: 50px; height: 50px; border: 1px solid rgba(212, 175, 122, 0.15); border-top: 1px solid var(--dourado); border-radius: 50%; animation: spin 1s linear infinite; }
         .loading-inicial .marca-logo { font-size: 18px; letter-spacing: 8px; opacity: 0.9; }
         .loading-inicial p { color: var(--cinza-suave); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; font-weight: 300; }
 
-        /* ============================================================
-           MODAL
-        ============================================================ */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; animation: fadeIn 0.3s ease; }
         .modal-conteudo { background: linear-gradient(135deg, var(--grafite), var(--preto-2)); color: var(--branco); padding: 40px 30px 30px 30px; border: 1px solid rgba(212, 175, 122, 0.3); border-radius: 6px; text-align: center; max-width: 360px; width: 100%; animation: slideUp 0.4s ease; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
         .modal-conteudo::before { content: ''; position: absolute; top: 0; left: 20%; right: 20%; height: 1px; background: linear-gradient(90deg, transparent, var(--dourado), transparent); }
@@ -443,19 +415,16 @@
         .modal-cta-botoes a.whats:hover { background: var(--whatsapp); border-color: var(--whatsapp); color: var(--branco); transform: translateY(-2px); }
         .modal-cta-botoes a.insta:hover { background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCB045); border-color: transparent; color: var(--branco); transform: translateY(-2px); }
 
-        /* ============================================================
-           RODAPÉ (Ajustado pra não sobrepor conteúdo)
-        ============================================================ */
         .rodape {
             position: fixed;
             bottom: 0; left: 0; right: 0;
-            padding: 10px 12px 14px; /* Mais padding inferior pra iPhones */
+            padding: 10px 12px 14px;
             background: linear-gradient(180deg, transparent, rgba(0,0,0,0.8) 40%, rgba(0,0,0,1));
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 6px;
-            z-index: 50; /* Z-index menor pra não travar clicks na tela */
+            z-index: 50;
             pointer-events: none;
         }
 
@@ -466,9 +435,6 @@
         .rodape-redes a.whats:hover { background: var(--whatsapp); border-color: var(--whatsapp); color: var(--branco); transform: translateY(-2px); }
         .rodape-redes a.insta:hover { background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCB045); border-color: transparent; color: var(--branco); transform: translateY(-2px); }
 
-        /* ============================================================
-           OVERLAY DE ENVIO
-        ============================================================ */
         .overlay-envio { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; padding: 20px; animation: fadeIn 0.3s ease; }
         .overlay-envio.ativo { display: flex; }
         .envio-conteudo { max-width: 340px; width: 100%; text-align: center; }
@@ -502,14 +468,12 @@
 </head>
 <body>
 
-    <!-- LOADING INICIAL -->
     <div id="loadingInicial" class="loading-inicial">
         <div class="marca-logo">ENTRE CLICKS</div>
         <div class="loading-spinner"></div>
         <p>Carregando</p>
     </div>
 
-    <!-- MARCA -->
     <div class="marca">
         <div class="marca-logo">ENTRE CLICKS</div>
         <div class="marca-linha">
@@ -517,9 +481,7 @@
         </div>
     </div>
 
-    <!-- TELA ESCOLHA -->
     <div class="tela-escolha hidden" id="telaEscolha">
-
         <div class="titulo-secao">
             <h1>Eternize <em>este</em> momento</h1>
             <p>escolha como registrar</p>
@@ -588,11 +550,11 @@
             </div>
         </button>
 
-        <input type="file" id="inputFoto" accept="image/*">
-        <input type="file" id="inputFotoLote" accept="image/*" multiple>
+        <!-- ACEITA EXPLICITAMENTE EXTENSÕES HEIC E HEIF -->
+        <input type="file" id="inputFoto" accept="image/*, .heic, .HEIC, .heif, .HEIF">
+        <input type="file" id="inputFotoLote" accept="image/*, .heic, .HEIC, .heif, .HEIF" multiple>
     </div>
 
-    <!-- TELA LOTE -->
     <div class="tela-lote hidden" id="telaLote">
         <div class="lote-titulo">
             <h2>Suas fotos</h2>
@@ -601,7 +563,7 @@
 
         <div id="loteProcessando" class="lote-processando hidden">
             <div class="loading-spinner"></div>
-            <p id="loteProcessandoMsg">Aplicando molduras...</p>
+            <p id="loteProcessandoMsg">Processando fotos...</p>
         </div>
 
         <div class="grade-lote hidden" id="gradeLote"></div>
@@ -619,13 +581,11 @@
         </div>
     </div>
 
-    <!-- ÁREA CÂMERA -->
     <div class="container hidden" id="areaCamera">
         <video id="video" autoplay playsinline muted></video>
         <img class="moldura-overlay" id="molduraCamera" alt="Moldura">
     </div>
 
-    <!-- ÁREA AJUSTE -->
     <div class="container hidden" id="areaAjuste">
         <div class="area-ajuste" id="areaFoto">
             <img id="fotoAjuste" alt="Sua foto">
@@ -633,14 +593,12 @@
         <img class="moldura-overlay" id="molduraAjuste" alt="Moldura">
     </div>
 
-    <!-- ÁREA RESULTADO -->
     <div class="container hidden" id="areaResultado">
         <canvas id="canvasResultado"></canvas>
     </div>
 
     <div id="mensagem"></div>
 
-    <!-- BOTÕES CÂMERA -->
     <div class="botoes hidden" id="botoesCamera">
         <button class="btn btn-voltar" id="btnVoltarCamera">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -663,7 +621,6 @@
         </button>
     </div>
 
-    <!-- BOTÕES AJUSTE -->
     <div class="botoes hidden" id="botoesAjuste">
         <button class="btn btn-voltar" id="btnVoltarAjuste">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -689,7 +646,6 @@
         Arraste <span class="separador">•</span> pinça para zoom
     </div>
 
-    <!-- BOTÕES RESULTADO -->
     <div class="botoes hidden" id="botoesResultado">
         <button class="btn btn-voltar" id="btnRefazer">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -714,13 +670,12 @@
         </button>
     </div>
 
-    <!-- RODAPÉ -->
     <div class="rodape">
         <div class="rodape-marca">· Entre Clicks ·</div>
         <div class="rodape-redes">
             <a href="https://wa.me/5528999281772" target="_blank" rel="noopener" class="whats" title="WhatsApp">
                 <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 00-5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
                 </svg>
             </a>
             <a href="https://instagram.com/entreclicks.oficial" target="_blank" rel="noopener" class="insta" title="Instagram">
@@ -733,7 +688,6 @@
         </div>
     </div>
 
-    <!-- OVERLAY DE ENVIO -->
     <div class="overlay-envio" id="overlayEnvio">
         <div class="envio-conteudo">
             <div class="envio-icone">
@@ -752,26 +706,20 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- ⭐ BIBLIOTECA PARA CONVERSÃO DE FORMATOS HEIC (iPhone) -->
+    <!-- BIBLIOTECA HEIC2ANY -->
     <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 
     <script>
-        // ============================================
-        // CONFIGURAÇÃO DO SUPABASE
-        // ============================================
         const SUPABASE_URL = "https://scwznirvzwrphztvopbz.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjd3puaXJ2endycGh6dHZvcGJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzI2NzQsImV4cCI6MjA5NTY0ODY3NH0.PLvr547bIEJwjECKxQaoR7lpazs8GbSpLYLMDiGD4Po";
         const BUCKET_FOTOS = "fotos-eventos";
 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // ============================================
-        // CONFIGURAÇÕES DE EXPORTAÇÃO
-        // ============================================
         const LARGURA_IMPRESSAO = 1560;
         const ALTURA_IMPRESSAO  = 2140;
-        const QUALIDADE_JPEG    = 0.85; // <- REDUZIDO DE 0.98 PARA 0.85 (Muito mais leve e sem perda visível)
-        const LIMITE_LOTE       = 5;
+        const QUALIDADE_JPEG    = 0.85;
+        const LIMITE_LOTE       = 29;
 
         const ICONES_MODAL = {
             sucesso: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>',
@@ -779,7 +727,7 @@
             info:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>'
         };
 
-        const ICONE_WHATS = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 00-5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>';
+        const ICONE_WHATS = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>';
         const ICONE_INSTA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
 
         let MOLDURA = {
@@ -792,7 +740,6 @@
             arquivo:       ''
         };
 
-        // ELEMENTOS
         const loadingInicial  = document.getElementById('loadingInicial');
         const telaEscolha     = document.getElementById('telaEscolha');
         const telaLote        = document.getElementById('telaLote');
@@ -851,31 +798,62 @@
         let indiceEditandoLote = -1;
 
         // ============================================================
-        // ⭐ FUNÇÃO AUXILIAR PARA DETECTAR E CONVERTER HEIC (IPHONE)
+        // ⭐ IDENTIFICAÇÃO E CONVERSÃO ROBUSTA PARA IPHONE / HEIC
         // ============================================================
+        async function ehArquivoHeic(file) {
+            if (!file) return false;
+            const nome = (file.name || '').toLowerCase();
+            const tipo = (file.type || '').toLowerCase();
+
+            if (nome.endsWith('.heic') || nome.endsWith('.heif') || tipo.includes('heic') || tipo.includes('heif')) {
+                return true;
+            }
+
+            // Checagem binária por Magic Bytes (ftypheic/ftypmif1) caso o computador venha sem extensão
+            try {
+                const cabecalho = await file.slice(0, 24).arrayBuffer();
+                const u8 = new Uint8Array(cabecalho);
+                let assinatura = '';
+                for (let i = 4; i < 16; i++) {
+                    assinatura += String.fromCharCode(u8[i]);
+                }
+                if (assinatura.includes('ftyp') && (
+                    assinatura.includes('heic') || assinatura.includes('heix') || 
+                    assinatura.includes('mif1') || assinatura.includes('msf1')
+                )) {
+                    return true;
+                }
+            } catch (e) {
+                // silencioso
+            }
+
+            return false;
+        }
+
         async function converterHeicSeNecessario(file) {
-            const extensao = file.name.split('.').pop().toLowerCase();
-            const ehHeic = extensao === 'heic' || extensao === 'heif' || file.type === 'image/heic' || file.type === 'image/heif';
-            
-            if (!ehHeic) return file;
+            const isHeic = await ehArquivoHeic(file);
+            if (!isHeic) return file;
+
+            if (typeof window.heic2any === 'undefined') {
+                throw new Error('A biblioteca de fotos do iPhone ainda está carregando. Tente novamente em alguns segundos.');
+            }
 
             try {
-                // Heic2any precisa carregar em segundo plano. Conversão é pesada.
-                if (typeof heic2any === 'undefined') {
-                    throw new Error('Processador de arquivos HEIC ainda carregando. Aguarde um segundo.');
-                }
-                
-                const blobConvertido = await heic2any({
+                // Conversão
+                const resultado = await window.heic2any({
                     blob: file,
                     toType: "image/jpeg",
-                    quality: 0.8
+                    quality: 0.85
                 });
 
-                const novoNome = file.name.replace(/\.(heic|heif)$/i, '.jpg');
-                return new File([blobConvertido], novoNome, { type: "image/jpeg" });
+                // SE O ARQUIVO FOR UMA LIVE PHOTO OU MODO RETRATO, heic2any RETORNA UM ARRAY
+                const blobFinal = Array.isArray(resultado) ? resultado[0] : resultado;
+                const nomeLimpo = (file.name || 'foto').replace(/\.(heic|heif)$/i, '') + '.jpg';
+
+                return new File([blobFinal], nomeLimpo, { type: 'image/jpeg' });
             } catch (err) {
-                console.error("Erro na conversão do formato HEIC:", err);
-                throw new Error("Não foi possível otimizar esta foto de iPhone. Tente selecioná-la novamente.");
+                console.error("Erro heic2any:", err);
+                throw new Error("Não foi possível decodificar este arquivo HEIC do iPhone. Tente selecioná-lo novamente.");
             }
         }
 
@@ -959,7 +937,6 @@
                 aplicarPosicoesJanela();
                 dimensionarContainers();
 
-                console.log('Configuração carregada');
                 return true;
             } catch (err) {
                 console.error('Erro ao carregar configuração:', err);
@@ -1096,15 +1073,15 @@
             mensagem.textContent = 'Carregando foto...';
 
             try {
-                // ⭐ CONVERSÃO DE FORMATO DO IPHONE SE DETECTADO HEIC
-                if (arquivo.name.toLowerCase().endsWith('.heic') || arquivo.name.toLowerCase().endsWith('.heif') || arquivo.type === 'image/heic') {
-                    mensagem.textContent = 'Otimizando formato iPhone (HEIC)...';
+                const isHeic = await ehArquivoHeic(arquivo);
+                if (isHeic) {
+                    mensagem.textContent = 'Convertendo formato HEIC do iPhone...';
                     arquivo = await converterHeicSeNecessario(arquivo);
                 }
             } catch (err) {
                 mensagem.textContent = '';
-                mostrarModal('erro', 'Ops!', err.message);
                 inputFoto.value = '';
+                mostrarModal('erro', 'Atenção', err.message);
                 return;
             }
 
@@ -1153,10 +1130,13 @@
             for (let i = 0; i < arquivos.length; i++) {
                 let arquivo = arquivos[i];
                 try {
-                    loteProcessandoMsg.textContent = `Preparando foto ${i + 1} de ${arquivos.length}...`;
+                    loteProcessandoMsg.textContent = `Processando foto ${i + 1} de ${arquivos.length}...`;
                     
-                    // ⭐ CONVERSÃO DE FORMATO DO IPHONE SE DETECTADO HEIC NO LOTE
-                    arquivo = await converterHeicSeNecessario(arquivo);
+                    const isHeic = await ehArquivoHeic(arquivo);
+                    if (isHeic) {
+                        loteProcessandoMsg.textContent = `Convertendo foto iPhone ${i + 1}...`;
+                        arquivo = await converterHeicSeNecessario(arquivo);
+                    }
                     
                     await adicionarFotoAoLote(arquivo);
                 }
@@ -1595,7 +1575,7 @@
         });
 
         // ============================================
-        // GERA VERSÃO 9:16 COM FUNDO DESFOCADO PRA COMPARTILHAR
+        // COMPARTILHAMENTO
         // ============================================
         async function gerarCanvasParaCompartilhamento() {
             const LARGURA_SHARE = 1080;
@@ -1661,9 +1641,6 @@
             return canvasShare;
         }
 
-        // ============================================
-        // COMPARTILHAR
-        // ============================================
         btnCompartilhar.addEventListener('click', async () => {
             try {
                 const textoOriginal = btnCompartilhar.innerHTML;
@@ -1774,7 +1751,6 @@
             }, 100);
 
             try {
-                // REDUZIDO A QUALIDADE AQUI (QUALIDADE_JPEG) PARA NÃO TRAVAR O CELULAR
                 const blob = await redimensionarCanvasComQualidade(
                     canvas, LARGURA_IMPRESSAO, ALTURA_IMPRESSAO, QUALIDADE_JPEG);
                 if (!blob) throw new Error('Erro ao gerar foto');
@@ -1831,7 +1807,7 @@
         });
 
         // ============================================
-        // ENVIAR LOTE (Processamento mais suave para evitar crash)
+        // ENVIAR LOTE
         // ============================================
         btnEnviarLote.addEventListener('click', async () => {
             if (fotosLote.length === 0) return;
@@ -1871,8 +1847,6 @@
 
                 try {
                     atualizarProgresso(pctInicio, `Preparando foto ${numero}...`, `${numero} de ${total}`);
-
-                    // Pausa de 300ms entre as fotos pro processador do celular respirar
                     await new Promise(r => setTimeout(r, 300)); 
 
                     const blob = await redimensionarCanvasComQualidade(
