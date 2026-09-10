@@ -601,7 +601,7 @@
 
         <div id="loteProcessando" class="lote-processando hidden">
             <div class="loading-spinner"></div>
-            <p>Aplicando molduras...</p>
+            <p id="loteProcessandoMsg">Aplicando molduras...</p>
         </div>
 
         <div class="grade-lote hidden" id="gradeLote"></div>
@@ -720,7 +720,7 @@
         <div class="rodape-redes">
             <a href="https://wa.me/5528999281772" target="_blank" rel="noopener" class="whats" title="WhatsApp">
                 <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 00-5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
                 </svg>
             </a>
             <a href="https://instagram.com/entreclicks.oficial" target="_blank" rel="noopener" class="insta" title="Instagram">
@@ -751,6 +751,9 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- ⭐ BIBLIOTECA PARA CONVERSÃO DE FORMATOS HEIC (iPhone) -->
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 
     <script>
         // ============================================
@@ -776,7 +779,7 @@
             info:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>'
         };
 
-        const ICONE_WHATS = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>';
+        const ICONE_WHATS = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 00-5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>';
         const ICONE_INSTA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
 
         let MOLDURA = {
@@ -832,6 +835,7 @@
         const contadorLote        = document.getElementById('contadorLote');
         const qtdEnvio            = document.getElementById('qtdEnvio');
         const loteProcessando     = document.getElementById('loteProcessando');
+        const loteProcessandoMsg  = document.getElementById('loteProcessandoMsg');
 
         const moldura = new Image();
         moldura.crossOrigin = 'anonymous';
@@ -845,6 +849,35 @@
 
         let fotosLote          = [];
         let indiceEditandoLote = -1;
+
+        // ============================================================
+        // ⭐ FUNÇÃO AUXILIAR PARA DETECTAR E CONVERTER HEIC (IPHONE)
+        // ============================================================
+        async function converterHeicSeNecessario(file) {
+            const extensao = file.name.split('.').pop().toLowerCase();
+            const ehHeic = extensao === 'heic' || extensao === 'heif' || file.type === 'image/heic' || file.type === 'image/heif';
+            
+            if (!ehHeic) return file;
+
+            try {
+                // Heic2any precisa carregar em segundo plano. Conversão é pesada.
+                if (typeof heic2any === 'undefined') {
+                    throw new Error('Processador de arquivos HEIC ainda carregando. Aguarde um segundo.');
+                }
+                
+                const blobConvertido = await heic2any({
+                    blob: file,
+                    toType: "image/jpeg",
+                    quality: 0.8
+                });
+
+                const novoNome = file.name.replace(/\.(heic|heif)$/i, '.jpg');
+                return new File([blobConvertido], novoNome, { type: "image/jpeg" });
+            } catch (err) {
+                console.error("Erro na conversão do formato HEIC:", err);
+                throw new Error("Não foi possível otimizar esta foto de iPhone. Tente selecioná-la novamente.");
+            }
+        }
 
         // ============================================
         // REDIMENSIONAMENTO DE ALTA QUALIDADE
@@ -1055,12 +1088,25 @@
         // ============================================
         // INPUT FOTO ÚNICA
         // ============================================
-        inputFoto.addEventListener('change', (e) => {
-            const arquivo = e.target.files[0];
+        inputFoto.addEventListener('change', async (e) => {
+            let arquivo = e.target.files[0];
             if (!arquivo) return;
 
             indiceEditandoLote   = -1;
             mensagem.textContent = 'Carregando foto...';
+
+            try {
+                // ⭐ CONVERSÃO DE FORMATO DO IPHONE SE DETECTADO HEIC
+                if (arquivo.name.toLowerCase().endsWith('.heic') || arquivo.name.toLowerCase().endsWith('.heif') || arquivo.type === 'image/heic') {
+                    mensagem.textContent = 'Otimizando formato iPhone (HEIC)...';
+                    arquivo = await converterHeicSeNecessario(arquivo);
+                }
+            } catch (err) {
+                mensagem.textContent = '';
+                mostrarModal('erro', 'Ops!', err.message);
+                inputFoto.value = '';
+                return;
+            }
 
             const reader = new FileReader();
             reader.onload = (event) => {
@@ -1104,9 +1150,19 @@
             gradeLote.classList.add('hidden');
             botoesLote.classList.add('hidden');
 
-            for (const arquivo of arquivos) {
-                try { await adicionarFotoAoLote(arquivo); }
-                catch (err) { console.error('Erro ao processar foto:', err); }
+            for (let i = 0; i < arquivos.length; i++) {
+                let arquivo = arquivos[i];
+                try {
+                    loteProcessandoMsg.textContent = `Preparando foto ${i + 1} de ${arquivos.length}...`;
+                    
+                    // ⭐ CONVERSÃO DE FORMATO DO IPHONE SE DETECTADO HEIC NO LOTE
+                    arquivo = await converterHeicSeNecessario(arquivo);
+                    
+                    await adicionarFotoAoLote(arquivo);
+                }
+                catch (err) { 
+                    console.error('Erro ao processar foto:', err); 
+                }
             }
 
             inputFotoLote.value = '';
