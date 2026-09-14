@@ -57,6 +57,105 @@
             overflow-y: auto;
         }
 
+        /* ============================================================
+           BANNER DE AVISO INICIAL (FORÇA LEITURA)
+        ============================================================ */
+        .banner-aviso-inicial {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 10, 10, 0.96);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 9998;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .banner-aviso-inicial.hidden { display: none !important; }
+
+        .banner-card {
+            background: linear-gradient(145deg, var(--grafite), var(--preto-2));
+            border: 1px solid rgba(212, 175, 122, 0.4);
+            border-radius: 12px;
+            max-width: 380px;
+            width: 100%;
+            padding: 32px 24px 28px;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .banner-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 20%; right: 20%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--dourado), transparent);
+        }
+
+        .banner-icone {
+            width: 56px; height: 56px;
+            margin: 0 auto 16px;
+            border: 1.5px solid var(--dourado);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--dourado);
+        }
+
+        .banner-icone svg { width: 26px; height: 26px; }
+
+        .banner-titulo {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px; font-weight: 500;
+            color: var(--branco); margin-bottom: 4px;
+        }
+
+        .banner-subtitulo {
+            font-size: 10px; color: var(--dourado);
+            letter-spacing: 2px; text-transform: uppercase;
+            margin-bottom: 18px; font-weight: 500;
+        }
+
+        .banner-texto {
+            font-size: 13px; line-height: 1.65;
+            color: var(--cinza-claro); margin-bottom: 20px; font-weight: 300;
+        }
+
+        .banner-texto strong { color: var(--dourado-claro); font-weight: 600; }
+
+        .banner-destaque {
+            background: rgba(212, 175, 122, 0.12);
+            border: 1px solid rgba(212, 175, 122, 0.35);
+            border-radius: 6px; padding: 12px 14px;
+            margin-bottom: 24px; font-size: 11px;
+            color: var(--dourado); font-weight: 500; line-height: 1.5;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-banner-ok {
+            width: 100%; padding: 16px;
+            background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro));
+            color: var(--preto); border: none;
+            border-radius: 4px; font-size: 12px; font-weight: 700;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            cursor: pointer; font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(212, 175, 122, 0.3);
+        }
+
+        .btn-banner-ok:hover, .btn-banner-ok:active {
+            background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(212, 175, 122, 0.45);
+        }
+
+        /* ============================================================
+           MARCA
+        ============================================================ */
         .marca {
             text-align: center;
             margin: 8px 0 12px 0;
@@ -91,6 +190,9 @@
             text-transform: lowercase;
         }
 
+        /* ============================================================
+           TELA ESCOLHA
+        ============================================================ */
         .tela-escolha {
             display: flex;
             flex-direction: column;
@@ -132,105 +234,9 @@
             font-weight: 400;
         }
 
-        .aviso-evento {
-            width: 100%;
-            background: linear-gradient(135deg,
-                rgba(212, 175, 122, 0.12),
-                rgba(212, 175, 122, 0.06));
-            border: 1px solid rgba(212, 175, 122, 0.5);
-            border-radius: 6px;
-            padding: 18px 16px;
-            position: relative;
-            overflow: hidden;
-            animation: fadeInUp 0.7s ease 0.2s both;
-        }
-
-        .aviso-evento::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 15%;
-            right: 15%;
-            height: 1px;
-            background: linear-gradient(90deg,
-                transparent, var(--dourado), transparent);
-        }
-
-        .aviso-evento::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 3px;
-            height: 100%;
-            background: linear-gradient(180deg,
-                var(--dourado), var(--dourado-escuro));
-            border-radius: 6px 0 0 6px;
-        }
-
-        .aviso-evento-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .aviso-evento-icone {
-            width: 36px;
-            height: 36px;
-            border: 1px solid var(--dourado);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--dourado);
-            flex-shrink: 0;
-        }
-
-        .aviso-evento-icone svg { width: 18px; height: 18px; }
-
-        .aviso-evento-titulo {
-            font-family: 'Playfair Display', serif;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--dourado);
-            letter-spacing: 1px;
-            line-height: 1.3;
-        }
-
-        .aviso-evento-titulo small {
-            display: block;
-            font-family: 'Inter', sans-serif;
-            font-size: 9px;
-            font-weight: 500;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--dourado-escuro);
-            margin-top: 1px;
-        }
-
-        .aviso-destaque {
-            margin-top: 14px;
-            padding: 10px 12px;
-            background: rgba(212, 175, 122, 0.1);
-            border: 1px solid rgba(212, 175, 122, 0.3);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            color: var(--dourado);
-            font-family: 'Inter', sans-serif;
-            font-size: 10.5px;
-            font-weight: 600;
-            letter-spacing: 1.2px;
-            text-transform: uppercase;
-            line-height: 1.2;
-            white-space: nowrap;
-        }
-
-        .aviso-destaque svg { width: 15px; height: 15px; flex-shrink: 0; color: var(--dourado); }
-
+        /* ============================================================
+           BOTÕES DE ESCOLHA
+        ============================================================ */
         .btn-escolha {
             width: 100%;
             padding: 18px 18px;
@@ -287,6 +293,9 @@
             padding: 2px 6px; border-radius: 3px; font-weight: 700; letter-spacing: 1px; vertical-align: middle;
         }
 
+        /* ============================================================
+           CONTAINER (câmera / ajuste / resultado)
+        ============================================================ */
         .container {
             position: relative;
             width: 100%;
@@ -309,6 +318,9 @@
         #fotoAjuste { position: absolute; top: 0; left: 0; transform-origin: 0 0; will-change: transform; pointer-events: none; max-width: none; max-height: none; }
         .moldura-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
 
+        /* ============================================================
+           BOTÕES GERAIS
+        ============================================================ */
         .botoes {
             display: flex;
             gap: 8px;
@@ -368,6 +380,9 @@
         .dica-ajuste { text-align: center; color: var(--cinza-suave); font-size: 10px; margin-top: 4px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 400; }
         .dica-ajuste .separador { color: var(--dourado); margin: 0 8px; }
 
+        /* ============================================================
+           TELA DE LOTE
+        ============================================================ */
         .tela-lote { width: 100%; max-width: 380px; padding: 10px; animation: fadeIn 0.4s ease; flex: 1; }
         .lote-titulo { text-align: center; margin-bottom: 16px; }
         .lote-titulo h2 { font-family: 'Playfair Display', serif; font-weight: 500; font-size: 20px; color: var(--branco); margin-bottom: 4px; }
@@ -391,11 +406,17 @@
         .lote-processando .loading-spinner { margin: 0 auto 16px; }
         .lote-processando p { font-family: 'Playfair Display', serif; font-style: italic; font-size: 14px; }
 
+        /* ============================================================
+           LOADING INICIAL
+        ============================================================ */
         .loading-inicial { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--preto); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; gap: 24px; }
         .loading-spinner { width: 50px; height: 50px; border: 1px solid rgba(212, 175, 122, 0.15); border-top: 1px solid var(--dourado); border-radius: 50%; animation: spin 1s linear infinite; }
         .loading-inicial .marca-logo { font-size: 18px; letter-spacing: 8px; opacity: 0.9; }
         .loading-inicial p { color: var(--cinza-suave); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; font-weight: 300; }
 
+        /* ============================================================
+           MODAL GERAL
+        ============================================================ */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; animation: fadeIn 0.3s ease; }
         .modal-conteudo { background: linear-gradient(135deg, var(--grafite), var(--preto-2)); color: var(--branco); padding: 40px 30px 30px 30px; border: 1px solid rgba(212, 175, 122, 0.3); border-radius: 6px; text-align: center; max-width: 360px; width: 100%; animation: slideUp 0.4s ease; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
         .modal-conteudo::before { content: ''; position: absolute; top: 0; left: 20%; right: 20%; height: 1px; background: linear-gradient(90deg, transparent, var(--dourado), transparent); }
@@ -415,6 +436,9 @@
         .modal-cta-botoes a.whats:hover { background: var(--whatsapp); border-color: var(--whatsapp); color: var(--branco); transform: translateY(-2px); }
         .modal-cta-botoes a.insta:hover { background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCB045); border-color: transparent; color: var(--branco); transform: translateY(-2px); }
 
+        /* ============================================================
+           RODAPÉ
+        ============================================================ */
         .rodape {
             position: fixed;
             bottom: 0; left: 0; right: 0;
@@ -435,6 +459,9 @@
         .rodape-redes a.whats:hover { background: var(--whatsapp); border-color: var(--whatsapp); color: var(--branco); transform: translateY(-2px); }
         .rodape-redes a.insta:hover { background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCB045); border-color: transparent; color: var(--branco); transform: translateY(-2px); }
 
+        /* ============================================================
+           OVERLAY DE ENVIO
+        ============================================================ */
         .overlay-envio { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; padding: 20px; animation: fadeIn 0.3s ease; }
         .overlay-envio.ativo { display: flex; }
         .envio-conteudo { max-width: 340px; width: 100%; text-align: center; }
@@ -462,18 +489,46 @@
             .titulo-secao h1 { font-size: 20px; }
             .btn-escolha { padding: 15px 14px; }
             .btn-escolha .titulo-btn { font-size: 13px; }
-            .aviso-destaque { font-size: 9.5px; letter-spacing: 1px; padding: 10px 8px; }
         }
     </style>
 </head>
 <body>
 
+    <!-- LOADING INICIAL -->
     <div id="loadingInicial" class="loading-inicial">
         <div class="marca-logo">ENTRE CLICKS</div>
         <div class="loading-spinner"></div>
         <p>Carregando</p>
     </div>
 
+    <!-- BANNER DE AVISO INICIAL (PRIMEIRA TELA DO CONVIDADO) -->
+    <div id="bannerAviso" class="banner-aviso-inicial">
+        <div class="banner-card">
+            <div class="banner-icone">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                </svg>
+            </div>
+
+            <div class="banner-titulo">Atenção, convidado!</div>
+            <div class="banner-subtitulo">regra importante do evento</div>
+
+            <div class="banner-texto">
+                Este é um serviço exclusivo deste evento.<br><br>
+                Envie <strong>somente fotos tiradas aqui hoje</strong>.
+            </div>
+
+            <div class="banner-destaque">
+                Fotos antigas, de outros eventos ou de fora do local <strong>não serão impressas</strong>.
+            </div>
+
+            <button class="btn-banner-ok" onclick="aceitarAviso()">
+                Entendi, quero enviar minhas fotos
+            </button>
+        </div>
+    </div>
+
+    <!-- MARCA -->
     <div class="marca">
         <div class="marca-logo">ENTRE CLICKS</div>
         <div class="marca-linha">
@@ -481,31 +536,12 @@
         </div>
     </div>
 
+    <!-- TELA ESCOLHA (INICIA OCULTA ATÉ O BANNER SER ACEITO) -->
     <div class="tela-escolha hidden" id="telaEscolha">
+
         <div class="titulo-secao">
             <h1>Eternize <em>este</em> momento</h1>
             <p>escolha como registrar</p>
-        </div>
-
-        <div class="aviso-evento">
-            <div class="aviso-evento-header">
-                <div class="aviso-evento-icone">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
-                    </svg>
-                </div>
-                <div class="aviso-evento-titulo">
-                     Momento único, Memória exclusiva
-                <small>envie fotos apenas deste evento</small>
-                </div>
-            </div>
-            <div class="aviso-destaque">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
-                </svg>
-                Somente fotos tiradas durante o evento
-            </div>
         </div>
 
         <button class="btn-escolha" id="btnAbrirCamera">
@@ -550,11 +586,11 @@
             </div>
         </button>
 
-        <!-- ACEITA EXPLICITAMENTE EXTENSÕES HEIC E HEIF -->
-        <input type="file" id="inputFoto" accept="image/*, .heic, .HEIC, .heif, .HEIF">
-        <input type="file" id="inputFotoLote" accept="image/*, .heic, .HEIC, .heif, .HEIF" multiple>
+        <input type="file" id="inputFoto" accept="image/*">
+        <input type="file" id="inputFotoLote" accept="image/*" multiple>
     </div>
 
+    <!-- TELA LOTE -->
     <div class="tela-lote hidden" id="telaLote">
         <div class="lote-titulo">
             <h2>Suas fotos</h2>
@@ -563,7 +599,7 @@
 
         <div id="loteProcessando" class="lote-processando hidden">
             <div class="loading-spinner"></div>
-            <p id="loteProcessandoMsg">Processando fotos...</p>
+            <p>Aplicando molduras...</p>
         </div>
 
         <div class="grade-lote hidden" id="gradeLote"></div>
@@ -581,11 +617,13 @@
         </div>
     </div>
 
+    <!-- ÁREA CÂMERA -->
     <div class="container hidden" id="areaCamera">
         <video id="video" autoplay playsinline muted></video>
         <img class="moldura-overlay" id="molduraCamera" alt="Moldura">
     </div>
 
+    <!-- ÁREA AJUSTE -->
     <div class="container hidden" id="areaAjuste">
         <div class="area-ajuste" id="areaFoto">
             <img id="fotoAjuste" alt="Sua foto">
@@ -593,12 +631,14 @@
         <img class="moldura-overlay" id="molduraAjuste" alt="Moldura">
     </div>
 
+    <!-- ÁREA RESULTADO -->
     <div class="container hidden" id="areaResultado">
         <canvas id="canvasResultado"></canvas>
     </div>
 
     <div id="mensagem"></div>
 
+    <!-- BOTÕES CÂMERA -->
     <div class="botoes hidden" id="botoesCamera">
         <button class="btn btn-voltar" id="btnVoltarCamera">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -621,6 +661,7 @@
         </button>
     </div>
 
+    <!-- BOTÕES AJUSTE -->
     <div class="botoes hidden" id="botoesAjuste">
         <button class="btn btn-voltar" id="btnVoltarAjuste">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -646,6 +687,7 @@
         Arraste <span class="separador">•</span> pinça para zoom
     </div>
 
+    <!-- BOTÕES RESULTADO -->
     <div class="botoes hidden" id="botoesResultado">
         <button class="btn btn-voltar" id="btnRefazer">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -670,6 +712,7 @@
         </button>
     </div>
 
+    <!-- RODAPÉ -->
     <div class="rodape">
         <div class="rodape-marca">· Entre Clicks ·</div>
         <div class="rodape-redes">
@@ -688,6 +731,7 @@
         </div>
     </div>
 
+    <!-- OVERLAY DE ENVIO -->
     <div class="overlay-envio" id="overlayEnvio">
         <div class="envio-conteudo">
             <div class="envio-icone">
@@ -705,21 +749,24 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <!-- BIBLIOTECA HEIC2ANY -->
-    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 
     <script>
+        // ============================================
+        // CONFIGURAÇÃO DO SUPABASE
+        // ============================================
         const SUPABASE_URL = "https://scwznirvzwrphztvopbz.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjd3puaXJ2endycGh6dHZvcGJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzI2NzQsImV4cCI6MjA5NTY0ODY3NH0.PLvr547bIEJwjECKxQaoR7lpazs8GbSpLYLMDiGD4Po";
         const BUCKET_FOTOS = "fotos-eventos";
 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        // ============================================
+        // CONFIGURAÇÕES DE EXPORTAÇÃO
+        // ============================================
         const LARGURA_IMPRESSAO = 1560;
         const ALTURA_IMPRESSAO  = 2140;
-        const QUALIDADE_JPEG    = 0.85;
-        const LIMITE_LOTE       = 29;
+        const QUALIDADE_JPEG    = 0.85; 
+        const LIMITE_LOTE       = 5;
 
         const ICONES_MODAL = {
             sucesso: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>',
@@ -740,7 +787,9 @@
             arquivo:       ''
         };
 
+        // ELEMENTOS
         const loadingInicial  = document.getElementById('loadingInicial');
+        const bannerAviso     = document.getElementById('bannerAviso');
         const telaEscolha     = document.getElementById('telaEscolha');
         const telaLote        = document.getElementById('telaLote');
         const areaCamera      = document.getElementById('areaCamera');
@@ -782,7 +831,6 @@
         const contadorLote        = document.getElementById('contadorLote');
         const qtdEnvio            = document.getElementById('qtdEnvio');
         const loteProcessando     = document.getElementById('loteProcessando');
-        const loteProcessandoMsg  = document.getElementById('loteProcessandoMsg');
 
         const moldura = new Image();
         moldura.crossOrigin = 'anonymous';
@@ -797,64 +845,12 @@
         let fotosLote          = [];
         let indiceEditandoLote = -1;
 
-        // ============================================================
-        // ⭐ IDENTIFICAÇÃO E CONVERSÃO ROBUSTA PARA IPHONE / HEIC
-        // ============================================================
-        async function ehArquivoHeic(file) {
-            if (!file) return false;
-            const nome = (file.name || '').toLowerCase();
-            const tipo = (file.type || '').toLowerCase();
-
-            if (nome.endsWith('.heic') || nome.endsWith('.heif') || tipo.includes('heic') || tipo.includes('heif')) {
-                return true;
-            }
-
-            // Checagem binária por Magic Bytes (ftypheic/ftypmif1) caso o computador venha sem extensão
-            try {
-                const cabecalho = await file.slice(0, 24).arrayBuffer();
-                const u8 = new Uint8Array(cabecalho);
-                let assinatura = '';
-                for (let i = 4; i < 16; i++) {
-                    assinatura += String.fromCharCode(u8[i]);
-                }
-                if (assinatura.includes('ftyp') && (
-                    assinatura.includes('heic') || assinatura.includes('heix') || 
-                    assinatura.includes('mif1') || assinatura.includes('msf1')
-                )) {
-                    return true;
-                }
-            } catch (e) {
-                // silencioso
-            }
-
-            return false;
-        }
-
-        async function converterHeicSeNecessario(file) {
-            const isHeic = await ehArquivoHeic(file);
-            if (!isHeic) return file;
-
-            if (typeof window.heic2any === 'undefined') {
-                throw new Error('A biblioteca de fotos do iPhone ainda está carregando. Tente novamente em alguns segundos.');
-            }
-
-            try {
-                // Conversão
-                const resultado = await window.heic2any({
-                    blob: file,
-                    toType: "image/jpeg",
-                    quality: 0.85
-                });
-
-                // SE O ARQUIVO FOR UMA LIVE PHOTO OU MODO RETRATO, heic2any RETORNA UM ARRAY
-                const blobFinal = Array.isArray(resultado) ? resultado[0] : resultado;
-                const nomeLimpo = (file.name || 'foto').replace(/\.(heic|heif)$/i, '') + '.jpg';
-
-                return new File([blobFinal], nomeLimpo, { type: 'image/jpeg' });
-            } catch (err) {
-                console.error("Erro heic2any:", err);
-                throw new Error("Não foi possível decodificar este arquivo HEIC do iPhone. Tente selecioná-lo novamente.");
-            }
+        // ============================================
+        // AÇÃO DO BANNER INICIAL
+        // ============================================
+        function aceitarAviso() {
+            bannerAviso.classList.add('hidden');
+            mostrarTela('escolha');
         }
 
         // ============================================
@@ -937,6 +933,7 @@
                 aplicarPosicoesJanela();
                 dimensionarContainers();
 
+                console.log('Configuração carregada');
                 return true;
             } catch (err) {
                 console.error('Erro ao carregar configuração:', err);
@@ -1065,25 +1062,12 @@
         // ============================================
         // INPUT FOTO ÚNICA
         // ============================================
-        inputFoto.addEventListener('change', async (e) => {
-            let arquivo = e.target.files[0];
+        inputFoto.addEventListener('change', (e) => {
+            const arquivo = e.target.files[0];
             if (!arquivo) return;
 
             indiceEditandoLote   = -1;
             mensagem.textContent = 'Carregando foto...';
-
-            try {
-                const isHeic = await ehArquivoHeic(arquivo);
-                if (isHeic) {
-                    mensagem.textContent = 'Convertendo formato HEIC do iPhone...';
-                    arquivo = await converterHeicSeNecessario(arquivo);
-                }
-            } catch (err) {
-                mensagem.textContent = '';
-                inputFoto.value = '';
-                mostrarModal('erro', 'Atenção', err.message);
-                return;
-            }
 
             const reader = new FileReader();
             reader.onload = (event) => {
@@ -1127,22 +1111,9 @@
             gradeLote.classList.add('hidden');
             botoesLote.classList.add('hidden');
 
-            for (let i = 0; i < arquivos.length; i++) {
-                let arquivo = arquivos[i];
-                try {
-                    loteProcessandoMsg.textContent = `Processando foto ${i + 1} de ${arquivos.length}...`;
-                    
-                    const isHeic = await ehArquivoHeic(arquivo);
-                    if (isHeic) {
-                        loteProcessandoMsg.textContent = `Convertendo foto iPhone ${i + 1}...`;
-                        arquivo = await converterHeicSeNecessario(arquivo);
-                    }
-                    
-                    await adicionarFotoAoLote(arquivo);
-                }
-                catch (err) { 
-                    console.error('Erro ao processar foto:', err); 
-                }
+            for (const arquivo of arquivos) {
+                try { await adicionarFotoAoLote(arquivo); }
+                catch (err) { console.error('Erro ao processar foto:', err); }
             }
 
             inputFotoLote.value = '';
@@ -1575,7 +1546,7 @@
         });
 
         // ============================================
-        // COMPARTILHAMENTO
+        // GERA VERSÃO 9:16 COM FUNDO DESFOCADO PRA COMPARTILHAR
         // ============================================
         async function gerarCanvasParaCompartilhamento() {
             const LARGURA_SHARE = 1080;
@@ -1641,6 +1612,9 @@
             return canvasShare;
         }
 
+        // ============================================
+        // COMPARTILHAR
+        // ============================================
         btnCompartilhar.addEventListener('click', async () => {
             try {
                 const textoOriginal = btnCompartilhar.innerHTML;
@@ -1847,6 +1821,7 @@
 
                 try {
                     atualizarProgresso(pctInicio, `Preparando foto ${numero}...`, `${numero} de ${total}`);
+
                     await new Promise(r => setTimeout(r, 300)); 
 
                     const blob = await redimensionarCanvasComQualidade(
@@ -1895,7 +1870,7 @@
                     true);
             } else if (enviadas > 0) {
                 mostrarModal('info', 'Envio parcial',
-                    `${enviadas} foto(s) enviada(s) com sucesso.<br>${erros} não conseguiram ser enviadas. Pode ter sido instabilidade na internet.`);
+                    `${enviadas} foto(s) enviada(s) com sucesso.<br>${erros} não conseguiram ser enviadas. Tente enviar novamente.`);
                 btnEnviarLote.disabled = false;
             } else {
                 mostrarModal('erro', 'Falha no envio',
@@ -1944,7 +1919,8 @@
             const ok = await carregarConfiguracao();
             if (ok) {
                 loadingInicial.style.display = 'none';
-                mostrarTela('escolha');
+                // Deixa a tela de escolha oculta até o convidado aceitar o banner inicial
+                telaEscolha.classList.add('hidden');
             }
         })();
     </script>
