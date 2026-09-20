@@ -153,9 +153,7 @@
             box-shadow: 0 8px 25px rgba(212, 175, 122, 0.45);
         }
 
-        /* ============================================================
-           MARCA
-        ============================================================ */
+        /* MARCA */
         .marca {
             text-align: center;
             margin: 8px 0 12px 0;
@@ -190,9 +188,7 @@
             text-transform: lowercase;
         }
 
-        /* ============================================================
-           TELA ESCOLHA
-        ============================================================ */
+        /* TELA ESCOLHA */
         .tela-escolha {
             display: flex;
             flex-direction: column;
@@ -206,37 +202,12 @@
             animation: fadeIn 0.6s ease;
         }
 
-        .titulo-secao {
-            text-align: center;
-            margin-bottom: 8px;
-        }
+        .titulo-secao { text-align: center; margin-bottom: 8px; }
+        .titulo-secao h1 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: 24px; color: var(--branco); margin-bottom: 6px; line-height: 1.3; }
+        .titulo-secao h1 em { font-style: italic; color: var(--dourado); font-weight: 500; }
+        .titulo-secao p { color: var(--cinza-suave); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; font-weight: 400; }
 
-        .titulo-secao h1 {
-            font-family: 'Playfair Display', serif;
-            font-weight: 400;
-            font-size: 24px;
-            color: var(--branco);
-            margin-bottom: 6px;
-            line-height: 1.3;
-        }
-
-        .titulo-secao h1 em {
-            font-style: italic;
-            color: var(--dourado);
-            font-weight: 500;
-        }
-
-        .titulo-secao p {
-            color: var(--cinza-suave);
-            font-size: 11px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            font-weight: 400;
-        }
-
-        /* ============================================================
-           BOTÕES DE ESCOLHA
-        ============================================================ */
+        /* BOTÕES DE ESCOLHA */
         .btn-escolha {
             width: 100%;
             padding: 18px 18px;
@@ -254,9 +225,7 @@
         }
 
         .btn-escolha::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%; width: 100%; height: 100%;
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
             background: linear-gradient(90deg, transparent, rgba(212, 175, 122, 0.1), transparent);
             transition: left 0.6s;
         }
@@ -270,10 +239,8 @@
         }
 
         .btn-escolha .icone {
-            width: 40px; height: 40px;
-            border: 1px solid var(--dourado); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; color: var(--dourado); transition: all 0.3s ease;
+            width: 40px; height: 40px; border: 1px solid var(--dourado); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--dourado); transition: all 0.3s ease;
         }
 
         .btn-escolha:hover .icone { background: var(--dourado); color: var(--preto); }
@@ -282,14 +249,12 @@
         .btn-escolha .titulo-btn { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 500; letter-spacing: 1px; color: var(--branco); }
         .btn-escolha .desc { font-size: 10px; color: var(--cinza-suave); letter-spacing: 0.5px; font-weight: 300; }
 
-        .btn-escolha. {
+        .btn-escolha.destaque {
             border-color: var(--dourado);
             background: linear-gradient(135deg, rgba(212, 175, 122, 0.08), rgba(212, 175, 122, 0.02));
         }
 
-        /* ============================================================
-           CONTAINER (câmera / ajuste / resultado)
-        ============================================================ */
+        /* CONTAINER */
         .container {
             position: relative;
             width: 100%;
@@ -312,44 +277,22 @@
         #fotoAjuste { position: absolute; top: 0; left: 0; transform-origin: 0 0; will-change: transform; pointer-events: none; max-width: none; max-height: none; }
         .moldura-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
 
-        /* ============================================================
-           BOTÕES GERAIS
-        ============================================================ */
+        /* BOTÕES GERAIS */
         .botoes {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            justify-content: center;
-            width: 100%;
-            max-width: 380px;
-            padding: 5px 0 20px;
+            display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+            width: 100%; max-width: 380px; padding: 5px 0 20px;
         }
 
         .btn {
-            background: var(--grafite);
-            color: var(--branco);
-            border: 1px solid rgba(212, 175, 122, 0.25);
-            padding: 12px 16px;
-            font-size: 12px;
-            font-weight: 500;
-            font-family: 'Inter', sans-serif;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            border-radius: 3px;
-            cursor: pointer;
-            flex: 1;
-            min-width: 100px;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
+            background: var(--grafite); color: var(--branco); border: 1px solid rgba(212, 175, 122, 0.25);
+            padding: 12px 16px; font-size: 12px; font-weight: 500; font-family: 'Inter', sans-serif;
+            letter-spacing: 1.5px; text-transform: uppercase; border-radius: 3px; cursor: pointer;
+            flex: 1; min-width: 100px; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
         }
 
         .btn:hover:not(:disabled), .btn:active { background: var(--preto-2); border-color: var(--dourado); color: var(--dourado); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn svg { width: 14px; height: 14px; }
-
         .btn-voltar { background: transparent; border-color: rgba(255,255,255,0.15); color: var(--cinza-suave); flex: 0 0 auto; min-width: 90px; }
         .btn-voltar:hover:not(:disabled) { border-color: rgba(255,255,255,0.4); color: var(--branco); background: transparent; }
         .btn-primario { background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro)); color: var(--preto); border: none; font-weight: 600; }
@@ -374,9 +317,7 @@
         .dica-ajuste { text-align: center; color: var(--cinza-suave); font-size: 10px; margin-top: 4px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 400; }
         .dica-ajuste .separador { color: var(--dourado); margin: 0 8px; }
 
-        /* ============================================================
-           TELA DE LOTE
-        ============================================================ */
+        /* TELA DE LOTE */
         .tela-lote { width: 100%; max-width: 380px; padding: 10px; animation: fadeIn 0.4s ease; flex: 1; }
         .lote-titulo { text-align: center; margin-bottom: 16px; }
         .lote-titulo h2 { font-family: 'Playfair Display', serif; font-weight: 500; font-size: 20px; color: var(--branco); margin-bottom: 4px; }
@@ -400,17 +341,13 @@
         .lote-processando .loading-spinner { margin: 0 auto 16px; }
         .lote-processando p { font-family: 'Playfair Display', serif; font-style: italic; font-size: 14px; }
 
-        /* ============================================================
-           LOADING INICIAL
-        ============================================================ */
+        /* LOADING INICIAL */
         .loading-inicial { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--preto); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; gap: 24px; }
         .loading-spinner { width: 50px; height: 50px; border: 1px solid rgba(212, 175, 122, 0.15); border-top: 1px solid var(--dourado); border-radius: 50%; animation: spin 1s linear infinite; }
         .loading-inicial .marca-logo { font-size: 18px; letter-spacing: 8px; opacity: 0.9; }
         .loading-inicial p { color: var(--cinza-suave); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; font-weight: 300; }
 
-        /* ============================================================
-           MODAL GERAL
-        ============================================================ */
+        /* MODAL GERAL */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; animation: fadeIn 0.3s ease; }
         .modal-conteudo { background: linear-gradient(135deg, var(--grafite), var(--preto-2)); color: var(--branco); padding: 40px 30px 30px 30px; border: 1px solid rgba(212, 175, 122, 0.3); border-radius: 6px; text-align: center; max-width: 360px; width: 100%; animation: slideUp 0.4s ease; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
         .modal-conteudo::before { content: ''; position: absolute; top: 0; left: 20%; right: 20%; height: 1px; background: linear-gradient(90deg, transparent, var(--dourado), transparent); }
@@ -430,75 +367,64 @@
         .modal-cta-botoes a.whats:hover { background: var(--whatsapp); border-color: var(--whatsapp); color: var(--branco); transform: translateY(-2px); }
         .modal-cta-botoes a.insta:hover { background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCB045); border-color: transparent; color: var(--branco); transform: translateY(-2px); }
 
-        /* ============================================================
-   RODAPÉ REFORMULADO (ÍCONES MAIORES)
-============================================================ */
-.rodape {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    padding: 12px 12px 16px;
-    background: linear-gradient(180deg, transparent, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0.98));
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    z-index: 50;
-    pointer-events: none;
-}
+        /* RODAPÉ COM ÍCONES AMPLIADOS */
+        .rodape {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            padding: 12px 12px 16px;
+            background: linear-gradient(180deg, transparent, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0.98));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            z-index: 50;
+            pointer-events: none;
+        }
 
-.rodape-marca { 
-    font-family: 'Playfair Display', serif; 
-    font-size: 10px; 
-    color: var(--dourado-claro); 
-    letter-spacing: 2px; 
-    text-transform: uppercase; 
-    font-style: italic;
-    opacity: 0.9;
-}
+        .rodape-marca { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 10px; 
+            color: var(--dourado-claro); 
+            letter-spacing: 2px; 
+            text-transform: uppercase; 
+            font-style: italic;
+            opacity: 0.9;
+        }
 
-.rodape-redes { 
-    display: flex; 
-    gap: 12px; 
-    pointer-events: auto; 
-}
+        .rodape-redes { display: flex; gap: 12px; pointer-events: auto; }
 
-.rodape-redes a { 
-    width: 42px; 
-    height: 42px; 
-    border: 1px solid rgba(212, 175, 122, 0.4); 
-    border-radius: 50%; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    color: var(--dourado); 
-    text-decoration: none; 
-    transition: all 0.3s ease; 
-    background: rgba(28, 28, 28, 0.85); 
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-}
+        .rodape-redes a { 
+            width: 42px; 
+            height: 42px; 
+            border: 1px solid rgba(212, 175, 122, 0.4); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: var(--dourado); 
+            text-decoration: none; 
+            transition: all 0.3s ease; 
+            background: rgba(28, 28, 28, 0.85); 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
 
-.rodape-redes a svg { 
-    width: 20px; 
-    height: 20px; 
-}
+        .rodape-redes a svg { width: 20px; height: 20px; }
 
-.rodape-redes a.whats:hover, .rodape-redes a.whats:active { 
-    background: var(--whatsapp); 
-    border-color: var(--whatsapp); 
-    color: var(--branco); 
-    transform: translateY(-2px); 
-}
+        .rodape-redes a.whats:hover, .rodape-redes a.whats:active { 
+            background: var(--whatsapp); 
+            border-color: var(--whatsapp); 
+            color: var(--branco); 
+            transform: translateY(-2px); 
+        }
 
-.rodape-redes a.insta:hover, .rodape-redes a.insta:active { 
-    background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCB045); 
-    border-color: transparent; 
-    color: var(--branco); 
-    transform: translateY(-2px); 
-}
-        
-        /* ============================================================
-           OVERLAY DE ENVIO
-        ============================================================ */
+        .rodape-redes a.insta:hover, .rodape-redes a.insta:active { 
+            background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCB045); 
+            border-color: transparent; 
+            color: var(--branco); 
+            transform: translateY(-2px); 
+        }
+
+        /* OVERLAY DE ENVIO */
         .overlay-envio { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; padding: 20px; animation: fadeIn 0.3s ease; }
         .overlay-envio.ativo { display: flex; }
         .envio-conteudo { max-width: 340px; width: 100%; text-align: center; }
@@ -573,7 +499,7 @@
         </div>
     </div>
 
-    <!-- TELA ESCOLHA (INICIA OCULTA ATÉ O BANNER SER ACEITO) -->
+    <!-- TELA ESCOLHA -->
     <div class="tela-escolha hidden" id="telaEscolha">
 
         <div class="titulo-secao">
@@ -750,23 +676,23 @@
     </div>
 
     <!-- RODAPÉ REFORMULADO -->
-<div class="rodape">
-    <div class="rodape-marca">siga nossas redes sociais</div>
-    <div class="rodape-redes">
-        <a href="https://wa.me/5528999281772" target="_blank" rel="noopener" class="whats" title="WhatsApp">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-            </svg>
-        </a>
-        <a href="https://instagram.com/entreclicks.oficial" target="_blank" rel="noopener" class="insta" title="Instagram">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
-            </svg>
-        </a>
+    <div class="rodape">
+        <div class="rodape-marca">siga nossas redes sociais</div>
+        <div class="rodape-redes">
+            <a href="https://wa.me/5528999281772" target="_blank" rel="noopener" class="whats" title="WhatsApp">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
+            </a>
+            <a href="https://instagram.com/entreclicks.oficial" target="_blank" rel="noopener" class="insta" title="Instagram">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                </svg>
+            </a>
+        </div>
     </div>
-</div>
 
     <!-- OVERLAY DE ENVIO -->
     <div class="overlay-envio" id="overlayEnvio">
@@ -888,6 +814,48 @@
         function aceitarAviso() {
             bannerAviso.classList.add('hidden');
             mostrarTela('escolha');
+        }
+
+        // ============================================
+        // 💡 INTELIGÊNCIA DE TRATAMENTO DE LUZ PARA IMPRESSÃO
+        // ============================================
+        function calcularFiltroDeLuzInteligente(ctxFonte, larg, alt) {
+            try {
+                // Amostra pixels da imagem (passo de 8 pixels para ser instantâneo)
+                const imgData = ctxFonte.getImageData(0, 0, larg, alt);
+                const data = imgData.data;
+                let somaLuminosidade = 0;
+                let contador = 0;
+
+                for (let i = 0; i < data.length; i += 4 * 8) {
+                    const r = data[i];
+                    const g = data[i + 1];
+                    const b = data[i + 2];
+                    // Fórmula clássica de luminosidade percebida pelo olho humano
+                    const lum = (0.299 * r) + (0.587 * g) + (0.114 * b);
+                    somaLuminosidade += lum;
+                    contador++;
+                }
+
+                const mediaLuminosidade = somaLuminosidade / contador;
+                const LIMIAR_FOTO_BOA = 115; // 0 (escuridão) a 255 (branquidão). 115 é a luz ideal de impressão.
+
+                // SE A FOTO JÁ ESTIVER BOA/CLARA: IGNORA TOTALMENTE!
+                if (mediaLuminosidade >= LIMIAR_FOTO_BOA) {
+                    return 'none';
+                }
+
+                // SE A FOTO FOR ESCURA: Calcula o impulso necessário de brilho/contraste
+                const deficit = LIMIAR_FOTO_BOA - mediaLuminosidade;
+                const boostBrilho = 1 + (deficit / 190); // Varia de +5% a +35% de luz dependendo da escuridão
+                const boostContraste = 1.05; // Ajuste leve de contraste para não "lavar" as cores
+                const boostSaturacao = 1.06; // Ajuste leve de cor para o papel fotográfico
+
+                return `brightness(${Math.round(boostBrilho * 100)}%) contrast(${Math.round(boostContraste * 100)}%) saturate(${Math.round(boostSaturacao * 100)}%)`;
+            } catch (err) {
+                console.warn("Não foi possível analisar luminosidade (CORS ou erro):", err);
+                return 'none'; // Na dúvida, não mexe
+            }
         }
 
         // ============================================
@@ -1085,9 +1053,7 @@
             requestAnimationFrame(dimensionarContainers);
         }
 
-        // ============================================
         // BOTÕES DA TELA INICIAL
-        // ============================================
         btnAbrirCamera.addEventListener('click', () => {
             mostrarTela('camera');
             iniciarCamera();
@@ -1096,9 +1062,7 @@
         btnAbrirGaleria.addEventListener('click', () => inputFoto.click());
         btnAbrirGaleriaLote.addEventListener('click', () => inputFotoLote.click());
 
-        // ============================================
         // INPUT FOTO ÚNICA
-        // ============================================
         inputFoto.addEventListener('change', (e) => {
             const arquivo = e.target.files[0];
             if (!arquivo) return;
@@ -1122,9 +1086,7 @@
             reader.readAsDataURL(arquivo);
         });
 
-        // ============================================
         // INPUT LOTE
-        // ============================================
         inputFotoLote.addEventListener('change', async (e) => {
             const arquivos = Array.from(e.target.files);
             if (arquivos.length === 0) return;
@@ -1133,13 +1095,11 @@
             if (totalDepois > LIMITE_LOTE) {
                 const podeAdicionar = LIMITE_LOTE - fotosLote.length;
                 if (podeAdicionar <= 0) {
-                    mostrarModal('info', 'Limite atingido',
-                        `Você já atingiu o limite de ${LIMITE_LOTE} fotos por envio.`);
+                    mostrarModal('info', 'Limite atingido', `Você já atingiu o limite de ${LIMITE_LOTE} fotos por envio.`);
                     inputFotoLote.value = '';
                     return;
                 }
-                mostrarModal('info', 'Limite de fotos',
-                    `Você pode adicionar no máximo ${LIMITE_LOTE} fotos por vez. Vamos processar apenas as ${podeAdicionar} primeiras.`);
+                mostrarModal('info', 'Limite de fotos', `Você pode adicionar no máximo ${LIMITE_LOTE} fotos por vez. Vamos processar apenas as ${podeAdicionar} primeiras.`);
                 arquivos.splice(podeAdicionar);
             }
 
@@ -1189,13 +1149,24 @@
                             sy = (img.height - sH) / 2;
                         }
 
+                        // TESTA E APLICA FILTRO DE LUZ SE A FOTO FOR ESCURA
+                        const canvasLuz = document.createElement('canvas');
+                        canvasLuz.width = sW;
+                        canvasLuz.height = sH;
+                        const ctxLuz = canvasLuz.getContext('2d');
+                        ctxLuz.drawImage(img, sx, sy, sW, sH, 0, 0, sW, sH);
+
+                        const filtro = calcularFiltroDeLuzInteligente(ctxLuz, sW, sH);
+                        
+                        ctxTemp.save();
+                        ctxTemp.filter = filtro;
                         ctxTemp.drawImage(img, sx, sy, sW, sH,
                             MOLDURA.janelaX,      MOLDURA.janelaY,
                             MOLDURA.janelaLargura, MOLDURA.janelaAltura);
+                        ctxTemp.restore();
 
                         if (moldura.complete && moldura.naturalWidth > 0) {
-                            ctxTemp.drawImage(moldura, 0, 0,
-                                MOLDURA.larguraTotal, MOLDURA.alturaTotal);
+                            ctxTemp.drawImage(moldura, 0, 0, MOLDURA.larguraTotal, MOLDURA.alturaTotal);
                         }
 
                         const canvasPreview  = document.createElement('canvas');
@@ -1203,8 +1174,7 @@
                         canvasPreview.height = (300 * MOLDURA.alturaTotal) / MOLDURA.larguraTotal;
                         const ctxPreview = canvasPreview.getContext('2d');
                         ctxPreview.imageSmoothingQuality = 'high';
-                        ctxPreview.drawImage(canvasTemp, 0, 0,
-                            canvasPreview.width, canvasPreview.height);
+                        ctxPreview.drawImage(canvasTemp, 0, 0, canvasPreview.width, canvasPreview.height);
 
                         fotosLote.push({
                             imagemOriginal:     img,
@@ -1292,9 +1262,7 @@
             }
         });
 
-        // ============================================
-        // AJUSTE
-        // ============================================
+        // AJUSTE DE FOTO
         function iniciarAjuste() {
             fotoAjuste.src          = imagemOriginal.src;
             fotoAjuste.style.width  = imagemOriginal.width  + 'px';
@@ -1319,11 +1287,10 @@
         }
 
         function aplicarTransform() {
-            fotoAjuste.style.transform =
-                `translate(${ajuste.x}px, ${ajuste.y}px) scale(${ajuste.scale})`;
+            fotoAjuste.style.transform = `translate(${ajuste.x}px, ${ajuste.y}px) scale(${ajuste.scale})`;
         }
 
-        // GESTOS
+        // GESTOS DE TOUCH/ZOOM
         let toqueInicial     = null;
         let distanciaInicial = 0;
         let scaleInicial     = 1;
@@ -1336,10 +1303,7 @@
         }
 
         function getCentro(t) {
-            return {
-                x: (t[0].clientX + t[1].clientX) / 2,
-                y: (t[0].clientY + t[1].clientY) / 2
-            };
+            return { x: (t[0].clientX + t[1].clientX) / 2, y: (t[0].clientY + t[1].clientY) / 2 };
         }
 
         areaFoto.addEventListener('touchstart', (e) => {
@@ -1366,10 +1330,7 @@
             } else if (e.touches.length === 2 && distanciaInicial > 0) {
                 const novaDistancia = getDistancia(e.touches);
                 const escalaFator   = novaDistancia / distanciaInicial;
-                const novoScale     = Math.max(
-                    ajuste.initialScale * 0.5,
-                    Math.min(scaleInicial * escalaFator, ajuste.initialScale * 5)
-                );
+                const novoScale     = Math.max(ajuste.initialScale * 0.5, Math.min(scaleInicial * escalaFator, ajuste.initialScale * 5));
                 const centroAtual = getCentro(e.touches);
                 const rectArea    = areaFoto.getBoundingClientRect();
                 const cx = centroAtual.x - rectArea.left;
@@ -1406,10 +1367,7 @@
         areaFoto.addEventListener('wheel', (e) => {
             e.preventDefault();
             const delta     = e.deltaY > 0 ? 0.9 : 1.1;
-            const novoScale = Math.max(
-                ajuste.initialScale * 0.5,
-                Math.min(ajuste.scale * delta, ajuste.initialScale * 5)
-            );
+            const novoScale = Math.max(ajuste.initialScale * 0.5, Math.min(ajuste.scale * delta, ajuste.initialScale * 5));
             const rectArea  = areaFoto.getBoundingClientRect();
             const cx        = e.clientX - rectArea.left;
             const cy        = e.clientY - rectArea.top;
@@ -1441,14 +1399,25 @@
             const rectArea = areaFoto.getBoundingClientRect();
             const prop     = MOLDURA.janelaLargura / rectArea.width;
 
+            // ANALISA A FOTO AJUSTADA PARA VER SE PRECISA DE LUZ EXTRA
+            const canvasLuz = document.createElement('canvas');
+            canvasLuz.width = imagemOriginal.width;
+            canvasLuz.height = imagemOriginal.height;
+            const ctxLuz = canvasLuz.getContext('2d');
+            ctxLuz.drawImage(imagemOriginal, 0, 0);
+
+            const filtroLuz = calcularFiltroDeLuzInteligente(ctxLuz, imagemOriginal.width, imagemOriginal.height);
+
             ctx.save();
             ctx.beginPath();
-            ctx.rect(MOLDURA.janelaX, MOLDURA.janelaY,
-                     MOLDURA.janelaLargura, MOLDURA.janelaAltura);
+            ctx.rect(MOLDURA.janelaX, MOLDURA.janelaY, MOLDURA.janelaLargura, MOLDURA.janelaAltura);
             ctx.clip();
             ctx.translate(MOLDURA.janelaX, MOLDURA.janelaY);
             ctx.translate(ajuste.x * prop, ajuste.y * prop);
             ctx.scale(ajuste.scale * prop, ajuste.scale * prop);
+
+            // Aplica filtro inteligente SOMENTE se a foto for escura (se for boa, o filtro é 'none')
+            ctx.filter = filtroLuz;
             ctx.drawImage(imagemOriginal, 0, 0);
             ctx.restore();
 
@@ -1467,8 +1436,7 @@
                 canvasPreview.height = (300 * MOLDURA.alturaTotal) / MOLDURA.larguraTotal;
                 const ctxPreview = canvasPreview.getContext('2d');
                 ctxPreview.imageSmoothingQuality = 'high';
-                ctxPreview.drawImage(canvasCopia, 0, 0,
-                    canvasPreview.width, canvasPreview.height);
+                ctxPreview.drawImage(canvasCopia, 0, 0, canvasPreview.width, canvasPreview.height);
 
                 fotosLote[indiceEditandoLote].canvasCompleto     = canvasCopia;
                 fotosLote[indiceEditandoLote].previewUrl         = canvasPreview.toDataURL('image/jpeg', 0.7);
@@ -1483,9 +1451,7 @@
             }
         });
 
-        // ============================================
         // CÂMERA
-        // ============================================
         async function iniciarCamera() {
             try {
                 mensagem.textContent = 'Iniciando câmera...';
@@ -1494,20 +1460,13 @@
                     streamAtual = null;
                 }
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: cameraAtual,
-                        width:  { ideal: 1920 },
-                        height: { ideal: 2322 }
-                    },
+                    video: { facingMode: cameraAtual, width: { ideal: 1920 }, height: { ideal: 2322 } },
                     audio: false
                 });
                 streamAtual     = stream;
                 video.srcObject = stream;
                 video.style.transform = cameraAtual === 'user' ? 'scaleX(-1)' : 'none';
-                video.onloadedmetadata = () => {
-                    video.play();
-                    mensagem.textContent = '';
-                };
+                video.onloadedmetadata = () => { video.play(); mensagem.textContent = ''; };
             } catch (err) {
                 mensagem.textContent = 'Erro: ' + err.message;
             }
@@ -1553,9 +1512,21 @@
                 sy = (video.videoHeight - sH) / 2;
             }
 
+            // TESTA LUZ DO STREAM DA CÂMERA
+            const canvasLuz = document.createElement('canvas');
+            canvasLuz.width = sW;
+            canvasLuz.height = sH;
+            const ctxLuz = canvasLuz.getContext('2d');
+            ctxLuz.drawImage(video, sx, sy, sW, sH, 0, 0, sW, sH);
+
+            const filtroLuz = calcularFiltroDeLuzInteligente(ctxLuz, sW, sH);
+
+            ctx.save();
+            ctx.filter = filtroLuz; // Aplica se for foto noturna/escura
             ctx.drawImage(video, sx, sy, sW, sH,
                 MOLDURA.janelaX, MOLDURA.janelaY,
                 MOLDURA.janelaLargura, MOLDURA.janelaAltura);
+            ctx.restore();
 
             if (moldura.complete && moldura.naturalWidth > 0) {
                 ctx.drawImage(moldura, 0, 0, MOLDURA.larguraTotal, MOLDURA.alturaTotal);
@@ -1571,9 +1542,7 @@
         });
 
         window.addEventListener('resize', dimensionarContainers);
-        window.addEventListener('orientationchange', () => {
-            setTimeout(dimensionarContainers, 300);
-        });
+        window.addEventListener('orientationchange', () => { setTimeout(dimensionarContainers, 300); });
 
         btnBaixar.addEventListener('click', () => {
             const link    = document.createElement('a');
@@ -1582,9 +1551,7 @@
             link.click();
         });
 
-        // ============================================
-        // GERA VERSÃO 9:16 COM FUNDO DESFOCADO PRA COMPARTILHAR
-        // ============================================
+        // GERAR COMPARTILHAMENTO
         async function gerarCanvasParaCompartilhamento() {
             const LARGURA_SHARE = 1080;
             const ALTURA_SHARE  = 1920;
@@ -1601,15 +1568,9 @@
 
             let bgW, bgH, bgX, bgY;
             if (propCanvas > propShare) {
-                bgH = ALTURA_SHARE;
-                bgW = ALTURA_SHARE * propCanvas;
-                bgX = (LARGURA_SHARE - bgW) / 2;
-                bgY = 0;
+                bgH = ALTURA_SHARE; bgW = ALTURA_SHARE * propCanvas; bgX = (LARGURA_SHARE - bgW) / 2; bgY = 0;
             } else {
-                bgW = LARGURA_SHARE;
-                bgH = LARGURA_SHARE / propCanvas;
-                bgX = 0;
-                bgY = (ALTURA_SHARE - bgH) / 2;
+                bgW = LARGURA_SHARE; bgH = LARGURA_SHARE / propCanvas; bgX = 0; bgY = (ALTURA_SHARE - bgH) / 2;
             }
 
             ctxShare.filter = 'blur(40px) brightness(0.55) saturate(1.3)';
@@ -1625,11 +1586,9 @@
             const alturaDisponivel  = ALTURA_SHARE  - (MARGEM * 2);
 
             if (propCanvas > (larguraDisponivel / alturaDisponivel)) {
-                fgW = larguraDisponivel;
-                fgH = larguraDisponivel / propCanvas;
+                fgW = larguraDisponivel; fgH = larguraDisponivel / propCanvas;
             } else {
-                fgH = alturaDisponivel;
-                fgW = alturaDisponivel * propCanvas;
+                fgH = alturaDisponivel; fgW = alturaDisponivel * propCanvas;
             }
 
             fgX = (LARGURA_SHARE - fgW) / 2;
@@ -1641,7 +1600,6 @@
             ctxShare.shadowOffsetY = 10;
 
             ctxShare.drawImage(canvas, fgX, fgY, fgW, fgH);
-
             ctxShare.shadowColor   = 'transparent';
             ctxShare.shadowBlur    = 0;
             ctxShare.shadowOffsetY = 0;
@@ -1649,9 +1607,7 @@
             return canvasShare;
         }
 
-        // ============================================
         // COMPARTILHAR
-        // ============================================
         btnCompartilhar.addEventListener('click', async () => {
             try {
                 const textoOriginal = btnCompartilhar.innerHTML;
@@ -1669,29 +1625,15 @@
                     btnCompartilhar.disabled  = false;
                     btnCompartilhar.innerHTML = textoOriginal;
 
-                    if (!blob) {
-                        alert('Erro ao gerar imagem. Tente baixar a foto.');
-                        return;
-                    }
+                    if (!blob) { alert('Erro ao gerar imagem.'); return; }
 
-                    const arquivo = new File(
-                        [blob],
-                        'entreclicks-' + Date.now() + '.jpg',
-                        { type: 'image/jpeg' }
-                    );
+                    const arquivo = new File([blob], 'entreclicks-' + Date.now() + '.jpg', { type: 'image/jpeg' });
 
                     if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
-                        try {
-                            await navigator.share({
-                                files: [arquivo],
-                                title: 'Entre Clicks',
-                                text:  'Eternize esse momento'
-                            });
-                        } catch (err) {
-                            if (err.name !== 'AbortError') throw err;
-                        }
+                        try { await navigator.share({ files: [arquivo], title: 'Entre Clicks', text:  'Eternize esse momento' }); }
+                        catch (err) { if (err.name !== 'AbortError') throw err; }
                     } else {
-                        alert('Seu navegador não suporta compartilhamento direto. Vamos baixar a foto pra você compartilhar manualmente.');
+                        alert('Baixando a foto para compartilhamento...');
                         const link    = document.createElement('a');
                         link.download = 'entreclicks-share-' + Date.now() + '.jpg';
                         link.href     = canvasCompartilhar.toDataURL('image/jpeg', 0.95);
@@ -1702,13 +1644,11 @@
             } catch (err) {
                 btnCompartilhar.disabled = false;
                 console.error(err);
-                alert('Não foi possível compartilhar. Tente baixar a foto.');
+                alert('Tente baixar a foto para compartilhar.');
             }
         });
 
-        // ============================================
         // ENVIAR FOTO ÚNICA
-        // ============================================
         btnEnviarImpressao.addEventListener('click', async () => {
             if (fotoJaEnviada) {
                 mostrarModal('info', 'Foto já enviada', 'Essa foto já foi enviada para impressão!');
@@ -1762,8 +1702,7 @@
             }, 100);
 
             try {
-                const blob = await redimensionarCanvasComQualidade(
-                    canvas, LARGURA_IMPRESSAO, ALTURA_IMPRESSAO, QUALIDADE_JPEG);
+                const blob = await redimensionarCanvasComQualidade(canvas, LARGURA_IMPRESSAO, ALTURA_IMPRESSAO, QUALIDADE_JPEG);
                 if (!blob) throw new Error('Erro ao gerar foto');
 
                 clearInterval(intervalSimulado);
@@ -1817,9 +1756,7 @@
             }
         });
 
-        // ============================================
         // ENVIAR LOTE
-        // ============================================
         btnEnviarLote.addEventListener('click', async () => {
             if (fotosLote.length === 0) return;
 
@@ -1861,9 +1798,7 @@
 
                     await new Promise(r => setTimeout(r, 300)); 
 
-                    const blob = await redimensionarCanvasComQualidade(
-                        foto.canvasCompleto,
-                        LARGURA_IMPRESSAO, ALTURA_IMPRESSAO, QUALIDADE_JPEG);
+                    const blob = await redimensionarCanvasComQualidade(foto.canvasCompleto, LARGURA_IMPRESSAO, ALTURA_IMPRESSAO, QUALIDADE_JPEG);
 
                     if (!blob) throw new Error('Erro ao gerar foto');
 
@@ -1916,9 +1851,7 @@
             }
         });
 
-        // ============================================
         // MODAL
-        // ============================================
         function mostrarModal(tipo, titulo, texto, mostrarCTA = false) {
             const modalExistente = document.querySelector('.modal');
             if (modalExistente) modalExistente.remove();
@@ -1949,15 +1882,12 @@
             document.body.appendChild(modal);
         }
 
-        // ============================================
         // INICIALIZAÇÃO
-        // ============================================
         (async function inicializar() {
             const ok = await carregarConfiguracao();
             if (ok) {
                 loadingInicial.style.display = 'none';
-                // Deixa a tela de escolha oculta até o convidado aceitar o banner inicial
-                telaEscolha.classList.add('hidden');
+                telaEscolha.classList.add('hidden'); // Fica travado no banner de aviso até o clique do botão
             }
         })();
     </script>
