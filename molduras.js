@@ -17,7 +17,7 @@ let filtroAtual          = 'pendentes';
 let fotosCarregadas      = [];          
 let statusFotos          = {};          
 
-// Variáveis do Reajuste do Admin
+// Estado do Cropper do Admin
 let fotoReajustandoNome  = null;
 let imgOriginalReajuste = null;
 let adminCrop = { x: 0, y: 0, scale: 1, baseW: 0, baseH: 0, winW: 0, winH: 0 };
@@ -699,7 +699,7 @@ window.carregarFotos = async function () {
 };
 
 // ============================================================
-// ✏️ REAJUSTE NO ADMIN (ALTURA ADAPTÁVEL PARA CABER BOTÕES)
+// ✏️ REAJUSTE DE ENQUADRAMENTO NO ADMIN (COM BOTÕES DE ZOOM)
 // ============================================================
 window.abrirReajusteAdmin = async function(nomeArquivo) {
   if (!configAtual || !configAtual.moldura_url) {
@@ -757,23 +757,30 @@ function exibirModalReajusteAdmin() {
   modal.id = 'modalReajusteAdmin';
   modal.className = 'modal-config ativo';
   modal.innerHTML = `
-    <div class="modal-config-conteudo" style="max-width:420px; max-height:92vh; overflow-y:auto; display:flex; flex-direction:column;">
+    <div class="modal-config-conteudo" style="max-width:380px; margin: 20px auto;">
       <div class="modal-config-header">
         <h3>✏️ Reajustar Foto</h3>
         <button class="btn-fechar-modal" onclick="fecharModalReajusteAdmin()">×</button>
       </div>
-      <div class="modal-config-body" style="text-align:center; padding:16px; flex:1; display:flex; flex-direction:column; justify-content:space-between;">
-        <p style="font-size:11px; color:var(--cinza-suave); margin-bottom:10px;">Arraste para mover • Roleta do mouse para zoom:</p>
+      <div class="modal-config-body" style="text-align:center; padding:16px;">
+        <p style="font-size:11px; color:var(--cinza-suave); margin-bottom:12px;">Arraste para mover a foto:</p>
         
-        <!-- max-height:48vh GARANTE QUE A MOLDURA NUNCA ESTIQUE DEMAIS A TELA -->
-        <div id="containerCropperAdmin" style="position:relative; width:100%; max-height:48vh; aspect-ratio:${totalW} / ${totalH}; background:#000; overflow:hidden; border-radius:4px; border:1px solid var(--dourado); margin:0 auto; touch-action:none;">
+        <!-- MANTÉM PROPORÇÃO EXATA DA MOLDURA (SEM ACHATAR!) -->
+        <div id="containerCropperAdmin" style="position:relative; width:100%; max-width:320px; aspect-ratio:${totalW} / ${totalH}; background:#000; overflow:hidden; border-radius:4px; border:1px solid var(--dourado); margin:0 auto; touch-action:none;">
           <div id="areaCropperAdmin" style="position:absolute; top:${topPct}%; left:${leftPct}%; width:${widthPct}%; height:${heightPct}%; overflow:hidden; cursor:grab; background:#111;">
             <img id="imgCropperAdmin" src="${imgOriginalReajuste.src}" style="position:absolute; top:0; left:0; transform-origin:0 0; user-select:none; -webkit-user-drag:none; pointer-events:none;">
           </div>
           <img src="${configAtual.moldura_url}" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:10;">
         </div>
 
-        <div style="display:flex; gap:10px; margin-top:16px; padding-bottom:4px;">
+        <!-- BOTÕES DE ZOOM DEDICADOS -->
+        <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin-top:14px;">
+          <button type="button" class="btn-sair" style="padding:6px 14px; font-weight:bold; font-size:13px;" onclick="alterarZoomAdmin(-0.15)" title="Diminuir Zoom">🔍 −</button>
+          <span style="font-size:11px; color:var(--dourado); font-weight:600; letter-spacing:1px;">ZOOM</span>
+          <button type="button" class="btn-sair" style="padding:6px 14px; font-weight:bold; font-size:13px;" onclick="alterarZoomAdmin(+0.15)" title="Aumentar Zoom">🔍 +</button>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:16px;">
           <button class="btn-sair" style="flex:1;" onclick="fecharModalReajusteAdmin()">Cancelar</button>
           <button class="btn-configurar" style="flex:1; justify-content:center;" onclick="salvarReajusteAdmin()">✓ Salvar Foto</button>
         </div>
@@ -781,7 +788,6 @@ function exibirModalReajusteAdmin() {
     </div>
   `;
   document.body.appendChild(modal);
-  document.body.style.overflow = 'hidden';
 
   setTimeout(iniciarInteracaoReajusteAdmin, 50);
 }
@@ -844,29 +850,23 @@ function iniciarInteracaoReajusteAdmin() {
   window.removeEventListener('mouseup', onMouseUp);
   window.addEventListener('mousemove', onMouseMove);
   window.addEventListener('mouseup', onMouseUp);
-
-  const onWheel = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
-    const novoScale = Math.max(1.0, Math.min(adminCrop.scale * zoomFactor, 4.0));
-
-    const rect = area.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
-    const ratio = novoScale / adminCrop.scale;
-    adminCrop.x = mouseX - (mouseX - adminCrop.x) * ratio;
-    adminCrop.y = mouseY - (mouseY - adminCrop.y) * ratio;
-    adminCrop.scale = novoScale;
-
-    atualizarTransformAdmin();
-  };
-
-  area.removeEventListener('wheel', onWheel);
-  area.addEventListener('wheel', onWheel, { passive: false });
 }
+
+// BOTÕES DE ZOOM (+ / -)
+window.alterarZoomAdmin = function(fator) {
+  const novoScale = Math.max(1.0, Math.min(adminCrop.scale + fator, 4.0));
+  if (novoScale === adminCrop.scale) return;
+
+  const cx = adminCrop.winW / 2;
+  const cy = adminCrop.winH / 2;
+  const ratio = novoScale / adminCrop.scale;
+
+  adminCrop.x = cx - (cx - adminCrop.x) * ratio;
+  adminCrop.y = cy - (cy - adminCrop.y) * ratio;
+  adminCrop.scale = novoScale;
+
+  atualizarTransformAdmin();
+};
 
 function atualizarTransformAdmin() {
   const img = document.getElementById('imgCropperAdmin');
