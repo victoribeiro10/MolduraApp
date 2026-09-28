@@ -17,7 +17,7 @@ let filtroAtual          = 'pendentes';
 let fotosCarregadas      = [];          
 let statusFotos          = {};          
 
-// Estado do Cropper do Admin
+// Variáveis do Reajuste do Admin
 let fotoReajustandoNome  = null;
 let imgOriginalReajuste = null;
 let adminCrop = { x: 0, y: 0, scale: 1, baseW: 0, baseH: 0, winW: 0, winH: 0 };
@@ -699,7 +699,7 @@ window.carregarFotos = async function () {
 };
 
 // ============================================================
-// ✏️ REAJUSTE DE ENQUADRAMENTO NO ADMIN (COM ANTI-BURACO E ZOOM)
+// ✏️ REAJUSTE NO ADMIN (ALTURA ADAPTÁVEL PARA CABER BOTÕES)
 // ============================================================
 window.abrirReajusteAdmin = async function(nomeArquivo) {
   if (!configAtual || !configAtual.moldura_url) {
@@ -757,22 +757,23 @@ function exibirModalReajusteAdmin() {
   modal.id = 'modalReajusteAdmin';
   modal.className = 'modal-config ativo';
   modal.innerHTML = `
-    <div class="modal-config-conteudo" style="max-width:460px; overflow:hidden;">
+    <div class="modal-config-conteudo" style="max-width:420px; max-height:92vh; overflow-y:auto; display:flex; flex-direction:column;">
       <div class="modal-config-header">
         <h3>✏️ Reajustar Foto</h3>
         <button class="btn-fechar-modal" onclick="fecharModalReajusteAdmin()">×</button>
       </div>
-      <div class="modal-config-body" style="text-align:center; padding:16px;">
-        <p style="font-size:11px; color:var(--cinza-suave); margin-bottom:12px;">Arraste para mover • Use a roleta para zoom:</p>
+      <div class="modal-config-body" style="text-align:center; padding:16px; flex:1; display:flex; flex-direction:column; justify-content:space-between;">
+        <p style="font-size:11px; color:var(--cinza-suave); margin-bottom:10px;">Arraste para mover • Roleta do mouse para zoom:</p>
         
-        <div id="containerCropperAdmin" style="position:relative; width:100%; aspect-ratio:${totalW} / ${totalH}; background:#000; overflow:hidden; border-radius:4px; border:1px solid var(--dourado); margin:0 auto; touch-action:none;">
+        <!-- max-height:48vh GARANTE QUE A MOLDURA NUNCA ESTIQUE DEMAIS A TELA -->
+        <div id="containerCropperAdmin" style="position:relative; width:100%; max-height:48vh; aspect-ratio:${totalW} / ${totalH}; background:#000; overflow:hidden; border-radius:4px; border:1px solid var(--dourado); margin:0 auto; touch-action:none;">
           <div id="areaCropperAdmin" style="position:absolute; top:${topPct}%; left:${leftPct}%; width:${widthPct}%; height:${heightPct}%; overflow:hidden; cursor:grab; background:#111;">
             <img id="imgCropperAdmin" src="${imgOriginalReajuste.src}" style="position:absolute; top:0; left:0; transform-origin:0 0; user-select:none; -webkit-user-drag:none; pointer-events:none;">
           </div>
           <img src="${configAtual.moldura_url}" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:10;">
         </div>
 
-        <div style="display:flex; gap:10px; margin-top:16px;">
+        <div style="display:flex; gap:10px; margin-top:16px; padding-bottom:4px;">
           <button class="btn-sair" style="flex:1;" onclick="fecharModalReajusteAdmin()">Cancelar</button>
           <button class="btn-configurar" style="flex:1; justify-content:center;" onclick="salvarReajusteAdmin()">✓ Salvar Foto</button>
         </div>
