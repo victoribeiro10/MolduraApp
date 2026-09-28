@@ -341,13 +341,12 @@ window.mudarAba = function (filtro) {
 };
 
 // ============================================================
-// RENDERIZAR GALERIA (COM BOTÃO REAJUSTAR)
+// RENDERIZAR GALERIA
 // ============================================================
 function renderizarGaleria() {
   const galeria = document.getElementById('galeria');
   const vazio   = document.getElementById('vazio');
 
-  // Ignora arquivos de backup original da listagem visual da galeria
   let fotosFiltradas = fotosCarregadas.filter(f => !f.name.startsWith('orig-'));
 
   if (filtroAtual === 'pendentes') {
@@ -420,7 +419,7 @@ function renderizarGaleria() {
 }
 
 // ============================================================
-// CARREGAR FOTOS DA NUVEM (ORDEM CRONOLÓGICA)
+// CARREGAR FOTOS DA NUVEM
 // ============================================================
 window.carregarFotos = async function () {
   const galeria      = document.getElementById('galeria');
@@ -471,7 +470,7 @@ window.carregarFotos = async function () {
 };
 
 // ============================================================
-// ✏️ REAJUSTE DE ENQUADRAMENTO NO ADMIN (NOVO!)
+// ✏️ REAJUSTE DE ENQUADRAMENTO NO ADMIN (CORRIGIDO)
 // ============================================================
 window.abrirReajusteAdmin = async function(nomeArquivo) {
   if (!configAtual || !configAtual.moldura_url) {
@@ -480,61 +479,72 @@ window.abrirReajusteAdmin = async function(nomeArquivo) {
   }
 
   fotoReajustandoNome = nomeArquivo;
-  
-  // Nome correspondente da foto original sem corte
   const nomeOriginal = nomeArquivo.replace('foto-', 'orig-');
   
   mostrarMensagem("Carregando foto original...", "aviso");
 
-  // Tenta puxar a foto original de backup, ou usa a própria se não achar
-  let urlImagemParaAjuste = "";
   const { data: dataOrig } = supabaseAdmin.storage.from(BUCKET_FOTOS).getPublicUrl(nomeOriginal);
   const { data: dataNormal } = supabaseAdmin.storage.from(BUCKET_FOTOS).getPublicUrl(nomeArquivo);
 
-  // Verifica se o arquivo original existe na nuvem
+  let urlImagemParaAjuste = dataOrig.publicUrl;
+
   try {
     const resp = await fetch(dataOrig.publicUrl, { method: 'HEAD' });
-    if (resp.ok) urlImagemParaAjuste = dataOrig.publicUrl;
-    else urlImagemParaAjuste = dataNormal.publicUrl;
+    if (!resp.ok) urlImagemParaAjuste = dataNormal.publicUrl;
   } catch(e) {
     urlImagemParaAjuste = dataNormal.publicUrl;
   }
 
-  // Abre modal de corte com a foto carregada
   const img = new Image();
   img.crossOrigin = "anonymous";
   img.onload = () => {
     imgOriginalReajuste = img;
     exibirModalReajusteAdmin();
   };
+  img.onerror = () => {
+    mostrarMensagem("Erro ao carregar imagem para reajuste.", "erro");
+  };
   img.src = urlImagemParaAjuste;
 };
 
+function fecharModalReajusteAdmin() {
+  const m = document.getElementById('modalReajusteAdmin');
+  if (m) m.remove();
+  document.body.style.overflow = '';
+}
+
 function exibirModalReajusteAdmin() {
-  const modalExistente = document.getElementById('modalReajusteAdmin');
-  if (modalExistente) modalExistente.remove();
+  fecharModalReajusteAdmin();
+
+  const totalW = configAtual.largura_total || 2000;
+  const totalH = configAtual.altura_total || 2666;
+
+  const topPct    = (configAtual.janela_y / totalH) * 100;
+  const leftPct   = (configAtual.janela_x / totalW) * 100;
+  const widthPct  = (configAtual.janela_largura / totalW) * 100;
+  const heightPct = (configAtual.janela_altura / totalH) * 100;
 
   const modal = document.createElement('div');
   modal.id = 'modalReajusteAdmin';
   modal.className = 'modal-config ativo';
   modal.innerHTML = `
-    <div class="modal-config-conteudo" style="max-width:500px;">
+    <div class="modal-config-conteudo" style="max-width:480px;">
       <div class="modal-config-header">
         <h3>✏️ Reajustar Foto</h3>
-        <button class="btn-fechar-modal" onclick="document.getElementById('modalReajusteAdmin').remove(); document.body.style.overflow='';">×</button>
+        <button class="btn-fechar-modal" onclick="fecharModalReajusteAdmin()">×</button>
       </div>
       <div class="modal-config-body" style="text-align:center;">
-        <p style="font-size:12px; color:var(--cinza-suave); margin-bottom:12px;">Arraste a foto com o mouse para ajustar a cabeça ou enquadramento:</p>
+        <p style="font-size:11px; color:var(--cinza-suave); margin-bottom:12px;">Arraste para mover • Use a roleta do mouse para zoom:</p>
         
-        <div id="containerCropperAdmin" style="position:relative; width:100%; aspect-ratio:2000/2666; background:#000; overflow:hidden; border-radius:4px; border:1px solid var(--dourado);">
-          <div id="areaCropperAdmin" style="position:absolute; top:${(configAtual.janela_y/2666)*100}%; left:${(configAtual.janela_x/2000)*100}%; width:${(configAtual.janela_largura/2000)*100}%; height:${(configAtual.janela_altura/2666)*100}%; overflow:hidden; cursor:grab;">
-            <img id="imgCropperAdmin" src="${imgOriginalReajuste.src}" style="position:absolute; top:0; left:0; transform-origin:0 0;">
+        <div id="containerCropperAdmin" style="position:relative; width:100%; aspect-ratio:${totalW} / ${totalH}; background:#000; overflow:hidden; border-radius:4px; border:1px solid var(--dourado); margin:0 auto;">
+          <div id="areaCropperAdmin" style="position:absolute; top:${topPct}%; left:${leftPct}%; width:${widthPct}%; height:${heightPct}%; overflow:hidden; cursor:grab;">
+            <img id="imgCropperAdmin" src="${imgOriginalReajuste.src}" style="position:absolute; top:0; left:0; transform-origin:0 0; user-select:none; -webkit-user-drag:none;">
           </div>
           <img src="${configAtual.moldura_url}" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:10;">
         </div>
 
-        <div style="display:flex; gap:10px; margin-top:20px;">
-          <button class="btn-sair" style="flex:1;" onclick="document.getElementById('modalReajusteAdmin').remove(); document.body.style.overflow='';">Cancelar</button>
+        <div style="display:flex; gap:10px; margin-top:18px;">
+          <button class="btn-sair" style="flex:1;" onclick="fecharModalReajusteAdmin()">Cancelar</button>
           <button class="btn-configurar" style="flex:1; justify-content:center;" onclick="salvarReajusteAdmin()">✓ Salvar Foto</button>
         </div>
       </div>
@@ -543,26 +553,33 @@ function exibirModalReajusteAdmin() {
   document.body.appendChild(modal);
   document.body.style.overflow = 'hidden';
 
-  iniciarInteracaoReajusteAdmin();
+  // Espera 100ms até o navegador desenhar a tela e ter o tamanho exato da janela em pixels!
+  setTimeout(iniciarInteracaoReajusteAdmin, 100);
 }
 
 function iniciarInteracaoReajusteAdmin() {
   const area = document.getElementById('areaCropperAdmin');
-  const img = document.getElementById('imgCropperAdmin');
-  if(!area || !img) return;
+  const img  = document.getElementById('imgCropperAdmin');
+  if (!area || !img || !imgOriginalReajuste) return;
 
   const rect = area.getBoundingClientRect();
+  if (rect.width === 0 || rect.height === 0) {
+    setTimeout(iniciarInteracaoReajusteAdmin, 100);
+    return;
+  }
+
   const scaleX = rect.width / imgOriginalReajuste.width;
   const scaleY = rect.height / imgOriginalReajuste.height;
   const coverScale = Math.max(scaleX, scaleY);
 
-  ajusteAdmin.scale = coverScale;
-  ajusteAdmin.x = (rect.width - imgOriginalReajuste.width * coverScale) / 2;
-  ajusteAdmin.y = (rect.height - imgOriginalReajuste.height * coverScale) / 2;
+  ajusteAdmin.scale        = coverScale;
+  ajusteAdmin.initialScale = coverScale;
+  ajusteAdmin.x            = (rect.width - imgOriginalReajuste.width * coverScale) / 2;
+  ajusteAdmin.y            = (rect.height - imgOriginalReajuste.height * coverScale) / 2;
 
-  img.style.width = imgOriginalReajuste.width + 'px';
+  img.style.width  = imgOriginalReajuste.width + 'px';
   img.style.height = imgOriginalReajuste.height + 'px';
-  img.style.transform = `translate(${ajusteAdmin.x}px, ${ajusteAdmin.y}px) scale(${ajusteAdmin.scale})`;
+  aplicarTransformAdmin();
 
   let arrastando = false;
   let startX = 0, startY = 0, startXImg = 0, startYImg = 0;
@@ -580,24 +597,52 @@ function iniciarInteracaoReajusteAdmin() {
     if (!arrastando) return;
     ajusteAdmin.x = startXImg + (e.clientX - startX);
     ajusteAdmin.y = startYImg + (e.clientY - startY);
-    img.style.transform = `translate(${ajusteAdmin.x}px, ${ajusteAdmin.y}px) scale(${ajusteAdmin.scale})`;
+    aplicarTransformAdmin();
   };
 
   window.onmouseup = () => {
     arrastando = false;
-    if(area) area.style.cursor = 'grab';
+    if (area) area.style.cursor = 'grab';
   };
+
+  // Zoom com a roleta do mouse
+  area.onwheel = (e) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    const novoScale = Math.max(
+      ajusteAdmin.initialScale * 0.5,
+      Math.min(ajusteAdmin.scale * delta, ajusteAdmin.initialScale * 5)
+    );
+    const rectArea = area.getBoundingClientRect();
+    const cx = e.clientX - rectArea.left;
+    const cy = e.clientY - rectArea.top;
+    const scaleDiff = novoScale / ajusteAdmin.scale;
+    ajusteAdmin.x     = cx - (cx - ajusteAdmin.x) * scaleDiff;
+    ajusteAdmin.y     = cy - (cy - ajusteAdmin.y) * scaleDiff;
+    ajusteAdmin.scale = novoScale;
+    aplicarTransformAdmin();
+  };
+}
+
+function aplicarTransformAdmin() {
+  const img = document.getElementById('imgCropperAdmin');
+  if (img) {
+    img.style.transform = `translate(${ajusteAdmin.x}px, ${ajusteAdmin.y}px) scale(${ajusteAdmin.scale})`;
+  }
 }
 
 async function salvarReajusteAdmin() {
   mostrarMensagem("Processando e salvando novo enquadramento...", "aviso");
-  
+
+  const totalW = configAtual.largura_total || 2000;
+  const totalH = configAtual.altura_total || 2666;
+
   const canvas = document.createElement('canvas');
-  canvas.width = 2000;
-  canvas.height = 2666;
+  canvas.width  = totalW;
+  canvas.height = totalH;
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = "#FFFFFF";
-  ctx.fillRect(0,0,2000,2666);
+  ctx.fillRect(0, 0, totalW, totalH);
 
   const area = document.getElementById('areaCropperAdmin');
   const rect = area.getBoundingClientRect();
@@ -613,30 +658,26 @@ async function salvarReajusteAdmin() {
   ctx.drawImage(imgOriginalReajuste, 0, 0);
   ctx.restore();
 
-  // Desenha a moldura por cima
   const imgMold = new Image();
   imgMold.crossOrigin = "anonymous";
   imgMold.onload = async () => {
-    ctx.drawImage(imgMold, 0, 0, 2000, 2666);
+    ctx.drawImage(imgMold, 0, 0, totalW, totalH);
     
-    // Converte para blob
     canvas.toBlob(async (blob) => {
       if(!blob) return;
 
-      // Substitui na nuvem no mesmo nome do arquivo
       const { error } = await supabaseAdmin.storage.from(BUCKET_FOTOS).upload(fotoReajustandoNome, blob, {
         cacheControl: '0',
         upsert: true,
         contentType: 'image/jpeg'
       });
 
-      if(error) {
+      if (error) {
         mostrarMensagem("Erro ao reajustar: " + error.message, "erro");
       } else {
-        mostrarMensagem("Foto reajustada com sucesso! Atualizando tela...", "sucesso");
-        document.getElementById('modalReajusteAdmin').remove();
-        document.body.style.overflow = '';
-        setTimeout(carregarFotos, 1000);
+        mostrarMensagem("Foto reajustada com sucesso!", "sucesso");
+        fecharModalReajusteAdmin();
+        setTimeout(carregarFotos, 800);
       }
     }, 'image/jpeg', 0.88);
   };
