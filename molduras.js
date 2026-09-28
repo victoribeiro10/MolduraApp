@@ -10,17 +10,15 @@ const SENHA_ADMIN     = "admin";
 const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
 let configAtual          = null;
-let molduraNaturalWidth  = 0;
-let molduraNaturalHeight = 0;
 let arquivoNovaMoldura   = null;
 let filtroAtual          = 'pendentes'; 
 let fotosCarregadas      = [];          
 let statusFotos          = {};          
 
-// Variáveis do Reajuste do Admin
+// Estado da Câmera/Cropper Admin
 let fotoReajustandoNome  = null;
 let imgOriginalReajuste = null;
-let ajusteAdmin = { x: 0, y: 0, scale: 1, baseScale: 1, displayW: 0, displayH: 0 };
+let adminCrop = { x: 0, y: 0, scale: 1, baseW: 0, baseH: 0, winW: 0, winH: 0 };
 
 // ============================================================
 // LOGIN
@@ -470,7 +468,7 @@ window.carregarFotos = async function () {
 };
 
 // ============================================================
-// ✏️ REAJUSTE DE ENQUADRAMENTO NO ADMIN (100% PREENCHIDO)
+// ✏️ REAJUSTE NO ADMIN (100% BLINDADO E SEM BURACOS/SCROLL BUG)
 // ============================================================
 window.abrirReajusteAdmin = async function(nomeArquivo) {
   if (!configAtual || !configAtual.moldura_url) {
@@ -528,22 +526,22 @@ function exibirModalReajusteAdmin() {
   modal.id = 'modalReajusteAdmin';
   modal.className = 'modal-config ativo';
   modal.innerHTML = `
-    <div class="modal-config-conteudo" style="max-width:480px;">
+    <div class="modal-config-conteudo" style="max-width:460px; overflow:hidden;">
       <div class="modal-config-header">
         <h3>✏️ Reajustar Foto</h3>
         <button class="btn-fechar-modal" onclick="fecharModalReajusteAdmin()">×</button>
       </div>
-      <div class="modal-config-body" style="text-align:center;">
-        <p style="font-size:11px; color:var(--cinza-suave); margin-bottom:12px;">Arraste para mover • Use a roleta do mouse para zoom:</p>
+      <div class="modal-config-body" style="text-align:center; padding:16px;">
+        <p style="font-size:11px; color:var(--cinza-suave); margin-bottom:12px;">Arraste para mover • Use a roleta para zoom:</p>
         
-        <div id="containerCropperAdmin" style="position:relative; width:100%; aspect-ratio:${totalW} / ${totalH}; background:#000; overflow:hidden; border-radius:4px; border:1px solid var(--dourado); margin:0 auto;">
-          <div id="areaCropperAdmin" style="position:absolute; top:${topPct}%; left:${leftPct}%; width:${widthPct}%; height:${heightPct}%; overflow:hidden; cursor:grab;">
-            <img id="imgCropperAdmin" src="${imgOriginalReajuste.src}" style="position:absolute; top:0; left:0; transform-origin:0 0; user-select:none; -webkit-user-drag:none;">
+        <div id="containerCropperAdmin" style="position:relative; width:100%; aspect-ratio:${totalW} / ${totalH}; background:#000; overflow:hidden; border-radius:4px; border:1px solid var(--dourado); margin:0 auto; touch-action:none;">
+          <div id="areaCropperAdmin" style="position:absolute; top:${topPct}%; left:${leftPct}%; width:${widthPct}%; height:${heightPct}%; overflow:hidden; cursor:grab; background:#111;">
+            <img id="imgCropperAdmin" src="${imgOriginalReajuste.src}" style="position:absolute; top:0; left:0; transform-origin:0 0; user-select:none; -webkit-user-drag:none; pointer-events:none;">
           </div>
           <img src="${configAtual.moldura_url}" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:10;">
         </div>
 
-        <div style="display:flex; gap:10px; margin-top:18px;">
+        <div style="display:flex; gap:10px; margin-top:16px;">
           <button class="btn-sair" style="flex:1;" onclick="fecharModalReajusteAdmin()">Cancelar</button>
           <button class="btn-configurar" style="flex:1; justify-content:center;" onclick="salvarReajusteAdmin()">✓ Salvar Foto</button>
         </div>
@@ -553,7 +551,7 @@ function exibirModalReajusteAdmin() {
   document.body.appendChild(modal);
   document.body.style.overflow = 'hidden';
 
-  setTimeout(iniciarInteracaoReajusteAdmin, 100);
+  setTimeout(iniciarInteracaoReajusteAdmin, 50);
 }
 
 function iniciarInteracaoReajusteAdmin() {
@@ -561,27 +559,31 @@ function iniciarInteracaoReajusteAdmin() {
   const img  = document.getElementById('imgCropperAdmin');
   if (!area || !img || !imgOriginalReajuste) return;
 
-  const rect = area.getBoundingClientRect();
-  if (rect.width === 0 || rect.height === 0) {
-    setTimeout(iniciarInteracaoReajusteAdmin, 100);
+  const rectArea = area.getBoundingClientRect();
+  if (rectArea.width === 0 || rectArea.height === 0) {
+    setTimeout(iniciarInteracaoReajusteAdmin, 50);
     return;
   }
 
-  // Calcula escala base exata para PREENCHER 100% da janela
-  const scaleX = rect.width / imgOriginalReajuste.width;
-  const scaleY = rect.height / imgOriginalReajuste.height;
+  const winW = rectArea.width;
+  const winH = rectArea.height;
+  const imgW = imgOriginalReajuste.naturalWidth || imgOriginalReajuste.width;
+  const imgH = imgOriginalReajuste.naturalHeight || imgOriginalReajuste.height;
+
+  // Escala exata COVER (coberta total sem deixar buracos pretos)
+  const scaleX = winW / imgW;
+  const scaleY = winH / imgH;
   const baseScale = Math.max(scaleX, scaleY);
 
-  ajusteAdmin.baseScale = baseScale;
-  ajusteAdmin.scale     = 1.0;
-  ajusteAdmin.displayW  = imgOriginalReajuste.width * baseScale;
-  ajusteAdmin.displayH  = imgOriginalReajuste.height * baseScale;
-  ajusteAdmin.x         = (rect.width - ajusteAdmin.displayW) / 2;
-  ajusteAdmin.y         = (rect.height - ajusteAdmin.displayH) / 2;
+  adminCrop.winW      = winW;
+  adminCrop.winH      = winH;
+  adminCrop.baseW     = imgW * baseScale;
+  adminCrop.baseH     = imgH * baseScale;
+  adminCrop.scale     = 1.0;
+  adminCrop.x         = (winW - adminCrop.baseW) / 2;
+  adminCrop.y         = (winH - adminCrop.baseH) / 2;
 
-  img.style.width  = ajusteAdmin.displayW + 'px';
-  img.style.height = ajusteAdmin.displayH + 'px';
-  aplicarTransformAdmin();
+  atualizarTransformAdmin();
 
   let arrastando = false;
   let startX = 0, startY = 0, startXImg = 0, startYImg = 0;
@@ -590,43 +592,72 @@ function iniciarInteracaoReajusteAdmin() {
     arrastando = true;
     startX = e.clientX;
     startY = e.clientY;
-    startXImg = ajusteAdmin.x;
-    startYImg = ajusteAdmin.y;
+    startXImg = adminCrop.x;
+    startYImg = adminCrop.y;
     area.style.cursor = 'grabbing';
   };
 
-  window.onmousemove = (e) => {
+  const onMouseMove = (e) => {
     if (!arrastando) return;
-    ajusteAdmin.x = startXImg + (e.clientX - startX);
-    ajusteAdmin.y = startYImg + (e.clientY - startY);
-    aplicarTransformAdmin();
+    adminCrop.x = startXImg + (e.clientX - startX);
+    adminCrop.y = startYImg + (e.clientY - startY);
+    atualizarTransformAdmin();
   };
 
-  window.onmouseup = () => {
+  const onMouseUp = () => {
     arrastando = false;
     if (area) area.style.cursor = 'grab';
   };
 
-  area.onwheel = (e) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    const novoScale = Math.max(0.5, Math.min(ajusteAdmin.scale * delta, 5.0));
-    const rectArea = area.getBoundingClientRect();
-    const cx = e.clientX - rectArea.left;
-    const cy = e.clientY - rectArea.top;
-    const scaleDiff = novoScale / ajusteAdmin.scale;
-    ajusteAdmin.x     = cx - (cx - ajusteAdmin.x) * scaleDiff;
-    ajusteAdmin.y     = cy - (cy - ajusteAdmin.y) * scaleDiff;
-    ajusteAdmin.scale = novoScale;
-    aplicarTransformAdmin();
+  window.removeEventListener('mousemove', onMouseMove);
+  window.removeEventListener('mouseup', onMouseUp);
+  window.addEventListener('mousemove', onMouseMove);
+  window.addEventListener('mouseup', onMouseUp);
+
+  // ROLETA DO MOUSE (COM BLOQUEIO NON-PASSIVE QUE IMPEDE A PÁGINA DE ROLAR!)
+  const onWheel = (e) => {
+    e.preventDefault(); // Agora funciona 100%!
+    e.stopPropagation();
+
+    const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
+    const novoScale = Math.max(1.0, Math.min(adminCrop.scale * zoomFactor, 4.0));
+
+    const rect = area.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    const ratio = novoScale / adminCrop.scale;
+    adminCrop.x = mouseX - (mouseX - adminCrop.x) * ratio;
+    adminCrop.y = mouseY - (mouseY - adminCrop.y) * ratio;
+    adminCrop.scale = novoScale;
+
+    atualizarTransformAdmin();
   };
+
+  area.removeEventListener('wheel', onWheel);
+  area.addEventListener('wheel', onWheel, { passive: false });
 }
 
-function aplicarTransformAdmin() {
+function atualizarTransformAdmin() {
   const img = document.getElementById('imgCropperAdmin');
-  if (img) {
-    img.style.transform = `translate(${ajusteAdmin.x}px, ${ajusteAdmin.y}px) scale(${ajusteAdmin.scale})`;
+  if (!img) return;
+
+  const currentW = adminCrop.baseW * adminCrop.scale;
+  const currentH = adminCrop.baseH * adminCrop.scale;
+
+  // TRAVA ANTI-BURACO: impede a foto de ser arrastada pra fora da janela!
+  if (currentW >= adminCrop.winW) {
+    if (adminCrop.x > 0) adminCrop.x = 0;
+    if (adminCrop.x < adminCrop.winW - currentW) adminCrop.x = adminCrop.winW - currentW;
   }
+  if (currentH >= adminCrop.winH) {
+    if (adminCrop.y > 0) adminCrop.y = 0;
+    if (adminCrop.y < adminCrop.winH - currentH) adminCrop.y = adminCrop.winH - currentH;
+  }
+
+  img.style.width  = `${adminCrop.baseW}px`;
+  img.style.height = `${adminCrop.baseH}px`;
+  img.style.transform = `translate(${adminCrop.x}px, ${adminCrop.y}px) scale(${adminCrop.scale})`;
 }
 
 async function salvarReajusteAdmin() {
@@ -642,19 +673,20 @@ async function salvarReajusteAdmin() {
   ctx.fillStyle = "#FFFFFF";
   ctx.fillRect(0, 0, totalW, totalH);
 
-  const area = document.getElementById('areaCropperAdmin');
-  const rect = area.getBoundingClientRect();
-  const prop = configAtual.janela_largura / rect.width;
-
-  const totalScale = ajusteAdmin.baseScale * ajusteAdmin.scale * prop;
+  // Calcula escala proporcional para a foto original no Canvas 2000x2666
+  const ratioCanvasToScreen = configAtual.janela_largura / adminCrop.winW;
 
   ctx.save();
   ctx.beginPath();
   ctx.rect(configAtual.janela_x, configAtual.janela_y, configAtual.janela_largura, configAtual.janela_altura);
   ctx.clip();
-  ctx.translate(configAtual.janela_x + ajusteAdmin.x * prop, configAtual.janela_y + ajusteAdmin.y * prop);
-  ctx.scale(totalScale, totalScale);
-  ctx.drawImage(imgOriginalReajuste, 0, 0);
+
+  const drawX = configAtual.janela_x + (adminCrop.x * ratioCanvasToScreen);
+  const drawY = configAtual.janela_y + (adminCrop.y * ratioCanvasToScreen);
+  const drawW = adminCrop.baseW * adminCrop.scale * ratioCanvasToScreen;
+  const drawH = adminCrop.baseH * adminCrop.scale * ratioCanvasToScreen;
+
+  ctx.drawImage(imgOriginalReajuste, drawX, drawY, drawW, drawH);
   ctx.restore();
 
   const imgMold = new Image();
