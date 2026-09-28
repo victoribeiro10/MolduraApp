@@ -10,12 +10,14 @@ const SENHA_ADMIN     = "admin";
 const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
 let configAtual          = null;
+let molduraNaturalWidth  = 0;
+let molduraNaturalHeight = 0;
 let arquivoNovaMoldura   = null;
 let filtroAtual          = 'pendentes'; 
 let fotosCarregadas      = [];          
 let statusFotos          = {};          
 
-// Estado da Câmera/Cropper Admin
+// Estado do Cropper do Admin
 let fotoReajustandoNome  = null;
 let imgOriginalReajuste = null;
 let adminCrop = { x: 0, y: 0, scale: 1, baseW: 0, baseH: 0, winW: 0, winH: 0 };
@@ -117,7 +119,7 @@ async function carregarConfiguracao() {
 }
 
 // ============================================================
-// MODAL AJUSTAR JANELA DE MOLDURA
+// MODAL AJUSTAR JANELA DA MOLDURA (RESTAURADO!)
 // ============================================================
 window.abrirModalConfig = function () {
   if (!configAtual || !configAtual.moldura_url) {
@@ -146,6 +148,235 @@ window.abrirModalConfig = function () {
 window.fecharModalConfig = function () {
   document.getElementById('modalConfig').classList.remove('ativo');
   document.body.style.overflow = '';
+};
+
+function montarEditorVisual(molduraUrl, jx, jy, jw, jh) {
+  const container = document.getElementById('editorContainer');
+  const coordsBox = document.getElementById('coordsTempoReal');
+
+  container.innerHTML = `
+    <img id="imgMolduraEditor" src="${molduraUrl}?t=${Date.now()}" alt="Moldura">
+    <div class="janela-editor" id="janelaEditor">
+      <div class="handle handle-nw" data-dir="nw"></div>
+      <div class="handle handle-n"  data-dir="n"></div>
+      <div class="handle handle-ne" data-dir="ne"></div>
+      <div class="handle handle-e"  data-dir="e"></div>
+      <div class="handle handle-se" data-dir="se"></div>
+      <div class="handle handle-s"  data-dir="s"></div>
+      <div class="handle handle-sw" data-dir="sw"></div>
+      <div class="handle handle-w"  data-dir="w"></div>
+    </div>
+  `;
+
+  const img = document.getElementById('imgMolduraEditor');
+
+  img.onload = () => {
+    molduraNaturalWidth  = img.naturalWidth;
+    molduraNaturalHeight = img.naturalHeight;
+    if (coordsBox) coordsBox.style.display = 'inline-flex';
+    posicionarJanela(jx, jy, jw, jh);
+    ativarInteracoesEditor();
+  };
+
+  img.onerror = () => {
+    container.innerHTML = '<div class="sem-moldura-editor">Erro ao carregar moldura</div>';
+    if (coordsBox) coordsBox.style.display = 'none';
+  };
+}
+
+function posicionarJanela(xPx, yPx, wPx, hPx) {
+  const img    = document.getElementById('imgMolduraEditor');
+  const janela = document.getElementById('janelaEditor');
+  if (!img || !janela || !molduraNaturalWidth) return;
+
+  const escala = img.clientWidth / molduraNaturalWidth;
+
+  janela.style.left   = (xPx * escala) + 'px';
+  janela.style.top    = (yPx * escala) + 'px';
+  janela.style.width  = (wPx * escala) + 'px';
+  janela.style.height = (hPx * escala) + 'px';
+
+  atualizarCoordsTempoReal(xPx, yPx, wPx, hPx);
+}
+
+function atualizarCoordsTempoReal(x, y, w, h) {
+  if (document.getElementById('txtX')) document.getElementById('txtX').textContent = Math.round(x);
+  if (document.getElementById('txtY')) document.getElementById('txtY').textContent = Math.round(y);
+  if (document.getElementById('txtW')) document.getElementById('txtW').textContent = Math.round(w);
+  if (document.getElementById('txtH')) document.getElementById('txtH').textContent = Math.round(h);
+  
+  if (document.getElementById('janelaX')) document.getElementById('janelaX').value       = Math.round(x);
+  if (document.getElementById('janelaY')) document.getElementById('janelaY').value       = Math.round(y);
+  if (document.getElementById('janelaLargura')) document.getElementById('janelaLargura').value = Math.round(w);
+  if (document.getElementById('janelaAltura')) document.getElementById('janelaAltura').value  = Math.round(h);
+}
+
+function ativarInteracoesEditor() {
+  const janela = document.getElementById('janelaEditor');
+  const img    = document.getElementById('imgMolduraEditor');
+  if (!janela || !img) return;
+
+  let modo = null, dirResize = null;
+  let startX, startY, startL, startT, startW, startH;
+
+  function getPos(e) {
+    if (e.touches && e.touches.length > 0) {
+      return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+    return { x: e.clientX, y: e.clientY };
+  }
+
+  function iniciar(e) {
+    const alvo     = e.target;
+    const isHandle = alvo.classList.contains('handle');
+
+    if (isHandle)        { modo = 'resize'; dirResize = alvo.dataset.dir; }
+    else if (alvo === janela) { modo = 'mover'; }
+    else return;
+
+    e.preventDefault();
+    const pos = getPos(e);
+    startX = pos.x;  startY = pos.y;
+    startL = janela.offsetLeft;  startT = janela.offsetTop;
+    startW = janela.offsetWidth; startH = janela.offsetHeight;
+
+    document.addEventListener('mousemove', mover);
+    document.addEventListener('mouseup',   parar);
+    document.addEventListener('touchmove', mover, { passive: false });
+    document.addEventListener('touchend',  parar);
+  }
+
+  function mover(e) {
+    if (!modo) return;
+    e.preventDefault();
+
+    const pos = getPos(e);
+    const dx  = pos.x - startX;
+    const dy  = pos.y - startY;
+    const imgW = img.clientWidth;
+    const imgH = img.clientHeight;
+
+    let novoL = startL, novoT = startT;
+    let novoW = startW, novoH = startH;
+
+    if (modo === 'mover') {
+      novoL = Math.max(0, Math.min(startL + dx, imgW - startW));
+      novoT = Math.max(0, Math.min(startT + dy, imgH - startH));
+
+    } else if (modo === 'resize') {
+      if (dirResize.includes('e')) novoW = Math.max(20, Math.min(startW + dx, imgW - startL));
+      if (dirResize.includes('s')) novoH = Math.max(20, Math.min(startH + dy, imgH - startT));
+      if (dirResize.includes('w')) {
+        const dxLim = Math.max(-startL, Math.min(dx, startW - 20));
+        novoL = startL + dxLim;
+        novoW = startW - dxLim;
+      }
+      if (dirResize.includes('n')) {
+        const dyLim = Math.max(-startT, Math.min(dy, startH - 20));
+        novoT = startT + dyLim;
+        novoH = startH - dyLim;
+      }
+    }
+
+    janela.style.left   = novoL + 'px';
+    janela.style.top    = novoT + 'px';
+    janela.style.width  = novoW + 'px';
+    janela.style.height = novoH + 'px';
+
+    const escala = molduraNaturalWidth / img.clientWidth;
+    atualizarCoordsTempoReal(
+      novoL * escala, novoT * escala,
+      novoW * escala, novoH * escala
+    );
+  }
+
+  function parar() {
+    modo = null; dirResize = null;
+    document.removeEventListener('mousemove', mover);
+    document.removeEventListener('mouseup',   parar);
+    document.removeEventListener('touchmove', mover);
+    document.removeEventListener('touchend',  parar);
+  }
+
+  janela.addEventListener('mousedown',  iniciar);
+  janela.addEventListener('touchstart', iniciar, { passive: false });
+
+  ['janelaX', 'janelaY', 'janelaLargura', 'janelaAltura'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', () => {
+        posicionarJanela(
+          parseInt(document.getElementById('janelaX').value)       || 0,
+          parseInt(document.getElementById('janelaY').value)       || 0,
+          parseInt(document.getElementById('janelaLargura').value) || 100,
+          parseInt(document.getElementById('janelaAltura').value)  || 100
+        );
+      });
+    }
+  });
+}
+
+window.salvarCoordenadas = async function () {
+  const btn          = document.getElementById('btnSalvarCoords');
+  const janelaX      = parseInt(document.getElementById('janelaX').value)       || 0;
+  const janelaY      = parseInt(document.getElementById('janelaY').value)       || 0;
+  const janelaLargura = parseInt(document.getElementById('janelaLargura').value) || 0;
+  const janelaAltura  = parseInt(document.getElementById('janelaAltura').value)  || 0;
+
+  if (!configAtual) {
+    mostrarMensagem("Configuração ainda não carregada.", "erro");
+    return;
+  }
+
+  btn.disabled     = true;
+  btn.textContent  = 'Salvando...';
+
+  try {
+    const { error } = await supabaseAdmin
+      .from('configuracao')
+      .update({
+        janela_x:       janelaX,
+        janela_y:       janelaY,
+        janela_largura: janelaLargura,
+        janela_altura:  janelaAltura
+      })
+      .eq('id', configAtual.id);
+
+    if (error) throw error;
+
+    await supabaseAdmin
+      .from('molduras_galeria')
+      .update({
+        janela_x:       janelaX,
+        janela_y:       janelaY,
+        janela_largura: janelaLargura,
+        janela_altura:  janelaAltura
+      })
+      .eq('ativa', true);
+
+    configAtual.janela_x       = janelaX;
+    configAtual.janela_y       = janelaY;
+    configAtual.janela_largura = janelaLargura;
+    configAtual.janela_altura  = janelaAltura;
+
+    document.getElementById('molduraInfoTxt').textContent =
+      `Janela: ${janelaLargura}×${janelaAltura}px • Posição: ${janelaX},${janelaY}`;
+
+    mostrarMensagem("Coordenadas salvas com sucesso!", "sucesso");
+    setTimeout(() => fecharModalConfig(), 1200);
+
+  } catch (err) {
+    console.error(err);
+    mostrarMensagem("Erro ao salvar: " + err.message, "erro");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+      </svg>
+      Salvar Coordenadas
+    `;
+  }
 };
 
 // ============================================================
@@ -468,7 +699,7 @@ window.carregarFotos = async function () {
 };
 
 // ============================================================
-// ✏️ REAJUSTE NO ADMIN (100% BLINDADO E SEM BURACOS/SCROLL BUG)
+// ✏️ REAJUSTE DE ENQUADRAMENTO NO ADMIN (COM ANTI-BURACO E ZOOM)
 // ============================================================
 window.abrirReajusteAdmin = async function(nomeArquivo) {
   if (!configAtual || !configAtual.moldura_url) {
@@ -570,7 +801,6 @@ function iniciarInteracaoReajusteAdmin() {
   const imgW = imgOriginalReajuste.naturalWidth || imgOriginalReajuste.width;
   const imgH = imgOriginalReajuste.naturalHeight || imgOriginalReajuste.height;
 
-  // Escala exata COVER (coberta total sem deixar buracos pretos)
   const scaleX = winW / imgW;
   const scaleY = winH / imgH;
   const baseScale = Math.max(scaleX, scaleY);
@@ -614,9 +844,8 @@ function iniciarInteracaoReajusteAdmin() {
   window.addEventListener('mousemove', onMouseMove);
   window.addEventListener('mouseup', onMouseUp);
 
-  // ROLETA DO MOUSE (COM BLOQUEIO NON-PASSIVE QUE IMPEDE A PÁGINA DE ROLAR!)
   const onWheel = (e) => {
-    e.preventDefault(); // Agora funciona 100%!
+    e.preventDefault();
     e.stopPropagation();
 
     const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
@@ -645,7 +874,6 @@ function atualizarTransformAdmin() {
   const currentW = adminCrop.baseW * adminCrop.scale;
   const currentH = adminCrop.baseH * adminCrop.scale;
 
-  // TRAVA ANTI-BURACO: impede a foto de ser arrastada pra fora da janela!
   if (currentW >= adminCrop.winW) {
     if (adminCrop.x > 0) adminCrop.x = 0;
     if (adminCrop.x < adminCrop.winW - currentW) adminCrop.x = adminCrop.winW - currentW;
@@ -673,7 +901,6 @@ async function salvarReajusteAdmin() {
   ctx.fillStyle = "#FFFFFF";
   ctx.fillRect(0, 0, totalW, totalH);
 
-  // Calcula escala proporcional para a foto original no Canvas 2000x2666
   const ratioCanvasToScreen = configAtual.janela_largura / adminCrop.winW;
 
   ctx.save();
