@@ -57,9 +57,7 @@
             overflow-y: auto;
         }
 
-        /* ============================================================
-           BANNER DE AVISO INICIAL (FORÇA LEITURA)
-        ============================================================ */
+        /* BANNER DE AVISO INICIAL */
         .banner-aviso-inicial {
             position: fixed;
             inset: 0;
@@ -367,7 +365,7 @@
         .modal-cta-botoes a.whats:hover { background: var(--whatsapp); border-color: var(--whatsapp); color: var(--branco); transform: translateY(-2px); }
         .modal-cta-botoes a.insta:hover { background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCB045); border-color: transparent; color: var(--branco); transform: translateY(-2px); }
 
-        /* RODAPÉ COM ÍCONES AMPLIADOS */
+        /* RODAPÉ */
         .rodape {
             position: fixed;
             bottom: 0; left: 0; right: 0;
@@ -464,7 +462,7 @@
         <p>Carregando</p>
     </div>
 
-    <!-- BANNER DE AVISO INICIAL (PRIMEIRA TELA DO CONVIDADO) -->
+    <!-- BANNER DE AVISO INICIAL -->
     <div id="bannerAviso" class="banner-aviso-inicial">
         <div class="banner-card">
             <div class="banner-icone">
@@ -535,7 +533,7 @@
             </div>
         </button>
 
-        <button class="btn-escolha destaque" id="btnAbrirGaleriaLote">
+        <button class="btn-escolha" id="btnAbrirGaleriaLote">
             <div class="icone">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -675,7 +673,7 @@
         </button>
     </div>
 
-    <!-- RODAPÉ REFORMULADO -->
+    <!-- RODAPÉ -->
     <div class="rodape">
         <div class="rodape-marca">siga nossas redes sociais</div>
         <div class="rodape-redes">
@@ -723,9 +721,7 @@
 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // ============================================
         // CONFIGURAÇÕES DE EXPORTAÇÃO
-        // ============================================
         const LARGURA_IMPRESSAO = 1560;
         const ALTURA_IMPRESSAO  = 2140;
         const QUALIDADE_JPEG    = 0.85; 
@@ -808,20 +804,15 @@
         let fotosLote          = [];
         let indiceEditandoLote = -1;
 
-        // ============================================
         // AÇÃO DO BANNER INICIAL
-        // ============================================
         function aceitarAviso() {
             bannerAviso.classList.add('hidden');
             mostrarTela('escolha');
         }
 
-        // ============================================
-        // 💡 INTELIGÊNCIA DE TRATAMENTO DE LUZ PARA IMPRESSÃO
-        // ============================================
+        // CORREÇÃO INTELIGENTE DE LUZ
         function calcularFiltroDeLuzInteligente(ctxFonte, larg, alt) {
             try {
-                // Amostra pixels da imagem (passo de 8 pixels para ser instantâneo)
                 const imgData = ctxFonte.getImageData(0, 0, larg, alt);
                 const data = imgData.data;
                 let somaLuminosidade = 0;
@@ -831,36 +822,30 @@
                     const r = data[i];
                     const g = data[i + 1];
                     const b = data[i + 2];
-                    // Fórmula clássica de luminosidade percebida pelo olho humano
                     const lum = (0.299 * r) + (0.587 * g) + (0.114 * b);
                     somaLuminosidade += lum;
                     contador++;
                 }
 
                 const mediaLuminosidade = somaLuminosidade / contador;
-                const LIMIAR_FOTO_BOA = 115; // 0 (escuridão) a 255 (branquidão). 115 é a luz ideal de impressão.
+                const LIMIAR_FOTO_BOA = 115;
 
-                // SE A FOTO JÁ ESTIVER BOA/CLARA: IGNORA TOTALMENTE!
                 if (mediaLuminosidade >= LIMIAR_FOTO_BOA) {
                     return 'none';
                 }
 
-                // SE A FOTO FOR ESCURA: Calcula o impulso necessário de brilho/contraste
                 const deficit = LIMIAR_FOTO_BOA - mediaLuminosidade;
-                const boostBrilho = 1 + (deficit / 190); // Varia de +5% a +35% de luz dependendo da escuridão
-                const boostContraste = 1.05; // Ajuste leve de contraste para não "lavar" as cores
-                const boostSaturacao = 1.06; // Ajuste leve de cor para o papel fotográfico
+                const boostBrilho = 1 + (deficit / 190);
+                const boostContraste = 1.05;
+                const boostSaturacao = 1.06;
 
                 return `brightness(${Math.round(boostBrilho * 100)}%) contrast(${Math.round(boostContraste * 100)}%) saturate(${Math.round(boostSaturacao * 100)}%)`;
             } catch (err) {
-                console.warn("Não foi possível analisar luminosidade (CORS ou erro):", err);
-                return 'none'; // Na dúvida, não mexe
+                return 'none';
             }
         }
 
-        // ============================================
-        // REDIMENSIONAMENTO DE ALTA QUALIDADE
-        // ============================================
+        // REDIMENSIONAMENTO
         async function redimensionarCanvasComQualidade(canvasOrigem, larguraFinal, alturaFinal, qualidade = 0.85) {
             let canvasAtual  = canvasOrigem;
             let larguraAtual = canvasOrigem.width;
@@ -894,9 +879,7 @@
             });
         }
 
-        // ============================================
-        // CARREGA CONFIGURAÇÃO DO SUPABASE
-        // ============================================
+        // CARREGA CONFIGURAÇÃO
         async function carregarConfiguracao() {
             try {
                 const { data, error } = await supabaseClient
@@ -1149,7 +1132,6 @@
                             sy = (img.height - sH) / 2;
                         }
 
-                        // TESTA E APLICA FILTRO DE LUZ SE A FOTO FOR ESCURA
                         const canvasLuz = document.createElement('canvas');
                         canvasLuz.width = sW;
                         canvasLuz.height = sH;
@@ -1290,7 +1272,7 @@
             fotoAjuste.style.transform = `translate(${ajuste.x}px, ${ajuste.y}px) scale(${ajuste.scale})`;
         }
 
-        // GESTOS DE TOUCH/ZOOM
+        // GESTOS TOUCH
         let toqueInicial     = null;
         let distanciaInicial = 0;
         let scaleInicial     = 1;
@@ -1399,7 +1381,6 @@
             const rectArea = areaFoto.getBoundingClientRect();
             const prop     = MOLDURA.janelaLargura / rectArea.width;
 
-            // ANALISA A FOTO AJUSTADA PARA VER SE PRECISA DE LUZ EXTRA
             const canvasLuz = document.createElement('canvas');
             canvasLuz.width = imagemOriginal.width;
             canvasLuz.height = imagemOriginal.height;
@@ -1416,7 +1397,6 @@
             ctx.translate(ajuste.x * prop, ajuste.y * prop);
             ctx.scale(ajuste.scale * prop, ajuste.scale * prop);
 
-            // Aplica filtro inteligente SOMENTE se a foto for escura (se for boa, o filtro é 'none')
             ctx.filter = filtroLuz;
             ctx.drawImage(imagemOriginal, 0, 0);
             ctx.restore();
@@ -1512,7 +1492,6 @@
                 sy = (video.videoHeight - sH) / 2;
             }
 
-            // TESTA LUZ DO STREAM DA CÂMERA
             const canvasLuz = document.createElement('canvas');
             canvasLuz.width = sW;
             canvasLuz.height = sH;
@@ -1522,7 +1501,7 @@
             const filtroLuz = calcularFiltroDeLuzInteligente(ctxLuz, sW, sH);
 
             ctx.save();
-            ctx.filter = filtroLuz; // Aplica se for foto noturna/escura
+            ctx.filter = filtroLuz;
             ctx.drawImage(video, sx, sy, sW, sH,
                 MOLDURA.janelaX, MOLDURA.janelaY,
                 MOLDURA.janelaLargura, MOLDURA.janelaAltura);
@@ -1648,6 +1627,26 @@
             }
         });
 
+        // Helper pra converter Blob para Base64 (para enviar original)
+        function blobToBase64(blob) {
+            return new Promise((resolve, _) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        // Helper pra extrair Blob da imagem original enviada
+        async function obterBlobOriginal() {
+            if (!imagemOriginal) return null;
+            const canvasOrig = document.createElement('canvas');
+            canvasOrig.width = imagemOriginal.naturalWidth || imagemOriginal.width;
+            canvasOrig.height = imagemOriginal.naturalHeight || imagemOriginal.height;
+            const ctxOrig = canvasOrig.getContext('2d');
+            ctxOrig.drawImage(imagemOriginal, 0, 0);
+            return new Promise(res => canvasOrig.toBlob(res, 'image/jpeg', 0.85));
+        }
+
         // ENVIAR FOTO ÚNICA
         btnEnviarImpressao.addEventListener('click', async () => {
             if (fotoJaEnviada) {
@@ -1711,6 +1710,7 @@
                 const timestamp   = Date.now();
                 const random      = Math.random().toString(36).substring(2, 8);
                 const nomeArquivo = `foto-${timestamp}-${random}.jpg`;
+                const nomeOriginal = `orig-${timestamp}-${random}.jpg`;
 
                 let progressoUpload = 35;
                 const intervalUpload = setInterval(() => {
@@ -1722,6 +1722,7 @@
                     atualizarProgresso(progressoUpload);
                 }, 150);
 
+                // 1. Upload da foto emoldurada
                 const { error } = await supabaseClient
                     .storage
                     .from(BUCKET_FOTOS)
@@ -1731,8 +1732,26 @@
                         contentType:  'image/jpeg'
                     });
 
-                clearInterval(intervalUpload);
                 if (error) throw error;
+
+                // 2. Upload da foto original sem corte (Backup pro Admin reajustar se precisar)
+                try {
+                    const blobOrig = await obterBlobOriginal();
+                    if (blobOrig) {
+                        await supabaseClient
+                            .storage
+                            .from(BUCKET_FOTOS)
+                            .upload(nomeOriginal, blobOrig, {
+                                cacheControl: '3600',
+                                upsert: false,
+                                contentType: 'image/jpeg'
+                            });
+                    }
+                } catch(eOrig) {
+                    console.warn("Não foi possível enviar o backup da original:", eOrig);
+                }
+
+                clearInterval(intervalUpload);
 
                 atualizarProgresso(100);
                 await new Promise(r => setTimeout(r, 600));
@@ -1807,6 +1826,7 @@
                     const timestamp   = Date.now();
                     const random      = Math.random().toString(36).substring(2, 8);
                     const nomeArquivo = `foto-${timestamp}-${random}.jpg`;
+                    const nomeOriginal = `orig-${timestamp}-${random}.jpg`;
 
                     const { error } = await supabaseClient
                         .storage
@@ -1818,6 +1838,21 @@
                         });
 
                     if (error) throw error;
+
+                    // Envia backup original da foto do lote
+                    try {
+                        if (foto.imagemOriginal) {
+                            const canvasOrig = document.createElement('canvas');
+                            canvasOrig.width = foto.imagemOriginal.naturalWidth || foto.imagemOriginal.width;
+                            canvasOrig.height = foto.imagemOriginal.naturalHeight || foto.imagemOriginal.height;
+                            canvasOrig.getContext('2d').drawImage(foto.imagemOriginal, 0, 0);
+                            canvasOrig.toBlob(async (blobO) => {
+                                if(blobO) {
+                                    await supabaseClient.storage.from(BUCKET_FOTOS).upload(nomeOriginal, blobO, { contentType: 'image/jpeg' });
+                                }
+                            }, 'image/jpeg', 0.85);
+                        }
+                    } catch(eO) {}
 
                     enviadas++;
                     atualizarProgresso(pctFim, `Foto ${numero} enviada!`, `${numero} de ${total}`);
@@ -1887,7 +1922,7 @@
             const ok = await carregarConfiguracao();
             if (ok) {
                 loadingInicial.style.display = 'none';
-                telaEscolha.classList.add('hidden'); // Fica travado no banner de aviso até o clique do botão
+                telaEscolha.classList.add('hidden');
             }
         })();
     </script>
