@@ -17,10 +17,10 @@ let filtroAtual          = 'pendentes';
 let fotosCarregadas      = [];          
 let statusFotos          = {};          
 
-// Variáveis para o Reajuste do Admin
+// Variáveis do Reajuste do Admin
 let fotoReajustandoNome  = null;
 let imgOriginalReajuste = null;
-let ajusteAdmin = { x: 0, y: 0, scale: 1, initialScale: 1 };
+let ajusteAdmin = { x: 0, y: 0, scale: 1, baseScale: 1, displayW: 0, displayH: 0 };
 
 // ============================================================
 // LOGIN
@@ -470,7 +470,7 @@ window.carregarFotos = async function () {
 };
 
 // ============================================================
-// ✏️ REAJUSTE DE ENQUADRAMENTO NO ADMIN (CORRIGIDO)
+// ✏️ REAJUSTE DE ENQUADRAMENTO NO ADMIN (100% PREENCHIDO)
 // ============================================================
 window.abrirReajusteAdmin = async function(nomeArquivo) {
   if (!configAtual || !configAtual.moldura_url) {
@@ -553,7 +553,6 @@ function exibirModalReajusteAdmin() {
   document.body.appendChild(modal);
   document.body.style.overflow = 'hidden';
 
-  // Espera 100ms até o navegador desenhar a tela e ter o tamanho exato da janela em pixels!
   setTimeout(iniciarInteracaoReajusteAdmin, 100);
 }
 
@@ -568,17 +567,20 @@ function iniciarInteracaoReajusteAdmin() {
     return;
   }
 
+  // Calcula escala base exata para PREENCHER 100% da janela
   const scaleX = rect.width / imgOriginalReajuste.width;
   const scaleY = rect.height / imgOriginalReajuste.height;
-  const coverScale = Math.max(scaleX, scaleY);
+  const baseScale = Math.max(scaleX, scaleY);
 
-  ajusteAdmin.scale        = coverScale;
-  ajusteAdmin.initialScale = coverScale;
-  ajusteAdmin.x            = (rect.width - imgOriginalReajuste.width * coverScale) / 2;
-  ajusteAdmin.y            = (rect.height - imgOriginalReajuste.height * coverScale) / 2;
+  ajusteAdmin.baseScale = baseScale;
+  ajusteAdmin.scale     = 1.0;
+  ajusteAdmin.displayW  = imgOriginalReajuste.width * baseScale;
+  ajusteAdmin.displayH  = imgOriginalReajuste.height * baseScale;
+  ajusteAdmin.x         = (rect.width - ajusteAdmin.displayW) / 2;
+  ajusteAdmin.y         = (rect.height - ajusteAdmin.displayH) / 2;
 
-  img.style.width  = imgOriginalReajuste.width + 'px';
-  img.style.height = imgOriginalReajuste.height + 'px';
+  img.style.width  = ajusteAdmin.displayW + 'px';
+  img.style.height = ajusteAdmin.displayH + 'px';
   aplicarTransformAdmin();
 
   let arrastando = false;
@@ -605,14 +607,10 @@ function iniciarInteracaoReajusteAdmin() {
     if (area) area.style.cursor = 'grab';
   };
 
-  // Zoom com a roleta do mouse
   area.onwheel = (e) => {
     e.preventDefault();
     const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    const novoScale = Math.max(
-      ajusteAdmin.initialScale * 0.5,
-      Math.min(ajusteAdmin.scale * delta, ajusteAdmin.initialScale * 5)
-    );
+    const novoScale = Math.max(0.5, Math.min(ajusteAdmin.scale * delta, 5.0));
     const rectArea = area.getBoundingClientRect();
     const cx = e.clientX - rectArea.left;
     const cy = e.clientY - rectArea.top;
@@ -648,13 +646,14 @@ async function salvarReajusteAdmin() {
   const rect = area.getBoundingClientRect();
   const prop = configAtual.janela_largura / rect.width;
 
+  const totalScale = ajusteAdmin.baseScale * ajusteAdmin.scale * prop;
+
   ctx.save();
   ctx.beginPath();
   ctx.rect(configAtual.janela_x, configAtual.janela_y, configAtual.janela_largura, configAtual.janela_altura);
   ctx.clip();
-  ctx.translate(configAtual.janela_x, configAtual.janela_y);
-  ctx.translate(ajusteAdmin.x * prop, ajusteAdmin.y * prop);
-  ctx.scale(ajusteAdmin.scale * prop, ajusteAdmin.scale * prop);
+  ctx.translate(configAtual.janela_x + ajusteAdmin.x * prop, configAtual.janela_y + ajusteAdmin.y * prop);
+  ctx.scale(totalScale, totalScale);
   ctx.drawImage(imgOriginalReajuste, 0, 0);
   ctx.restore();
 
