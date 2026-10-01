@@ -79,7 +79,7 @@ async function carregarConfiguracao() {
       .select('*')
       .order('id', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     if (!data)  throw new Error('Nenhuma configuração encontrada');
@@ -93,7 +93,7 @@ async function carregarConfiguracao() {
         .select('nome')
         .eq('ativa', true)
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (molduraAtiva) nomeAtiva = molduraAtiva.nome;
     }
