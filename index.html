@@ -1710,8 +1710,7 @@
                 const timestamp   = Date.now();
                 const random      = Math.random().toString(36).substring(2, 8);
                 const nomeArquivo = `foto-${timestamp}-${random}.jpg`;
-                const nomeOriginal = `orig-${timestamp}-${random}.jpg`;
-
+               
                 let progressoUpload = 35;
                 const intervalUpload = setInterval(() => {
                     progressoUpload += Math.random() * 4;
@@ -1734,24 +1733,7 @@
 
                 if (error) throw error;
 
-                // 2. Upload da foto original sem corte (Backup pro Admin reajustar se precisar)
-                try {
-                    const blobOrig = await obterBlobOriginal();
-                    if (blobOrig) {
-                        await supabaseClient
-                            .storage
-                            .from(BUCKET_FOTOS)
-                            .upload(nomeOriginal, blobOrig, {
-                                cacheControl: '3600',
-                                upsert: false,
-                                contentType: 'image/jpeg'
-                            });
-                    }
-                } catch(eOrig) {
-                    console.warn("Não foi possível enviar o backup da original:", eOrig);
-                }
-
-                clearInterval(intervalUpload);
+                           clearInterval(intervalUpload);
 
                 atualizarProgresso(100);
                 await new Promise(r => setTimeout(r, 600));
@@ -1826,8 +1808,7 @@
                     const timestamp   = Date.now();
                     const random      = Math.random().toString(36).substring(2, 8);
                     const nomeArquivo = `foto-${timestamp}-${random}.jpg`;
-                    const nomeOriginal = `orig-${timestamp}-${random}.jpg`;
-
+                    
                     const { error } = await supabaseClient
                         .storage
                         .from(BUCKET_FOTOS)
@@ -1839,22 +1820,7 @@
 
                     if (error) throw error;
 
-                    // Envia backup original da foto do lote
-                    try {
-                        if (foto.imagemOriginal) {
-                            const canvasOrig = document.createElement('canvas');
-                            canvasOrig.width = foto.imagemOriginal.naturalWidth || foto.imagemOriginal.width;
-                            canvasOrig.height = foto.imagemOriginal.naturalHeight || foto.imagemOriginal.height;
-                            canvasOrig.getContext('2d').drawImage(foto.imagemOriginal, 0, 0);
-                            canvasOrig.toBlob(async (blobO) => {
-                                if(blobO) {
-                                    await supabaseClient.storage.from(BUCKET_FOTOS).upload(nomeOriginal, blobO, { contentType: 'image/jpeg' });
-                                }
-                            }, 'image/jpeg', 0.85);
-                        }
-                    } catch(eO) {}
-
-                    enviadas++;
+                                        enviadas++;
                     atualizarProgresso(pctFim, `Foto ${numero} enviada!`, `${numero} de ${total}`);
 
                 } catch (err) {
