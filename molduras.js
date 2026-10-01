@@ -1,5 +1,5 @@
 // ============================================================
-// CONFIGURAÇÃO
+// 1. CONFIGURAÇÃO INICIAL
 // ============================================================
 const SUPABASE_URL = "https://scwznirvzwrphztvopbz.supabase.co";
 const SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjd3puaXJ2endycGh6dHZvcGJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzI2NzQsImV4cCI6MjA5NTY0ODY3NH0.PLvr547bIEJwjECKxQaoR7lpazs8GbSpLYLMDiGD4Po";
@@ -9,176 +9,138 @@ const BUCKET_MOLDURAS = "molduras";
 const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
 let configAtual          = null;
-let molduraNaturalWidth  = 0;
-let molduraNaturalHeight = 0;
 let arquivoNovaMoldura   = null;
 let filtroAtual          = 'pendentes'; 
 let fotosCarregadas      = [];          
 let statusFotos          = {};          
-
-// Estado do Cropper do Admin
-let fotoReajustandoNome  = null;
-let imgOriginalReajuste = null;
 let adminCrop = { x: 0, y: 0, scale: 1, baseW: 0, baseH: 0, winW: 0, winH: 0 };
+let fotoReajustandoNome = null;
+let imgOriginalReajuste = null;
 
 // ============================================================
-// INICIALIZAÇÃO (BOOT)
+// 2. FUNÇÕES DE UTILIDADE (CARREGAM PRIMEIRO)
 // ============================================================
-async function carregarConfiguracao() {
-  try {
-    const { data, error } = await supabaseAdmin
-      .from('configuracao')
-      .select('*')
-      .order('id', { ascending: false })
-      .limit(1)
-      .single();
 
-    if (!error && data) {
-      configAtual = data;
-    }
+window.mostrarMensagem = function(texto, tipo) {
+  const el = document.getElementById("mensagem");
+  if (!el) return;
+  const textoLimpo = texto.replace(/[✅❌⚠️📭⏳🖼️💾]/g, '').trim();
+  el.innerHTML = `<div class="msg-${tipo}">${textoLimpo}</div>`;
+  if (tipo === "sucesso" || tipo === "aviso") setTimeout(() => el.innerHTML = "", 6000);
+};
 
-    let nomeAtiva = '—';
-    if (data && data.moldura_url) {
-      const { data: molduraAtiva } = await supabaseAdmin
-        .from('molduras_galeria')
-        .select('nome')
-        .eq('ativa', true)
-        .limit(1)
-        .single();
-      if (molduraAtiva) nomeAtiva = molduraAtiva.nome;
-    }
-
-    const mini    = document.getElementById('molduraMini');
-    const infoTxt = document.getElementById('molduraInfoTxt');
-    const nomeTxt = document.getElementById('molduraNomeAtiva');
-
-    if (data && data.moldura_url) {
-      if(mini) mini.innerHTML = `<img src="${data.moldura_url}?t=${Date.now()}" alt="Moldura">`;
-      if(infoTxt) infoTxt.textContent = `Janela: ${data.janela_largura}×${data.janela_altura}px • Posição: ${data.janela_x},${data.janela_y}`;
-      if(nomeTxt) nomeTxt.textContent = nomeAtiva;
-    }
-  } catch (err) { console.error(err); }
-}
-
-window.mostrarPainel = function() {
-  const telaLogin = document.getElementById("telaLogin");
-  const painelAdmin = document.getElementById("painelAdmin");
-  if (telaLogin) telaLogin.style.display = "none";
-  if (painelAdmin) painelAdmin.style.display = "block";
-  carregarConfiguracao();
-  carregarFotos();
+window.abrirModal = function (url) {
+  const modal = document.createElement('div');
+  modal.className = 'modal-foto';
+  modal.innerHTML = `<button class="modal-fechar" onclick="this.parentElement.remove()">×</button><img src="${url}">`;
+  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+  document.body.appendChild(modal);
 };
 
 // ============================================================
-// GESTÃO DE MOLDURAS
+// 3. LOGICA DE EXIBIÇÃO DA GALERIA
 // ============================================================
-window.abrirModalGaleria = function () {
-  document.getElementById('modalGaleriaMolduras').classList.add('ativo');
-  carregarGaleriaMolduras();
-};
-window.fecharModalGaleria = function () { document.getElementById('modalGaleriaMolduras').classList.remove('ativo'); document.body.style.overflow = ''; };
 
-window.abrirModalAdicionarMoldura = function () {
-  document.getElementById('modalAdicionarMoldura').classList.add('ativo');
-  document.getElementById('nomeNovaMoldura').value = '';
-  document.getElementById('inputNovaMoldura').value = '';
-  arquivoNovaMoldura = null;
-  const up = document.getElementById('uploadPreview');
-  if(up) { up.classList.remove('tem-imagem'); up.innerHTML = `<span>Clique para selecionar</span>`; }
-};
-window.fecharModalAdicionarMoldura = function () { document.getElementById('modalAdicionarMoldura').classList.remove('ativo'); };
+window.renderizarGaleria = function() {
+  const galeria = document.getElementById('galeria');
+  const vazio   = document.getElementById('vazio');
+  if (!galeria) return;
 
-async function carregarGaleriaMolduras() {
-  const galeria = document.getElementById('galeriaMolduras');
-  if(!galeria) return;
-  galeria.innerHTML = '<div>Carregando...</div>';
-  const { data } = await supabaseAdmin.from('molduras_galeria').select('*').order('created_at', { ascending: false });
+  const visiveis = fotosCarregadas.filter(f => !f.name.startsWith('orig-'));
+  let filtradas = visiveis;
+  if (filtroAtual === 'pendentes') filtradas = visiveis.filter(f => !statusFotos[f.name]?.baixada);
+  else if (filtroAtual === 'baixadas') filtradas = visiveis.filter(f => statusFotos[f.name]?.baixada);
+  
+  if(document.getElementById('contadorPendentes')) document.getElementById('contadorPendentes').textContent = visiveis.filter(f => !statusFotos[f.name]?.baixada).length;
+  if(document.getElementById('contadorBaixadas')) document.getElementById('contadorBaixadas').textContent  = visiveis.filter(f => statusFotos[f.name]?.baixada).length;
+  if(document.getElementById('contadorTodas')) document.getElementById('contadorTodas').textContent     = visiveis.length;
+
+  if (visiveis.length === 0) { galeria.innerHTML = ''; if(vazio) vazio.style.display = 'block'; return; }
+  if(vazio) vazio.style.display = 'none';
+  
   galeria.innerHTML = '';
-  if (!data || data.length === 0) { galeria.innerHTML = '<div>Nenhuma moldura.</div>'; return; }
-  data.forEach(m => {
+  filtradas.forEach(foto => {
+    const { data } = supabaseAdmin.storage.from(BUCKET_FOTOS).getPublicUrl(foto.name);
+    const jaBaixada = statusFotos[foto.name]?.baixada;
     const div = document.createElement('div');
-    div.className = 'item-moldura' + (m.ativa ? ' ativa' : '');
+    div.className = 'foto-item' + (jaBaixada ? ' baixada' : '');
     div.innerHTML = `
-      <img src="${m.moldura_url}">
-      <div class="item-moldura-info"><h5>${m.nome}</h5></div>
-      <div class="item-moldura-acoes">
-        <button class="btn-usar-moldura" onclick="window.ativarMoldura(${m.id})" ${m.ativa ? 'disabled' : ''}>${m.ativa ? 'Ativa' : 'Usar'}</button>
-        <button class="btn-deletar-moldura" onclick="window.deletarMoldura(${m.id}, '${m.arquivo_nome}')">🗑</button>
+      ${jaBaixada ? '<div class="selo-baixada">✓</div>' : ''}
+      <img src="${data.publicUrl}?t=${Date.now()}" loading="lazy" onclick="abrirModal('${data.publicUrl}')">
+      <div class="foto-acoes">
+        <button class="btn-download-item" onclick="baixarFoto('${data.publicUrl}', '${foto.name}')">Baixar</button>
+        <button class="btn-desmarcar" onclick="abrirReajusteAdmin('${foto.name}')">✏️ Ajustar</button>
+        <button class="btn-apagar-item" onclick="apagarFoto('${foto.name}')">🗑</button>
       </div>`;
     galeria.appendChild(div);
   });
+};
+
+window.carregarFotos = async function () {
+  try {
+    const { data: statusData } = await supabaseAdmin.from('fotos_status').select('*');
+    statusFotos = {};
+    if (statusData) statusData.forEach(item => { statusFotos[item.arquivo_nome] = { baixada: item.baixada }; });
+
+    const { data: arquivos } = await supabaseAdmin.storage.from(BUCKET_FOTOS).list('', { limit: 1000, sortBy: { column: 'created_at', order: 'asc' } });
+    fotosCarregadas = arquivos || [];
+    renderizarGaleria();
+    const vis = fotosCarregadas.filter(f => !f.name.startsWith('orig-'));
+    if(document.getElementById('totalFotos')) document.getElementById('totalFotos').textContent = vis.length;
+  } catch (err) { console.error(err); }
+};
+
+// ============================================================
+// 4. CONFIGURAÇÃO TÉCNICA E MOLDURAS
+// ============================================================
+
+async function carregarConfiguracao() {
+  try {
+    const { data } = await supabaseAdmin.from('configuracao').select('*').order('id', { ascending: false }).limit(1).single();
+    if (data) {
+      configAtual = data;
+      const mini = document.getElementById('molduraMini');
+      if(mini && data.moldura_url) mini.innerHTML = `<img src="${data.moldura_url}?t=${Date.now()}">`;
+      if(document.getElementById('molduraInfoTxt')) document.getElementById('molduraInfoTxt').textContent = `Janela: ${data.janela_largura}×${data.janela_altura}px`;
+    }
+  } catch (err) { console.error(err); }
 }
 
 window.ativarMoldura = async function (id) {
   try {
     const { data: moldura } = await supabaseAdmin.from('molduras_galeria').select('*').eq('id', id).single();
     if(!moldura) return;
+    
     await supabaseAdmin.from('molduras_galeria').update({ ativa: false }).neq('id', id);
     await supabaseAdmin.from('molduras_galeria').update({ ativa: true }).eq('id', id);
 
-    const configData = {
-      moldura_url: moldura.moldura_url,
-      janela_x: moldura.janela_x,
-      janela_y: moldura.janela_y,
-      janela_largura: moldura.janela_largura,
-      janela_altura: moldura.janela_altura,
-      largura_total: moldura.largura_total,
-      altura_total: moldura.altura_total
+    const payload = { 
+        moldura_url: moldura.moldura_url, 
+        janela_x: moldura.janela_x, 
+        janela_y: moldura.janela_y, 
+        janela_largura: moldura.janela_largura, 
+        janela_altura: moldura.janela_altura,
+        largura_total: moldura.largura_total,
+        altura_total: moldura.altura_total
     };
 
-    if (!configAtual) {
-      await supabaseAdmin.from('configuracao').insert(configData);
-    } else {
-      await supabaseAdmin.from('configuracao').update(configData).eq('id', configAtual.id);
-    }
+    // CORREÇÃO DO ERRO 400: Usa upsert para garantir que o registro exista
+    await supabaseAdmin.from('configuracao').upsert({ id: 1, ...payload });
 
-    mostrarMensagem("Moldura ativa!", "sucesso");
-    fecharModalGaleria();
+    window.mostrarMensagem("Moldura ativada!", "sucesso");
+    window.fecharModalGaleria();
     carregarConfiguracao();
   } catch (err) { console.error(err); }
 };
 
-window.salvarNovaMoldura = async function () {
-  const nome = document.getElementById('nomeNovaMoldura').value.trim();
-  const btn  = document.getElementById('btnSalvarNovaMoldura');
-  if (!nome || !arquivoNovaMoldura) return;
-  btn.disabled = true; btn.innerHTML = 'Enviando...';
-  try {
-    const t = Date.now(); const ext = arquivoNovaMoldura.name.split('.').pop();
-    const nomeArq = `moldura-${t}.${ext}`;
-    await supabaseAdmin.storage.from(BUCKET_MOLDURAS).upload(nomeArq, arquivoNovaMoldura);
-    const { data: urlData } = supabaseAdmin.storage.from(BUCKET_MOLDURAS).getPublicUrl(nomeArq);
-    const img = new Image();
-    img.onload = async () => {
-      await supabaseAdmin.from('molduras_galeria').insert({
-        nome: nome, moldura_url: urlData.publicUrl, arquivo_nome: nomeArq,
-        janela_x: Math.round(img.width * 0.1), janela_y: Math.round(img.height * 0.1),
-        janela_largura: Math.round(img.width * 0.8), janela_altura: Math.round(img.height * 0.8),
-        largura_total: img.width, altura_total: img.height, ativa: false
-      });
-      mostrarMensagem("Moldura adicionada!", "sucesso");
-      fecharModalAdicionarMoldura(); carregarGaleriaMolduras();
-    };
-    img.src = urlData.publicUrl;
-  } catch (err) { console.error(err); }
-  finally { btn.disabled = false; btn.innerHTML = "Adicionar à Galeria"; }
-};
-
-window.deletarMoldura = async function (id, arquivoNome) {
-  if (!confirm(`Deletar moldura?`)) return;
-  await supabaseAdmin.storage.from(BUCKET_MOLDURAS).remove([arquivoNome]);
-  await supabaseAdmin.from('molduras_galeria').delete().eq('id', id);
-  carregarGaleriaMolduras();
-};
-
 // ============================================================
-// REAJUSTE DE FOTO (ADMIN)
+// 5. REAJUSTE DE FOTO (ADMIN)
 // ============================================================
+
 window.abrirReajusteAdmin = async function(nomeArquivo) {
-  if (!configAtual) return;
   fotoReajustandoNome = nomeArquivo;
   const nomeOriginal = nomeArquivo.replace('foto-', 'orig-');
-  mostrarMensagem("Carregando...", "aviso");
+  window.mostrarMensagem("Carregando original...", "aviso");
   const { data: dO } = supabaseAdmin.storage.from(BUCKET_FOTOS).getPublicUrl(nomeOriginal);
   const { data: dN } = supabaseAdmin.storage.from(BUCKET_FOTOS).getPublicUrl(nomeArquivo);
   let url = dO.publicUrl;
@@ -216,7 +178,7 @@ function exibirModalReajusteAdmin() {
       </div>
     </div>`;
   document.body.appendChild(modal);
-  setTimeout(iniciarInteracaoReajusteAdmin, 50);
+  setTimeout(iniciarInteracaoReajusteAdmin, 100);
 }
 
 function iniciarInteracaoReajusteAdmin() {
@@ -252,7 +214,7 @@ function atualizarTransformAdmin() {
 }
 
 window.salvarReajusteAdmin = async function() {
-  mostrarMensagem("Salvando...", "aviso");
+  window.mostrarMensagem("Salvando...", "aviso");
   const canvas = document.createElement('canvas'); canvas.width = 2000; canvas.height = 2666;
   const ctx = canvas.getContext('2d'); ctx.fillStyle = "#FFF"; ctx.fillRect(0,0,2000,2666);
   const prop = configAtual.janela_largura / adminCrop.winW;
@@ -264,57 +226,22 @@ window.salvarReajusteAdmin = async function() {
     ctx.drawImage(imgM, 0, 0, 2000, 2666);
     canvas.toBlob(async (b) => {
       await supabaseAdmin.storage.from(BUCKET_FOTOS).upload(fotoReajustandoNome, b, { cacheControl:'0', upsert:true, contentType:'image/jpeg' });
-      mostrarMensagem("Sucesso!", "sucesso"); document.getElementById('modalReajusteAdmin').remove(); carregarFotos();
+      window.mostrarMensagem("Sucesso!", "sucesso"); 
+      const modal = document.getElementById('modalReajusteAdmin'); if(modal) modal.remove();
+      window.carregarFotos();
     }, 'image/jpeg', 0.9);
   };
   imgM.src = configAtual.moldura_url;
 };
 
 // ============================================================
-// AJUSTE TÉCNICO DE JANELA
+// 6. FUNÇÕES DO SISTEMA (BAIXAR, APAGAR, ETC)
 // ============================================================
-window.salvarCoordenadas = async function () {
-  const jX = parseInt(document.getElementById('janelaX').value);
-  const jY = parseInt(document.getElementById('janelaY').value);
-  const jW = parseInt(document.getElementById('janelaLargura').value);
-  const jH = parseInt(document.getElementById('janelaAltura').value);
-  try {
-    await supabaseAdmin.from('configuracao').update({ janela_x: jX, janela_y: jY, janela_largura: jW, janela_altura: jH }).eq('id', configAtual.id);
-    await supabaseAdmin.from('molduras_galeria').update({ janela_x: jX, janela_y: jY, janela_largura: jW, janela_altura: jH }).eq('ativa', true);
-    mostrarMensagem("Coordenadas salvas!", "sucesso");
-    fecharModalConfig(); carregarConfiguracao();
-  } catch (err) { mostrarMensagem("Erro: " + err.message, "erro"); }
-};
-
-// ============================================================
-// CARREGAMENTO DE FOTOS E STATUS
-// ============================================================
-window.carregarFotos = async function () {
-  try {
-    await carregarStatusFotos();
-    const { data: arquivos } = await supabaseAdmin.storage.from(BUCKET_FOTOS).list('', { limit: 1000, sortBy: { column: 'created_at', order: 'asc' } });
-    fotosCarregadas = arquivos || [];
-    renderizarGaleria();
-    const vis = fotosCarregadas.filter(f => !f.name.startsWith('orig-'));
-    if(document.getElementById('totalFotos')) document.getElementById('totalFotos').textContent = vis.length;
-  } catch (err) { console.error(err); }
-};
-
-async function carregarStatusFotos() {
-  try {
-    const { data } = await supabaseAdmin.from('fotos_status').select('*');
-    statusFotos = {};
-    if (data) data.forEach(item => { statusFotos[item.arquivo_nome] = { baixada: item.baixada }; });
-  } catch (err) { console.error(err); }
-}
-
-async function marcarComoBaixada(arquivoNome) {
-  await supabaseAdmin.from('fotos_status').upsert({ arquivo_nome: arquivoNome, baixada: true }, { onConflict: 'arquivo_nome' });
-}
 
 window.baixarFoto = async function (url, nome) {
   const r = await fetch(url); const b = await r.blob(); saveAs(b, nome);
-  await marcarComoBaixada(nome); renderizarGaleria();
+  await supabaseAdmin.from('fotos_status').upsert({ arquivo_nome: nome, baixada: true }, { onConflict: 'arquivo_nome' });
+  window.carregarFotos();
 };
 
 window.apagarFoto = async function (nome) {
@@ -322,14 +249,18 @@ window.apagarFoto = async function (nome) {
   const nO = nome.replace('foto-', 'orig-');
   await supabaseAdmin.storage.from(BUCKET_FOTOS).remove([nome, nO]);
   await supabaseAdmin.from('fotos_status').delete().eq('arquivo_nome', nome);
-  carregarFotos();
+  window.carregarFotos();
 };
 
 // ============================================================
-// BOOT E EVENTOS
+// 7. INICIALIZAÇÃO FINAL (DOM LOADED)
 // ============================================================
+
 document.addEventListener('DOMContentLoaded', () => {
-  window.mostrarPainel(); 
+  // Inicia o painel
+  window.mostrarPainel();
+
+  // Escuta upload de nova moldura
   const input = document.getElementById('inputNovaMoldura');
   if (input) {
     input.addEventListener('change', (e) => {
