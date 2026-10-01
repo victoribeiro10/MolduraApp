@@ -22,8 +22,44 @@ let imgOriginalReajuste = null;
 let adminCrop = { x: 0, y: 0, scale: 1, baseW: 0, baseH: 0, winW: 0, winH: 0 };
 
 // ============================================================
-// INICIALIZAÇÃO AUTOMÁTICA (SEM SENHA)
+// INICIALIZAÇÃO (BOOT)
 // ============================================================
+async function carregarConfiguracao() {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('configuracao')
+      .select('*')
+      .order('id', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (!error && data) {
+      configAtual = data;
+    }
+
+    let nomeAtiva = '—';
+    if (data && data.moldura_url) {
+      const { data: molduraAtiva } = await supabaseAdmin
+        .from('molduras_galeria')
+        .select('nome')
+        .eq('ativa', true)
+        .limit(1)
+        .single();
+      if (molduraAtiva) nomeAtiva = molduraAtiva.nome;
+    }
+
+    const mini    = document.getElementById('molduraMini');
+    const infoTxt = document.getElementById('molduraInfoTxt');
+    const nomeTxt = document.getElementById('molduraNomeAtiva');
+
+    if (data && data.moldura_url) {
+      if(mini) mini.innerHTML = `<img src="${data.moldura_url}?t=${Date.now()}" alt="Moldura">`;
+      if(infoTxt) infoTxt.textContent = `Janela: ${data.janela_largura}×${data.janela_altura}px • Posição: ${data.janela_x},${data.janela_y}`;
+      if(nomeTxt) nomeTxt.textContent = nomeAtiva;
+    }
+  } catch (err) { console.error(err); }
+}
+
 window.mostrarPainel = function() {
   const telaLogin = document.getElementById("telaLogin");
   const painelAdmin = document.getElementById("painelAdmin");
@@ -34,60 +70,73 @@ window.mostrarPainel = function() {
 };
 
 // ============================================================
-// GESTÃO DE MOLDURAS (ABRIR / FECHAR / LISTAR)
+// GESTÃO DE MOLDURAS
 // ============================================================
 window.abrirModalGaleria = function () {
   document.getElementById('modalGaleriaMolduras').classList.add('ativo');
-  document.body.style.overflow = 'hidden';
   carregarGaleriaMolduras();
 };
-
-window.fecharModalGaleria = function () {
-  document.getElementById('modalGaleriaMolduras').classList.remove('ativo');
-  document.body.style.overflow = '';
-};
+window.fecharModalGaleria = function () { document.getElementById('modalGaleriaMolduras').classList.remove('ativo'); document.body.style.overflow = ''; };
 
 window.abrirModalAdicionarMoldura = function () {
   document.getElementById('modalAdicionarMoldura').classList.add('ativo');
-  document.body.style.overflow = 'hidden';
   document.getElementById('nomeNovaMoldura').value = '';
   document.getElementById('inputNovaMoldura').value = '';
   arquivoNovaMoldura = null;
-  const btn = document.getElementById('btnSalvarNovaMoldura');
-  if(btn) btn.disabled = true;
   const up = document.getElementById('uploadPreview');
   if(up) { up.classList.remove('tem-imagem'); up.innerHTML = `<span>Clique para selecionar</span>`; }
 };
-
-window.fecharModalAdicionarMoldura = function () {
-  document.getElementById('modalAdicionarMoldura').classList.remove('ativo');
-  document.body.style.overflow = '';
-};
+window.fecharModalAdicionarMoldura = function () { document.getElementById('modalAdicionarMoldura').classList.remove('ativo'); };
 
 async function carregarGaleriaMolduras() {
   const galeria = document.getElementById('galeriaMolduras');
   if(!galeria) return;
-  galeria.innerHTML = '<div class="galeria-molduras-vazia">Carregando...</div>';
-  try {
-    const { data, error } = await supabaseAdmin.from('molduras_galeria').select('*').order('created_at', { ascending: false });
-    if (error) throw error;
-    if(document.getElementById('totalMoldurasGaleria')) document.getElementById('totalMoldurasGaleria').textContent = data.length;
-    if (data.length === 0) { galeria.innerHTML = '<div class="galeria-molduras-vazia">Nenhuma moldura salva.</div>'; return; }
-    galeria.innerHTML = '';
-    data.forEach(moldura => {
-      const div = document.createElement('div');
-      div.className = 'item-moldura' + (moldura.ativa ? ' ativa' : '');
-      div.innerHTML = `
-        <img src="${moldura.moldura_url}" loading="lazy">
-        <div class="item-moldura-info"><h5>${moldura.nome}</h5></div>
-        <div class="item-moldura-acoes">
-          <button class="btn-usar-moldura" onclick="ativarMoldura(${moldura.id})" ${moldura.ativa ? 'disabled' : ''}>${moldura.ativa ? 'Ativa' : 'Usar'}</button>
-          <button class="btn-deletar-moldura" onclick="deletarMoldura(${moldura.id}, '${moldura.arquivo_nome}', '${moldura.nome.replace(/'/g, "\\'")}')">🗑</button>
-        </div>`;
-      galeria.appendChild(div);
-    });
-  } catch (err) { mostrarMensagem("Erro galeria: " + err.message, "erro"); }
+  galeria.innerHTML = '<div>Carregando...</div>';
+  const { data } = await supabaseAdmin.from('molduras_galeria').select('*').order('created_at', { ascending: false });
+  galeria.innerHTML = '';
+  if (!data || data.length === 0) { galeria.innerHTML = '<div>Nenhuma moldura.</div>'; return; }
+  data.forEach(m => {
+    const div = document.createElement('div');
+    div.className = 'item-moldura' + (m.ativa ? ' ativa' : '');
+    div.innerHTML = `
+      <img src="${m.moldura_url}">
+      <div class="item-moldura-info"><h5>${m.nome}</h5></div>
+      <div class="item-moldura-acoes">
+        <button class="btn-usar-moldura" onclick="window.ativarMoldura(${m.id})" ${m.ativa ? 'disabled' : ''}>${m.ativa ? 'Ativa' : 'Usar'}</button>
+        <button class="btn-deletar-moldura" onclick="window.deletarMoldura(${m.id}, '${m.arquivo_nome}')">🗑</button>
+      </div>`;
+    galeria.appendChild(div);
+  });
 }
+
+window.ativarMoldura = async function (id) {
+  try {
+    const { data: moldura } = await supabaseAdmin.from('molduras_galeria').select('*').eq('id', id).single();
+    if(!moldura) return;
+    await supabaseAdmin.from('molduras_galeria').update({ ativa: false }).neq('id', id);
+    await supabaseAdmin.from('molduras_galeria').update({ ativa: true }).eq('id', id);
+
+    const configData = {
+      moldura_url: moldura.moldura_url,
+      janela_x: moldura.janela_x,
+      janela_y: moldura.janela_y,
+      janela_largura: moldura.janela_largura,
+      janela_altura: moldura.janela_altura,
+      largura_total: moldura.largura_total,
+      altura_total: moldura.altura_total
+    };
+
+    if (!configAtual) {
+      await supabaseAdmin.from('configuracao').insert(configData);
+    } else {
+      await supabaseAdmin.from('configuracao').update(configData).eq('id', configAtual.id);
+    }
+
+    mostrarMensagem("Moldura ativa!", "sucesso");
+    fecharModalGaleria();
+    carregarConfiguracao();
+  } catch (err) { console.error(err); }
+};
 
 window.salvarNovaMoldura = async function () {
   const nome = document.getElementById('nomeNovaMoldura').value.trim();
@@ -111,46 +160,25 @@ window.salvarNovaMoldura = async function () {
       fecharModalAdicionarMoldura(); carregarGaleriaMolduras();
     };
     img.src = urlData.publicUrl;
-  } catch (err) { mostrarMensagem("Erro: " + err.message, "erro"); }
+  } catch (err) { console.error(err); }
   finally { btn.disabled = false; btn.innerHTML = "Adicionar à Galeria"; }
 };
 
-// ============================================================
-// AJUSTE TÉCNICO DE JANELA
-// ============================================================
-window.abrirModalConfig = function () {
-  if (!configAtual) return;
-  const modal = document.getElementById('modalConfig');
-  modal.classList.add('ativo');
-  document.body.style.overflow = 'hidden';
-  document.getElementById('janelaX').value = configAtual.janela_x;
-  document.getElementById('janelaY').value = configAtual.janela_y;
-  document.getElementById('janelaLargura').value = configAtual.janela_largura;
-  document.getElementById('janelaAltura').value = configAtual.janela_altura;
-  montarEditorVisual(configAtual.moldura_url, configAtual.janela_x, configAtual.janela_y, configAtual.janela_largura, configAtual.janela_altura);
-};
-
-window.salvarCoordenadas = async function () {
-  const jX = parseInt(document.getElementById('janelaX').value);
-  const jY = parseInt(document.getElementById('janelaY').value);
-  const jW = parseInt(document.getElementById('janelaLargura').value);
-  const jH = parseInt(document.getElementById('janelaAltura').value);
-  try {
-    await supabaseAdmin.from('configuracao').update({ janela_x: jX, janela_y: jY, janela_largura: jW, janela_altura: jH }).eq('id', configAtual.id);
-    await supabaseAdmin.from('molduras_galeria').update({ janela_x: jX, janela_y: jY, janela_largura: jW, janela_altura: jH }).eq('ativa', true);
-    mostrarMensagem("Coordenadas salvas!", "sucesso");
-    fecharModalConfig(); carregarConfiguracao();
-  } catch (err) { mostrarMensagem("Erro: " + err.message, "erro"); }
+window.deletarMoldura = async function (id, arquivoNome) {
+  if (!confirm(`Deletar moldura?`)) return;
+  await supabaseAdmin.storage.from(BUCKET_MOLDURAS).remove([arquivoNome]);
+  await supabaseAdmin.from('molduras_galeria').delete().eq('id', id);
+  carregarGaleriaMolduras();
 };
 
 // ============================================================
-// ✏️ REAJUSTE DE FOTO (ADMIN)
+// REAJUSTE DE FOTO (ADMIN)
 // ============================================================
 window.abrirReajusteAdmin = async function(nomeArquivo) {
   if (!configAtual) return;
   fotoReajustandoNome = nomeArquivo;
   const nomeOriginal = nomeArquivo.replace('foto-', 'orig-');
-  mostrarMensagem("Carregando original...", "aviso");
+  mostrarMensagem("Carregando...", "aviso");
   const { data: dO } = supabaseAdmin.storage.from(BUCKET_FOTOS).getPublicUrl(nomeOriginal);
   const { data: dN } = supabaseAdmin.storage.from(BUCKET_FOTOS).getPublicUrl(nomeArquivo);
   let url = dO.publicUrl;
@@ -178,12 +206,12 @@ function exibirModalReajusteAdmin() {
           <img src="${configAtual.moldura_url}" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:10;">
         </div>
         <div style="display:flex; justify-content:center; gap:12px; margin-top:14px;">
-          <button class="btn-sair" onclick="alterarZoomAdmin(-0.15)">🔍 −</button>
-          <button class="btn-sair" onclick="alterarZoomAdmin(+0.15)">🔍 +</button>
+          <button class="btn-sair" onclick="window.alterarZoomAdmin(-0.15)">🔍 −</button>
+          <button class="btn-sair" onclick="window.alterarZoomAdmin(+0.15)">🔍 +</button>
         </div>
         <div style="display:flex; gap:10px; margin-top:16px;">
           <button class="btn-sair" style="flex:1" onclick="document.getElementById('modalReajusteAdmin').remove()">Cancelar</button>
-          <button class="btn-configurar" style="flex:1" onclick="salvarReajusteAdmin()">✓ Salvar</button>
+          <button class="btn-configurar" style="flex:1" onclick="window.salvarReajusteAdmin()">✓ Salvar</button>
         </div>
       </div>
     </div>`;
@@ -243,7 +271,23 @@ window.salvarReajusteAdmin = async function() {
 };
 
 // ============================================================
-// CARREGAMENTO E STATUS
+// AJUSTE TÉCNICO DE JANELA
+// ============================================================
+window.salvarCoordenadas = async function () {
+  const jX = parseInt(document.getElementById('janelaX').value);
+  const jY = parseInt(document.getElementById('janelaY').value);
+  const jW = parseInt(document.getElementById('janelaLargura').value);
+  const jH = parseInt(document.getElementById('janelaAltura').value);
+  try {
+    await supabaseAdmin.from('configuracao').update({ janela_x: jX, janela_y: jY, janela_largura: jW, janela_altura: jH }).eq('id', configAtual.id);
+    await supabaseAdmin.from('molduras_galeria').update({ janela_x: jX, janela_y: jY, janela_largura: jW, janela_altura: jH }).eq('ativa', true);
+    mostrarMensagem("Coordenadas salvas!", "sucesso");
+    fecharModalConfig(); carregarConfiguracao();
+  } catch (err) { mostrarMensagem("Erro: " + err.message, "erro"); }
+};
+
+// ============================================================
+// CARREGAMENTO DE FOTOS E STATUS
 // ============================================================
 window.carregarFotos = async function () {
   try {
@@ -255,6 +299,18 @@ window.carregarFotos = async function () {
     if(document.getElementById('totalFotos')) document.getElementById('totalFotos').textContent = vis.length;
   } catch (err) { console.error(err); }
 };
+
+async function carregarStatusFotos() {
+  try {
+    const { data } = await supabaseAdmin.from('fotos_status').select('*');
+    statusFotos = {};
+    if (data) data.forEach(item => { statusFotos[item.arquivo_nome] = { baixada: item.baixada }; });
+  } catch (err) { console.error(err); }
+}
+
+async function marcarComoBaixada(arquivoNome) {
+  await supabaseAdmin.from('fotos_status').upsert({ arquivo_nome: arquivoNome, baixada: true }, { onConflict: 'arquivo_nome' });
+}
 
 window.baixarFoto = async function (url, nome) {
   const r = await fetch(url); const b = await r.blob(); saveAs(b, nome);
@@ -269,21 +325,11 @@ window.apagarFoto = async function (nome) {
   carregarFotos();
 };
 
-window.ativarMoldura = async function (id) {
-  try {
-    const { data: moldura } = await supabaseAdmin.from('molduras_galeria').select('*').eq('id', id).single();
-    await supabaseAdmin.from('molduras_galeria').update({ ativa: false }).neq('id', id);
-    await supabaseAdmin.from('molduras_galeria').update({ ativa: true }).eq('id', id);
-    await supabaseAdmin.from('configuracao').update({ moldura_url: moldura.moldura_url, janela_x: moldura.janela_x, janela_y: moldura.janela_y, janela_largura: moldura.janela_largura, janela_altura: moldura.janela_altura }).eq('id', configAtual.id);
-    mostrarMensagem("Moldura ativa!", "sucesso"); fecharModalGaleria(); carregarConfiguracao();
-  } catch (err) { console.error(err); }
-};
-
 // ============================================================
 // BOOT E EVENTOS
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
-  window.mostrarPainel();
+  window.mostrarPainel(); 
   const input = document.getElementById('inputNovaMoldura');
   if (input) {
     input.addEventListener('change', (e) => {
@@ -292,7 +338,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const reader = new FileReader();
       reader.onload = (ev) => {
         const up = document.getElementById('uploadPreview');
-        if(up) { up.classList.add('tem-imagem'); up.innerHTML = `<img src="${ev.target.result}" style="max-width:100%; max-height:200px;"><div class="arquivo-nome">${arquivoNovaMoldura.name}</div>`; }
+        if(up) {
+          up.classList.add('tem-imagem');
+          up.innerHTML = `<img src="${ev.target.result}" style="max-width:100%; max-height:200px;"><div class="arquivo-nome">${arquivoNovaMoldura.name}</div>`;
+        }
       };
       reader.readAsDataURL(arquivoNovaMoldura);
       if(document.getElementById('btnSalvarNovaMoldura')) document.getElementById('btnSalvarNovaMoldura').disabled = false;
