@@ -1,5 +1,5 @@
 // ============================================================
-// 1. CONFIGURAÇÃO INICIAL
+// 1. CONFIGURAÇÃO DO SUPABASE
 // ============================================================
 const SUPABASE_URL = "https://scwznirvzwrphztvopbz.supabase.co";
 const SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjd3puaXJ2endycGh6dHZvcGJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzI2NzQsImV4cCI6MjA5NTY0ODY3NH0.PLvr547bIEJwjECKxQaoR7lpazs8GbSpLYLMDiGD4Po";
@@ -9,24 +9,32 @@ const BUCKET_MOLDURAS = "molduras";
 const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
 let configAtual          = null;
+let molduraNaturalWidth  = 0;
+let molduraNaturalHeight = 0;
 let arquivoNovaMoldura   = null;
 let filtroAtual          = 'pendentes'; 
 let fotosCarregadas      = [];          
 let statusFotos          = {};          
-let adminCrop = { x: 0, y: 0, scale: 1, baseW: 0, baseH: 0, winW: 0, winH: 0 };
-let fotoReajustandoNome = null;
+
+// Estado do Cropper do Admin
+let fotoReajustandoNome  = null;
 let imgOriginalReajuste = null;
+let adminCrop = { x: 0, y: 0, scale: 1, baseW: 0, baseH: 0, winW: 0, winH: 0 };
 
 // ============================================================
-// 2. FUNÇÕES DE UTILIDADE (CARREGAM PRIMEIRO)
+// 2. FUNÇÕES UTILITÁRIAS DE MENSAGEM E MODAL (INÍCIO)
 // ============================================================
-
 window.mostrarMensagem = function(texto, tipo) {
   const el = document.getElementById("mensagem");
   if (!el) return;
   const textoLimpo = texto.replace(/[✅❌⚠️📭⏳🖼️💾]/g, '').trim();
   el.innerHTML = `<div class="msg-${tipo}">${textoLimpo}</div>`;
-  if (tipo === "sucesso" || tipo === "aviso") setTimeout(() => el.innerHTML = "", 6000);
+  if (tipo === "sucesso" || tipo === "aviso") setTimeout(() => { if(el) el.innerHTML = ""; }, 6000);
+};
+
+window.limparMensagem = function() {
+  const el = document.getElementById("mensagem");
+  if (el) el.innerHTML = "";
 };
 
 window.abrirModal = function (url) {
@@ -38,9 +46,8 @@ window.abrirModal = function (url) {
 };
 
 // ============================================================
-// 3. LOGICA DE EXIBIÇÃO DA GALERIA
+// 3. RENDERIZAR GALERIA DE FOTOS
 // ============================================================
-
 window.renderizarGaleria = function() {
   const galeria = document.getElementById('galeria');
   const vazio   = document.getElementById('vazio');
@@ -76,12 +83,17 @@ window.renderizarGaleria = function() {
   });
 };
 
+window.carregarStatusFotos = async function() {
+  try {
+    const { data } = await supabaseAdmin.from('fotos_status').select('*');
+    statusFotos = {};
+    if (data) data.forEach(item => { statusFotos[item.arquivo_nome] = { baixada: item.baixada }; });
+  } catch (err) { console.error(err); }
+};
+
 window.carregarFotos = async function () {
   try {
-    const { data: statusData } = await supabaseAdmin.from('fotos_status').select('*');
-    statusFotos = {};
-    if (statusData) statusData.forEach(item => { statusFotos[item.arquivo_nome] = { baixada: item.baixada }; });
-
+    await carregarStatusFotos();
     const { data: arquivos } = await supabaseAdmin.storage.from(BUCKET_FOTOS).list('', { limit: 1000, sortBy: { column: 'created_at', order: 'asc' } });
     fotosCarregadas = arquivos || [];
     renderizarGaleria();
@@ -91,10 +103,9 @@ window.carregarFotos = async function () {
 };
 
 // ============================================================
-// 4. CONFIGURAÇÃO TÉCNICA E MOLDURAS
+// 4. CONFIGURAÇÕES E GESTÃO DE MOLDURAS
 // ============================================================
-
-async function carregarConfiguracao() {
+window.carregarConfiguracao = async function() {
   try {
     const { data } = await supabaseAdmin.from('configuracao').select('*').order('id', { ascending: false }).limit(1).single();
     if (data) {
@@ -104,6 +115,59 @@ async function carregarConfiguracao() {
       if(document.getElementById('molduraInfoTxt')) document.getElementById('molduraInfoTxt').textContent = `Janela: ${data.janela_largura}×${data.janela_altura}px`;
     }
   } catch (err) { console.error(err); }
+};
+
+window.abrirModalGaleria = function () {
+  document.getElementById('modalGaleriaMolduras').classList.add('ativo');
+  document.body.style.overflow = 'hidden';
+  carregarGaleriaMolduras();
+};
+
+window.fecharModalGaleria = function () {
+  document.getElementById('modalGaleriaMolduras').classList.remove('ativo');
+  document.body.style.overflow = '';
+};
+
+window.abrirModalAdicionarMoldura = function () {
+  document.getElementById('modalAdicionarMoldura').classList.add('ativo');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('nomeNovaMoldura').value = '';
+  document.getElementById('inputNovaMoldura').value = '';
+  arquivoNovaMoldura = null;
+  const btn = document.getElementById('btnSalvarNovaMoldura');
+  if(btn) btn.disabled = true;
+  const up = document.getElementById('uploadPreview');
+  if(up) { up.classList.remove('tem-imagem'); up.innerHTML = `<span>Clique para selecionar</span>`; }
+};
+
+window.fecharModalAdicionarMoldura = function () {
+  document.getElementById('modalAdicionarMoldura').classList.remove('ativo');
+  document.body.style.overflow = '';
+};
+
+async function carregarGaleriaMolduras() {
+  const galeria = document.getElementById('galeriaMolduras');
+  if(!galeria) return;
+  galeria.innerHTML = '<div class="galeria-molduras-vazia">Carregando...</div>';
+  try {
+    const { data, error } = await supabaseAdmin.from('molduras_galeria').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    if(document.getElementById('totalMoldurasGaleria')) document.getElementById('totalMoldurasGaleria').textContent = data.length;
+    if (data.length === 0) { galeria.innerHTML = '<div class="galeria-molduras-vazia">Nenhuma moldura salva.</div>'; return; }
+    galeria.innerHTML = '';
+    data.forEach(moldura => {
+      const div = document.createElement('div');
+      div.className = 'item-moldura' + (moldura.ativa ? ' ativa' : '');
+      div.innerHTML = `
+        <img src="${moldura.moldura_url}" loading="lazy">
+        <div class="item-moldura-info"><h5>${moldura.nome}</h5></div>
+        <div class="item-moldura-acoes">
+          <button class="btn-usar-moldura" onclick="ativarMoldura(${moldura.id})" ${moldura.ativa ? 'disabled' : ''}>${moldura.ativa ? 'Ativa' : 'Usar'}</button>
+          <button class="btn-deletar-moldura" onclick="deletarMoldura(${moldura.id}, '${moldura.arquivo_nome}', '${moldura.nome.replace(/'/g, "\\'")}')">🗑</button>
+        </div>`;
+      galeria.appendChild(div);
+    });
+  } catch (err) { mostrarMensagem("Erro galeria: " + err.message, "erro"); }
 }
 
 window.ativarMoldura = async function (id) {
@@ -120,27 +184,170 @@ window.ativarMoldura = async function (id) {
         janela_y: moldura.janela_y, 
         janela_largura: moldura.janela_largura, 
         janela_altura: moldura.janela_altura,
-        largura_total: moldura.largura_total,
-        altura_total: moldura.altura_total
+        largura_total: moldura.largura_total || 2000,
+        altura_total: moldura.altura_total || 2666
     };
 
-    // CORREÇÃO DO ERRO 400: Usa upsert para garantir que o registro exista
-    await supabaseAdmin.from('configuracao').upsert({ id: 1, ...payload });
+    // Atualização segura do banco sem causar erro 400
+    if (configAtual && configAtual.id) {
+      await supabaseAdmin.from('configuracao').update(payload).eq('id', configAtual.id);
+    } else {
+      await supabaseAdmin.from('configuracao').insert([payload]);
+    }
 
-    window.mostrarMensagem("Moldura ativada!", "sucesso");
-    window.fecharModalGaleria();
+    mostrarMensagem("Moldura ativada!", "sucesso");
+    fecharModalGaleria();
     carregarConfiguracao();
-  } catch (err) { console.error(err); }
+  } catch (err) {
+    console.error(err);
+    mostrarMensagem("Erro ao ativar: " + err.message, "erro");
+  }
+};
+
+window.salvarNovaMoldura = async function () {
+  const nome = document.getElementById('nomeNovaMoldura').value.trim();
+  const btn  = document.getElementById('btnSalvarNovaMoldura');
+  if (!nome || !arquivoNovaMoldura) return;
+  btn.disabled = true; btn.innerHTML = 'Enviando...';
+  try {
+    const t = Date.now(); const ext = arquivoNovaMoldura.name.split('.').pop();
+    const nomeArq = `moldura-${t}.${ext}`;
+    await supabaseAdmin.storage.from(BUCKET_MOLDURAS).upload(nomeArq, arquivoNovaMoldura);
+    const { data: urlData } = supabaseAdmin.storage.from(BUCKET_MOLDURAS).getPublicUrl(nomeArq);
+    const img = new Image();
+    img.onload = async () => {
+      await supabaseAdmin.from('molduras_galeria').insert({
+        nome: nome, moldura_url: urlData.publicUrl, arquivo_nome: nomeArq,
+        janela_x: Math.round(img.width * 0.1), janela_y: Math.round(img.height * 0.1),
+        janela_largura: Math.round(img.width * 0.8), janela_altura: Math.round(img.height * 0.8),
+        largura_total: img.width, altura_total: img.height, ativa: false
+      });
+      mostrarMensagem("Moldura adicionada!", "sucesso");
+      fecharModalAdicionarMoldura(); carregarGaleriaMolduras();
+    };
+    img.src = urlData.publicUrl;
+  } catch (err) { mostrarMensagem("Erro: " + err.message, "erro"); }
+  finally { btn.disabled = false; btn.innerHTML = "Adicionar à Galeria"; }
+};
+
+window.deletarMoldura = async function (id, arquivoNome) {
+  if (!confirm(`Deletar moldura?`)) return;
+  await supabaseAdmin.storage.from(BUCKET_MOLDURAS).remove([arquivoNome]);
+  await supabaseAdmin.from('molduras_galeria').delete().eq('id', id);
+  carregarGaleriaMolduras();
 };
 
 // ============================================================
-// 5. REAJUSTE DE FOTO (ADMIN)
+// 5. AJUSTE TÉCNICO DA JANELA (JANELA DA MOLDURA)
 // ============================================================
+window.abrirModalConfig = function () {
+  if (!configAtual || !configAtual.moldura_url) {
+    mostrarMensagem("Nenhuma moldura ativa.", "aviso");
+    return;
+  }
+  const modal = document.getElementById('modalConfig');
+  modal.classList.add('ativo');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('janelaX').value = configAtual.janela_x;
+  document.getElementById('janelaY').value = configAtual.janela_y;
+  document.getElementById('janelaLargura').value = configAtual.janela_largura;
+  document.getElementById('janelaAltura').value = configAtual.janela_altura;
+  montarEditorVisual(configAtual.moldura_url, configAtual.janela_x, configAtual.janela_y, configAtual.janela_largura, configAtual.janela_altura);
+};
 
+window.fecharModalConfig = function () {
+  document.getElementById('modalConfig').classList.remove('ativo');
+  document.body.style.overflow = '';
+};
+
+function montarEditorVisual(molduraUrl, jx, jy, jw, jh) {
+  const container = document.getElementById('editorContainer');
+  if(!container) return;
+  container.innerHTML = `
+    <img id="imgMolduraEditor" src="${molduraUrl}?t=${Date.now()}" alt="Moldura">
+    <div class="janela-editor" id="janelaEditor">
+      <div class="handle handle-nw" data-dir="nw"></div><div class="handle handle-n" data-dir="n"></div>
+      <div class="handle handle-ne" data-dir="ne"></div><div class="handle handle-e" data-dir="e"></div>
+      <div class="handle handle-se" data-dir="se"></div><div class="handle handle-s" data-dir="s"></div>
+      <div class="handle handle-sw" data-dir="sw"></div><div class="handle handle-w" data-dir="w"></div>
+    </div>`;
+  const img = document.getElementById('imgMolduraEditor');
+  img.onload = () => {
+    molduraNaturalWidth = img.naturalWidth;
+    molduraNaturalHeight = img.naturalHeight;
+    posicionarJanela(jx, jy, jw, jh);
+    ativarInteracoesEditor();
+  };
+}
+
+function posicionarJanela(xPx, yPx, wPx, hPx) {
+  const img = document.getElementById('imgMolduraEditor');
+  const janela = document.getElementById('janelaEditor');
+  if (!img || !janela || !molduraNaturalWidth) return;
+  const escala = img.clientWidth / molduraNaturalWidth;
+  janela.style.left = (xPx * escala) + 'px';
+  janela.style.top = (yPx * escala) + 'px';
+  janela.style.width = (wPx * escala) + 'px';
+  janela.style.height = (hPx * escala) + 'px';
+}
+
+function ativarInteracoesEditor() {
+  const janela = document.getElementById('janelaEditor');
+  const img = document.getElementById('imgMolduraEditor');
+  if (!janela || !img) return;
+  let modo = null, dirResize = null, startX, startY, startL, startT, startW, startH;
+  function getPos(e) { return (e.touches && e.touches.length > 0) ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY }; }
+  function iniciar(e) {
+    const isHandle = e.target.classList.contains('handle');
+    if (isHandle) { modo = 'resize'; dirResize = e.target.dataset.dir; }
+    else if (e.target === janela) { modo = 'mover'; } else return;
+    e.preventDefault();
+    const pos = getPos(e);
+    startX = pos.x; startY = pos.y; startL = janela.offsetLeft; startT = janela.offsetTop; startW = janela.offsetWidth; startH = janela.offsetHeight;
+    document.addEventListener('mousemove', mover); document.addEventListener('mouseup', parar);
+  }
+  function mover(e) {
+    if (!modo) return; e.preventDefault();
+    const pos = getPos(e); const dx = pos.x - startX; const dy = pos.y - startY;
+    let nL = startL, nT = startT, nW = startW, nH = startH;
+    if (modo === 'mover') {
+      nL = Math.max(0, Math.min(startL + dx, img.clientWidth - startW));
+      nT = Math.max(0, Math.min(startT + dy, img.clientHeight - startH));
+    } else if (modo === 'resize') {
+      if (dirResize.includes('e')) nW = Math.max(20, Math.min(startW + dx, img.clientWidth - startL));
+      if (dirResize.includes('s')) nH = Math.max(20, Math.min(startH + dy, img.clientHeight - startT));
+    }
+    janela.style.left = nL + 'px'; janela.style.top = nT + 'px'; janela.style.width = nW + 'px'; janela.style.height = nH + 'px';
+    const esc = molduraNaturalWidth / img.clientWidth;
+    document.getElementById('janelaX').value = Math.round(nL * esc);
+    document.getElementById('janelaY').value = Math.round(nT * esc);
+    document.getElementById('janelaLargura').value = Math.round(nW * esc);
+    document.getElementById('janelaAltura').value = Math.round(nH * esc);
+  }
+  function parar() { modo = null; document.removeEventListener('mousemove', mover); document.removeEventListener('mouseup', parar); }
+  janela.addEventListener('mousedown', iniciar);
+}
+
+window.salvarCoordenadas = async function () {
+  const jX = parseInt(document.getElementById('janelaX').value);
+  const jY = parseInt(document.getElementById('janelaY').value);
+  const jW = parseInt(document.getElementById('janelaLargura').value);
+  const jH = parseInt(document.getElementById('janelaAltura').value);
+  try {
+    await supabaseAdmin.from('configuracao').update({ janela_x: jX, janela_y: jY, janela_largura: jW, janela_altura: jH }).eq('id', configAtual.id);
+    mostrarMensagem("Coordenadas salvas!", "sucesso");
+    fecharModalConfig(); carregarConfiguracao();
+  } catch (err) { mostrarMensagem("Erro: " + err.message, "erro"); }
+};
+
+// ============================================================
+// 6. ✏️ REAJUSTE DE FOTO (ADMIN CROPPER)
+// ============================================================
 window.abrirReajusteAdmin = async function(nomeArquivo) {
+  if (!configAtual) return;
   fotoReajustandoNome = nomeArquivo;
   const nomeOriginal = nomeArquivo.replace('foto-', 'orig-');
-  window.mostrarMensagem("Carregando original...", "aviso");
+  mostrarMensagem("Carregando...", "aviso");
   const { data: dO } = supabaseAdmin.storage.from(BUCKET_FOTOS).getPublicUrl(nomeOriginal);
   const { data: dN } = supabaseAdmin.storage.from(BUCKET_FOTOS).getPublicUrl(nomeArquivo);
   let url = dO.publicUrl;
@@ -150,8 +357,14 @@ window.abrirReajusteAdmin = async function(nomeArquivo) {
   img.src = url;
 };
 
+function fecharModalReajusteAdmin() {
+  const m = document.getElementById('modalReajusteAdmin');
+  if (m) m.remove();
+  document.body.style.overflow = '';
+}
+
 function exibirModalReajusteAdmin() {
-  const mEx = document.getElementById('modalReajusteAdmin'); if(mEx) mEx.remove();
+  fecharModalReajusteAdmin();
   const totalW = configAtual.largura_total || 2000; const totalH = configAtual.altura_total || 2666;
   const tP = (configAtual.janela_y/totalH)*100; const lP = (configAtual.janela_x/totalW)*100;
   const wP = (configAtual.janela_largura/totalW)*100; const hP = (configAtual.janela_altura/totalH)*100;
@@ -159,7 +372,7 @@ function exibirModalReajusteAdmin() {
   modal.id = 'modalReajusteAdmin'; modal.className = 'modal-config ativo';
   modal.innerHTML = `
     <div class="modal-config-conteudo" style="max-width:380px; margin: 20px auto;">
-      <div class="modal-config-header"><h3>✏️ Reajustar Foto</h3><button class="btn-fechar-modal" onclick="document.getElementById('modalReajusteAdmin').remove();">×</button></div>
+      <div class="modal-config-header"><h3>✏️ Reajustar Foto</h3><button class="btn-fechar-modal" onclick="fecharModalReajusteAdmin()">×</button></div>
       <div class="modal-config-body" style="text-align:center; padding:16px;">
         <div id="containerCropperAdmin" style="position:relative; width:100%; max-width:320px; aspect-ratio:${totalW}/${totalH}; background:#000; overflow:hidden; border:1px solid var(--dourado); margin:0 auto; touch-action:none;">
           <div id="areaCropperAdmin" style="position:absolute; top:${tP}%; left:${lP}%; width:${wP}%; height:${hP}%; overflow:hidden; cursor:grab; background:#111;">
@@ -172,13 +385,13 @@ function exibirModalReajusteAdmin() {
           <button class="btn-sair" onclick="window.alterarZoomAdmin(+0.15)">🔍 +</button>
         </div>
         <div style="display:flex; gap:10px; margin-top:16px;">
-          <button class="btn-sair" style="flex:1" onclick="document.getElementById('modalReajusteAdmin').remove()">Cancelar</button>
-          <button class="btn-configurar" style="flex:1" onclick="window.salvarReajusteAdmin()">✓ Salvar</button>
+          <button class="btn-sair" style="flex:1" onclick="fecharModalReajusteAdmin()">Cancelar</button>
+          <button class="btn-configurar" style="flex:1" onclick="salvarReajusteAdmin()">✓ Salvar</button>
         </div>
       </div>
     </div>`;
   document.body.appendChild(modal);
-  setTimeout(iniciarInteracaoReajusteAdmin, 100);
+  setTimeout(iniciarInteracaoReajusteAdmin, 50);
 }
 
 function iniciarInteracaoReajusteAdmin() {
@@ -213,8 +426,8 @@ function atualizarTransformAdmin() {
   img.style.transform = `translate(${adminCrop.x}px, ${adminCrop.y}px) scale(${adminCrop.scale})`;
 }
 
-window.salvarReajusteAdmin = async function() {
-  window.mostrarMensagem("Salvando...", "aviso");
+async function salvarReajusteAdmin() {
+  mostrarMensagem("Salvando...", "aviso");
   const canvas = document.createElement('canvas'); canvas.width = 2000; canvas.height = 2666;
   const ctx = canvas.getContext('2d'); ctx.fillStyle = "#FFF"; ctx.fillRect(0,0,2000,2666);
   const prop = configAtual.janela_largura / adminCrop.winW;
@@ -226,22 +439,19 @@ window.salvarReajusteAdmin = async function() {
     ctx.drawImage(imgM, 0, 0, 2000, 2666);
     canvas.toBlob(async (b) => {
       await supabaseAdmin.storage.from(BUCKET_FOTOS).upload(fotoReajustandoNome, b, { cacheControl:'0', upsert:true, contentType:'image/jpeg' });
-      window.mostrarMensagem("Sucesso!", "sucesso"); 
-      const modal = document.getElementById('modalReajusteAdmin'); if(modal) modal.remove();
-      window.carregarFotos();
+      mostrarMensagem("Sucesso!", "sucesso"); fecharModalReajusteAdmin(); carregarFotos();
     }, 'image/jpeg', 0.9);
   };
   imgM.src = configAtual.moldura_url;
-};
+}
 
 // ============================================================
-// 6. FUNÇÕES DO SISTEMA (BAIXAR, APAGAR, ETC)
+// 7. OPERAÇÕES DE ARQUIVO (BAIXAR E DELETAR)
 // ============================================================
-
 window.baixarFoto = async function (url, nome) {
   const r = await fetch(url); const b = await r.blob(); saveAs(b, nome);
   await supabaseAdmin.from('fotos_status').upsert({ arquivo_nome: nome, baixada: true }, { onConflict: 'arquivo_nome' });
-  window.carregarFotos();
+  carregarFotos();
 };
 
 window.apagarFoto = async function (nome) {
@@ -249,33 +459,12 @@ window.apagarFoto = async function (nome) {
   const nO = nome.replace('foto-', 'orig-');
   await supabaseAdmin.storage.from(BUCKET_FOTOS).remove([nome, nO]);
   await supabaseAdmin.from('fotos_status').delete().eq('arquivo_nome', nome);
-  window.carregarFotos();
+  carregarFotos();
 };
 
 // ============================================================
-// 7. INICIALIZAÇÃO FINAL (DOM LOADED)
+// 8. BOOT AUTOMÁTICO AO CARREGAR
 // ============================================================
-
 document.addEventListener('DOMContentLoaded', () => {
-  // Inicia o painel
   window.mostrarPainel();
-
-  // Escuta upload de nova moldura
-  const input = document.getElementById('inputNovaMoldura');
-  if (input) {
-    input.addEventListener('change', (e) => {
-      arquivoNovaMoldura = e.target.files[0];
-      if (!arquivoNovaMoldura) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const up = document.getElementById('uploadPreview');
-        if(up) {
-          up.classList.add('tem-imagem');
-          up.innerHTML = `<img src="${ev.target.result}" style="max-width:100%; max-height:200px;"><div class="arquivo-nome">${arquivoNovaMoldura.name}</div>`;
-        }
-      };
-      reader.readAsDataURL(arquivoNovaMoldura);
-      if(document.getElementById('btnSalvarNovaMoldura')) document.getElementById('btnSalvarNovaMoldura').disabled = false;
-    });
-  }
 });
