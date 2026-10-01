@@ -1453,7 +1453,11 @@
       <div class="login-titulo">Acesso Restrito</div>
       <div class="login-sub">digite a senha para continuar</div>
 
-      </div>
+      <input type="password" id="senhaInput" placeholder="••••••"
+        onkeypress="if(event.key==='Enter') fazerLogin()">
+      <button onclick="fazerLogin()">Entrar</button>
+      <p id="erroLogin" class="erro-login"></p>
+    </div>
   </div>
 
   <!-- ============================================================
