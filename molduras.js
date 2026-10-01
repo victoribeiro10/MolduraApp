@@ -24,7 +24,7 @@ window.fazerLogin = function () {
   const erro  = document.getElementById("erroLogin");
 
   if (senha === SENHA_ADMIN) {
-    sessionStorage.setItem("moldura_admin_logado", "sim");
+    localStorage.setItem("moldura_admin_logado", "sim");
     mostrarPainel();
   } else {
     erro.textContent = "senha incorreta";
@@ -34,7 +34,7 @@ window.fazerLogin = function () {
 };
 
 window.sair = function () {
-  sessionStorage.removeItem("moldura_admin_logado");
+  localStorage.removeItem("moldura_admin_logado");
   location.reload();
 };
 
@@ -45,7 +45,7 @@ function mostrarPainel() {
   carregarFotos();
 }
 
-if (sessionStorage.getItem("moldura_admin_logado") === "sim") {
+if (localStorage.getItem("moldura_admin_logado") === "sim") {
   mostrarPainel();
 }
 
