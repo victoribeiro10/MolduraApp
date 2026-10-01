@@ -2,140 +2,235 @@
 // MODAL — ADICIONAR NOVA MOLDURA
 // ============================================================
 
+// Guarda o arquivo selecionado
+let arquivoNovaMoldura = null;
+
+
+// ============================================================
+// ABRIR MODAL
+// ============================================================
+
 window.abrirModalAdicionarMoldura = function () {
-  const modal = document.getElementById('modalAdicionarMoldura');
+  const modal = document.getElementById("modalAdicionarMoldura");
 
   if (!modal) {
     console.error('Modal "modalAdicionarMoldura" não encontrado no HTML.');
-    mostrarMensagem('Erro: modal de adicionar moldura não encontrado.', 'erro');
+
+    if (typeof window.mostrarMensagem === "function") {
+      window.mostrarMensagem(
+        "Erro: modal de adicionar moldura não encontrado.",
+        "erro"
+      );
+    }
+
     return;
   }
 
-  // Limpa os campos ao abrir
-  const nomeInput = document.getElementById('nomeNovaMoldura');
-  const arquivoInput = document.getElementById('inputNovaMoldura');
-  const preview = document.getElementById('uploadPreview');
-  const arquivoNome = document.getElementById('arquivoNome');
-  const btnSalvar = document.getElementById('btnSalvarNovaMoldura');
+  const nomeInput = document.getElementById("nomeNovaMoldura");
+  const arquivoInput = document.getElementById("inputNovaMoldura");
+  const preview = document.getElementById("uploadPreview");
+  const arquivoNome = document.getElementById("arquivoNome");
+  const btnSalvar = document.getElementById("btnSalvarNovaMoldura");
 
-  if (nomeInput) nomeInput.value = '';
-  if (arquivoInput) arquivoInput.value = '';
+  // Limpa campos
+  if (nomeInput) {
+    nomeInput.value = "";
+  }
+
+  if (arquivoInput) {
+    arquivoInput.value = "";
+  }
 
   arquivoNovaMoldura = null;
 
   if (arquivoNome) {
-    arquivoNome.textContent = '';
-    arquivoNome.style.display = 'none';
+    arquivoNome.textContent = "";
+    arquivoNome.style.display = "none";
   }
 
   if (preview) {
-    preview.classList.remove('arquivo-selecionado');
+    preview.classList.remove("arquivo-selecionado");
   }
 
   if (btnSalvar) {
     btnSalvar.disabled = true;
+
     btnSalvar.innerHTML = `
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round"
-          d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+      <svg viewBox="0 0 24 24"
+           fill="none"
+           stroke="currentColor"
+           stroke-width="2">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+        />
       </svg>
       Adicionar à Galeria
     `;
   }
 
-  modal.classList.add('ativo');
-  document.body.style.overflow = 'hidden';
+  modal.classList.add("ativo");
+  document.body.style.overflow = "hidden";
 
-  // Foca no nome
-  setTimeout(() => {
-    if (nomeInput) nomeInput.focus();
+  setTimeout(function () {
+    if (nomeInput) {
+      nomeInput.focus();
+    }
   }, 100);
 };
 
 
+// ============================================================
+// FECHAR MODAL
+// ============================================================
+
 window.fecharModalAdicionarMoldura = function () {
-  const modal = document.getElementById('modalAdicionarMoldura');
+  const modal = document.getElementById("modalAdicionarMoldura");
 
   if (modal) {
-    modal.classList.remove('ativo');
+    modal.classList.remove("ativo");
   }
 
-  document.body.style.overflow = '';
+  document.body.style.overflow = "";
 
   arquivoNovaMoldura = null;
 };
 
 
 // ============================================================
-// SELEÇÃO DO ARQUIVO DA MOLDURA
+// ATUALIZA ESTADO DO BOTÃO
 // ============================================================
 
-document.addEventListener('DOMContentLoaded', function () {
+function atualizarBotaoSalvarMoldura() {
+  const nomeInput = document.getElementById("nomeNovaMoldura");
+  const btnSalvar = document.getElementById("btnSalvarNovaMoldura");
 
-  const inputArquivo = document.getElementById('inputNovaMoldura');
-
-  if (!inputArquivo) {
-    console.warn('inputNovaMoldura não encontrado.');
+  if (!btnSalvar) {
     return;
   }
 
-  inputArquivo.addEventListener('change', function () {
+  const temNome =
+    nomeInput &&
+    nomeInput.value.trim().length > 0;
 
-    const arquivo = this.files && this.files[0];
+  const temArquivo =
+    arquivoNovaMoldura !== null;
+
+  btnSalvar.disabled = !(temNome && temArquivo);
+}
+
+
+// ============================================================
+// SELEÇÃO DO ARQUIVO
+// ============================================================
+
+function configurarUploadNovaMoldura() {
+  const inputArquivo =
+    document.getElementById("inputNovaMoldura");
+
+  const nomeInput =
+    document.getElementById("nomeNovaMoldura");
+
+  if (!inputArquivo) {
+    console.warn(
+      'Input "inputNovaMoldura" não encontrado.'
+    );
+    return;
+  }
+
+  // Evita registrar o evento duas vezes
+  if (inputArquivo.dataset.configurado === "sim") {
+    return;
+  }
+
+  inputArquivo.dataset.configurado = "sim";
+
+  inputArquivo.addEventListener("change", function () {
+    const arquivo =
+      this.files && this.files.length
+        ? this.files[0]
+        : null;
+
+    const arquivoNome =
+      document.getElementById("arquivoNome");
+
+    const preview =
+      document.getElementById("uploadPreview");
+
+    const btnSalvar =
+      document.getElementById("btnSalvarNovaMoldura");
 
     arquivoNovaMoldura = null;
 
-    const arquivoNome = document.getElementById('arquivoNome');
-    const preview = document.getElementById('uploadPreview');
-    const btnSalvar = document.getElementById('btnSalvarNovaMoldura');
-    const nomeInput = document.getElementById('nomeNovaMoldura');
-
+    // Nenhum arquivo
     if (!arquivo) {
       if (arquivoNome) {
-        arquivoNome.textContent = '';
-        arquivoNome.style.display = 'none';
+        arquivoNome.textContent = "";
+        arquivoNome.style.display = "none";
       }
 
       if (preview) {
-        preview.classList.remove('arquivo-selecionado');
+        preview.classList.remove(
+          "arquivo-selecionado"
+        );
       }
 
-      if (btnSalvar) {
-        btnSalvar.disabled = true;
-      }
+      atualizarBotaoSalvarMoldura();
 
       return;
     }
 
-    // Verifica formato
+    // ========================================================
+    // VERIFICA TIPO
+    // ========================================================
+
     const tiposPermitidos = [
-      'image/png',
-      'image/jpeg'
+      "image/png",
+      "image/jpeg"
     ];
 
     if (!tiposPermitidos.includes(arquivo.type)) {
-      mostrarMensagem(
-        'Selecione uma imagem PNG ou JPG.',
-        'erro'
-      );
+      if (typeof window.mostrarMensagem === "function") {
+        window.mostrarMensagem(
+          "Selecione uma imagem PNG ou JPG.",
+          "erro"
+        );
+      }
 
-      this.value = '';
+      this.value = "";
+
+      atualizarBotaoSalvarMoldura();
+
       return;
     }
 
-    // Limite de tamanho: 20 MB
+    // ========================================================
+    // LIMITE DE TAMANHO
+    // ========================================================
+
     const limiteMB = 20;
-    const limiteBytes = limiteMB * 1024 * 1024;
+    const limiteBytes =
+      limiteMB * 1024 * 1024;
 
     if (arquivo.size > limiteBytes) {
-      mostrarMensagem(
-        `A moldura é muito grande. O limite é ${limiteMB} MB.`,
-        'erro'
-      );
+      if (typeof window.mostrarMensagem === "function") {
+        window.mostrarMensagem(
+          `A moldura é muito grande. O limite é ${limiteMB} MB.`,
+          "erro"
+        );
+      }
 
-      this.value = '';
+      this.value = "";
+
+      atualizarBotaoSalvarMoldura();
+
       return;
     }
+
+    // ========================================================
+    // GUARDA ARQUIVO
+    // ========================================================
 
     arquivoNovaMoldura = arquivo;
 
@@ -143,50 +238,52 @@ document.addEventListener('DOMContentLoaded', function () {
       arquivoNome.textContent =
         `${arquivo.name} • ${(arquivo.size / (1024 * 1024)).toFixed(1)} MB`;
 
-      arquivoNome.style.display = 'block';
+      arquivoNome.style.display = "block";
     }
 
     if (preview) {
-      preview.classList.add('arquivo-selecionado');
+      preview.classList.add(
+        "arquivo-selecionado"
+      );
     }
 
-    // Só libera o botão se tiver nome + arquivo
-    const temNome =
-      nomeInput &&
-      nomeInput.value.trim().length > 0;
-
-    if (btnSalvar) {
-      btnSalvar.disabled = !temNome;
-    }
+    atualizarBotaoSalvarMoldura();
   });
 
+  // ==========================================================
+  // NOME DA MOLDURA
+  // ==========================================================
 
-  // ============================================================
-  // HABILITA BOTÃO QUANDO DIGITAR O NOME
-  // ============================================================
+  if (
+    nomeInput &&
+    nomeInput.dataset.configurado !== "sim"
+  ) {
+    nomeInput.dataset.configurado = "sim";
 
-  const nomeInput = document.getElementById('nomeNovaMoldura');
-
-  if (nomeInput) {
-
-    nomeInput.addEventListener('input', function () {
-
-      const btnSalvar =
-        document.getElementById('btnSalvarNovaMoldura');
-
-      const temNome =
-        this.value.trim().length > 0;
-
-      const temArquivo =
-        arquivoNovaMoldura !== null;
-
-      if (btnSalvar) {
-        btnSalvar.disabled = !(temNome && temArquivo);
-      }
-    });
+    nomeInput.addEventListener(
+      "input",
+      atualizarBotaoSalvarMoldura
+    );
   }
+}
 
-});
+
+// ============================================================
+// INICIALIZA EVENTOS
+// ============================================================
+
+if (document.readyState === "loading") {
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    configurarUploadNovaMoldura
+  );
+
+} else {
+
+  configurarUploadNovaMoldura();
+
+}
 
 
 // ============================================================
@@ -196,77 +293,120 @@ document.addEventListener('DOMContentLoaded', function () {
 window.salvarNovaMoldura = async function () {
 
   const nomeInput =
-    document.getElementById('nomeNovaMoldura');
+    document.getElementById("nomeNovaMoldura");
 
   const btnSalvar =
-    document.getElementById('btnSalvarNovaMoldura');
+    document.getElementById("btnSalvarNovaMoldura");
+
+  // ==========================================================
+  // VALIDA CAMPOS
+  // ==========================================================
 
   if (!nomeInput) {
-    mostrarMensagem(
-      'Campo de nome da moldura não encontrado.',
-      'erro'
-    );
+    if (typeof window.mostrarMensagem === "function") {
+      window.mostrarMensagem(
+        "Campo de nome da moldura não encontrado.",
+        "erro"
+      );
+    }
+
     return;
   }
 
-  const nome = nomeInput.value.trim();
+  const nome =
+    nomeInput.value.trim();
 
-  // Validações
   if (!nome) {
-    mostrarMensagem(
-      'Digite um nome para a moldura.',
-      'aviso'
-    );
+    if (typeof window.mostrarMensagem === "function") {
+      window.mostrarMensagem(
+        "Digite um nome para a moldura.",
+        "aviso"
+      );
+    }
 
     nomeInput.focus();
+
     return;
   }
 
   if (!arquivoNovaMoldura) {
-    mostrarMensagem(
-      'Selecione o arquivo da moldura.',
-      'aviso'
-    );
+    if (typeof window.mostrarMensagem === "function") {
+      window.mostrarMensagem(
+        "Selecione o arquivo da moldura.",
+        "aviso"
+      );
+    }
+
     return;
   }
 
-  // Evita dois cliques
+  // ==========================================================
+  // BLOQUEIA BOTÃO
+  // ==========================================================
+
   if (btnSalvar) {
+
     btnSalvar.disabled = true;
+
     btnSalvar.innerHTML = `
-      <svg viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round"
+      <svg viewBox="0 0 24 24"
+           fill="none"
+           stroke="currentColor"
+           stroke-width="2">
+        <path
+          stroke-linecap="round"
           stroke-linejoin="round"
-          d="M12 3v18m9-9H3"/>
+          d="M12 3v18m9-9H3"
+        />
       </svg>
       Enviando moldura...
     `;
   }
 
+  let nomeArquivo = null;
+
   try {
 
-    mostrarMensagem(
-      'Enviando moldura para a galeria...',
-      'aviso'
-    );
+    if (
+      typeof window.supabaseAdmin === "undefined" &&
+      typeof supabaseAdmin === "undefined"
+    ) {
+      throw new Error(
+        "Supabase não foi inicializado."
+      );
+    }
 
     // ========================================================
-    // GERA NOME ÚNICO PARA O ARQUIVO
+    // MENSAGEM
+    // ========================================================
+
+    if (typeof window.mostrarMensagem === "function") {
+      window.mostrarMensagem(
+        "Enviando moldura para a galeria...",
+        "aviso"
+      );
+    }
+
+    // ========================================================
+    // EXTENSÃO
     // ========================================================
 
     const extensao =
-      arquivoNovaMoldura.type === 'image/png'
-        ? 'png'
-        : 'jpg';
+      arquivoNovaMoldura.type === "image/png"
+        ? "png"
+        : "jpg";
 
-    const nomeArquivo =
+    // ========================================================
+    // NOME ÚNICO
+    // ========================================================
+
+    nomeArquivo =
       `${Date.now()}-${Math.random()
         .toString(36)
         .substring(2, 8)}.${extensao}`;
 
     // ========================================================
-    // UPLOAD PARA O BUCKET "molduras"
+    // UPLOAD
     // ========================================================
 
     const { error: erroUpload } =
@@ -276,9 +416,10 @@ window.salvarNovaMoldura = async function () {
           nomeArquivo,
           arquivoNovaMoldura,
           {
-            cacheControl: '3600',
+            cacheControl: "3600",
             upsert: false,
-            contentType: arquivoNovaMoldura.type
+            contentType:
+              arquivoNovaMoldura.type
           }
         );
 
@@ -287,136 +428,201 @@ window.salvarNovaMoldura = async function () {
     }
 
     // ========================================================
-    // PEGA URL PÚBLICA
+    // URL PÚBLICA
     // ========================================================
 
     const { data: urlData } =
       supabaseAdmin.storage
         .from(BUCKET_MOLDURAS)
-        .getPublicUrl(nomeArquivo);
+        .getPublicUrl(
+          nomeArquivo
+        );
 
-    if (!urlData || !urlData.publicUrl) {
+    if (
+      !urlData ||
+      !urlData.publicUrl
+    ) {
       throw new Error(
-        'Não foi possível obter a URL pública da moldura.'
+        "Não foi possível obter a URL pública da moldura."
       );
     }
 
-    const molduraUrl = urlData.publicUrl;
-
-
-    // ========================================================
-    // DESCOBRE DIMENSÕES DA MOLDURA
-    // ========================================================
-
-    const dimensoes = await new Promise((resolve, reject) => {
-
-      const img = new Image();
-
-      img.onload = function () {
-        resolve({
-          largura: img.naturalWidth,
-          altura: img.naturalHeight
-        });
-      };
-
-      img.onerror = function () {
-        reject(
-          new Error(
-            'Não foi possível ler as dimensões da moldura.'
-          )
-        );
-      };
-
-      img.src = molduraUrl + '?t=' + Date.now();
-    });
-
+    const molduraUrl =
+      urlData.publicUrl;
 
     // ========================================================
-    // CRIA REGISTRO NA GALERIA
+    // DESCOBRE DIMENSÕES
+    // ========================================================
+
+    const dimensoes =
+      await new Promise(
+        function (resolve, reject) {
+
+          const img =
+            new Image();
+
+          img.onload =
+            function () {
+
+              resolve({
+                largura:
+                  img.naturalWidth,
+
+                altura:
+                  img.naturalHeight
+              });
+
+            };
+
+          img.onerror =
+            function () {
+
+              reject(
+                new Error(
+                  "Não foi possível ler as dimensões da moldura."
+                )
+              );
+
+            };
+
+          img.src =
+            molduraUrl +
+            "?t=" +
+            Date.now();
+        }
+      );
+
+    // ========================================================
+    // SALVA NO BANCO
     // ========================================================
 
     const { data: novaMoldura, error: erroBanco } =
       await supabaseAdmin
-        .from('molduras_galeria')
+        .from("molduras_galeria")
         .insert({
           nome: nome,
           arquivo_nome: nomeArquivo,
           moldura_url: molduraUrl,
 
-          // Nova moldura começa desativada
           ativa: false,
 
-          // Dimensões reais da moldura
-          largura_total: dimensoes.largura,
-          altura_total: dimensoes.altura,
+          largura_total:
+            dimensoes.largura,
 
-          // Valores iniciais da janela
+          altura_total:
+            dimensoes.altura,
+
           janela_x: 0,
           janela_y: 0,
-          janela_largura: dimensoes.largura,
-          janela_altura: dimensoes.altura
+
+          janela_largura:
+            dimensoes.largura,
+
+          janela_altura:
+            dimensoes.altura
         })
         .select()
         .single();
 
+    // ========================================================
+    // SE BANCO FALHAR, REMOVE ARQUIVO
+    // ========================================================
+
     if (erroBanco) {
 
-      // Se o upload funcionou mas o banco falhou,
-      // tenta remover o arquivo para não deixar lixo no bucket.
-      await supabaseAdmin.storage
-        .from(BUCKET_MOLDURAS)
-        .remove([nomeArquivo]);
+      try {
+
+        await supabaseAdmin.storage
+          .from(BUCKET_MOLDURAS)
+          .remove([
+            nomeArquivo
+          ]);
+
+      } catch (erroRemocao) {
+
+        console.warn(
+          "Não foi possível remover o arquivo após erro no banco:",
+          erroRemocao
+        );
+
+      }
 
       throw erroBanco;
     }
-
 
     // ========================================================
     // SUCESSO
     // ========================================================
 
     console.log(
-      'Nova moldura cadastrada:',
+      "Nova moldura cadastrada:",
       novaMoldura
     );
 
-    mostrarMensagem(
-      `Moldura "${nome}" adicionada à galeria!`,
-      'sucesso'
-    );
+    if (typeof window.mostrarMensagem === "function") {
+      window.mostrarMensagem(
+        `Moldura "${nome}" adicionada à galeria!`,
+        "sucesso"
+      );
+    }
 
-    fecharModalAdicionarMoldura();
+    // Fecha modal
+    window.fecharModalAdicionarMoldura();
 
-    // Atualiza a galeria
-    await carregarGaleriaMolduras();
+    // ========================================================
+    // ATUALIZA GALERIA
+    // ========================================================
+
+    if (
+      typeof window.carregarGaleriaMolduras ===
+      "function"
+    ) {
+      await window.carregarGaleriaMolduras();
+
+    } else if (
+      typeof carregarGaleriaMolduras ===
+      "function"
+    ) {
+      await carregarGaleriaMolduras();
+    }
 
   } catch (err) {
 
     console.error(
-      'Erro ao adicionar moldura:',
+      "Erro ao adicionar moldura:",
       err
     );
 
-    mostrarMensagem(
-      'Erro ao adicionar moldura: ' +
-      (err.message || err),
-      'erro'
-    );
+    if (typeof window.mostrarMensagem === "function") {
+      window.mostrarMensagem(
+        "Erro ao adicionar moldura: " +
+        (err && err.message
+          ? err.message
+          : err),
+        "erro"
+      );
+    }
 
   } finally {
 
+    // ========================================================
+    // RESTAURA BOTÃO
+    // ========================================================
+
     if (btnSalvar) {
 
-      btnSalvar.disabled =
-        !(document.getElementById('nomeNovaMoldura')?.value.trim()
-          && arquivoNovaMoldura);
+      atualizarBotaoSalvarMoldura();
 
       btnSalvar.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round"
+        <svg viewBox="0 0 24 24"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="2">
+          <path
+            stroke-linecap="round"
             stroke-linejoin="round"
-            d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+            d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+          />
         </svg>
         Adicionar à Galeria
       `;
@@ -424,11 +630,25 @@ window.salvarNovaMoldura = async function () {
   }
 };
 
+
 // ============================================================
 // RESTAURAR LOGIN AUTOMATICAMENTE
 // ============================================================
-setTimeout(() => {
-  if (sessionStorage.getItem("moldura_admin_logado") === "sim") {
-    mostrarPainel();
+
+setTimeout(function () {
+
+  if (
+    sessionStorage.getItem(
+      "moldura_admin_logado"
+    ) === "sim"
+  ) {
+
+    if (
+      typeof window.mostrarPainel ===
+      "function"
+    ) {
+      window.mostrarPainel();
+    }
   }
+
 }, 0);
