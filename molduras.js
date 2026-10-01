@@ -51,10 +51,6 @@ function mostrarPainel() {
   carregarFotos();
 }
 
-if (sessionStorage.getItem("moldura_admin_logado") === "sim") {
-  mostrarPainel();
-}
-
 // ============================================================
 // MENSAGENS
 // ============================================================
@@ -1113,3 +1109,11 @@ async function apagarTudo() {
     btnApagar.disabled = false;
   }
 }
+// ============================================================
+// RESTAURAR LOGIN AUTOMATICAMENTE
+// ============================================================
+setTimeout(() => {
+  if (sessionStorage.getItem("moldura_admin_logado") === "sim") {
+    mostrarPainel();
+  }
+}, 0);
