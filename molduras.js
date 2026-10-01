@@ -1,3 +1,22 @@
+// --- FUNÇÃO DE CARREGAR CONFIGURAÇÃO (FALTANDO NO CÓDIGO) ---
+async function carregarConfiguracao() {
+    try {
+        const { data, error } = await _supabase
+            .from('configuracao')
+            .select('*')
+            .maybeSingle(); // Usar maybeSingle evita erro se a tabela estiver vazia
+
+        if (error) {
+            console.warn("Aviso ao buscar configuração:", error.message);
+            return null;
+        }
+
+        return data;
+    } catch (err) {
+        console.error("Erro em carregarConfiguracao:", err);
+        return null;
+    }
+}
 // ============================================================
 // 1. CONFIGURAÇÃO SUPABASE
 // ============================================================
