@@ -17,6 +17,10 @@ const BUCKET_MOLDURAS = "molduras";
 
 const SENHA_ADMIN = "admin";
 
+// Mostrado no rodapé do editor e no console.
+// Serve para conferir rapidamente qual versão está publicada.
+const VERSAO_ADMIN = "v3";
+
 const supabaseAdmin =
   window.supabase.createClient(
     SUPABASE_URL,
@@ -4823,7 +4827,8 @@ async function (
       if (aviso) {
 
         aviso.textContent =
-          "Esta foto não tem a imagem original salva: o ajuste é feito recortando só a área da moldura. Arraste e use o zoom para reposicionar.";
+          "Esta foto não tem a imagem original salva: o ajuste é feito recortando só a área da moldura. Arraste e use o zoom para reposicionar. • editor " +
+          VERSAO_ADMIN;
 
         aviso.style.color =
           "var(--dourado)";
@@ -5484,6 +5489,19 @@ function exibirModalReajusteAdmin() {
           "
         >
           Arraste a foto para posicionar • use o zoom para aproximar
+        </div>
+
+
+        <div
+          style="
+            margin-top:6px;
+            font-size:10px;
+            letter-spacing:1px;
+            color:var(--cinza-suave);
+            opacity:0.5;
+          "
+        >
+          editor ${VERSAO_ADMIN}
         </div>
 
       </div>
@@ -6377,6 +6395,13 @@ async function () {
 // ============================================================
 
 function inicializarPainel() {
+
+  console.info(
+    "Painel EntreClicks — admin " +
+    VERSAO_ADMIN +
+    " (editor de foto usa a imagem original, sem moldura)"
+  );
+
 
   // ==========================================================
   // CONFIGURA UPLOAD

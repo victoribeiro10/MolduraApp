@@ -1673,8 +1673,18 @@
 
         // Envia a foto original (sem moldura) junto da foto emoldurada.
         // Ex.: foto-123-abc.jpg  ->  originais/orig-123-abc.jpg
-        // Fica numa pasta separada para não aparecer na galeria do painel.
-        const PASTA_ORIGINAIS = 'originais/';
+        // A pasta mantém as originais fora da galeria do painel.
+
+        async function subirOriginal(nome, blobOrig) {
+            return supabaseClient
+                .storage
+                .from(BUCKET_FOTOS)
+                .upload(nome, blobOrig, {
+                    cacheControl: '3600',
+                    upsert:       false,
+                    contentType:  'image/jpeg'
+                });
+        }
 
         async function enviarFotoOriginal(nomeArquivoFoto, fonte) {
             try {
@@ -1684,19 +1694,19 @@
                 const nomeBase = nomeArquivoFoto.replace('foto-', 'orig-');
                 if (nomeBase === nomeArquivoFoto) return;
 
-                const nomeOriginal = PASTA_ORIGINAIS + nomeBase;
+                // 1ª tentativa: pasta 'originais/' (não aparece no painel)
+                const { error } = await subirOriginal('originais/' + nomeBase, blobOrig);
+                if (!error) return;
 
-                const { error } = await supabaseClient
-                    .storage
-                    .from(BUCKET_FOTOS)
-                    .upload(nomeOriginal, blobOrig, {
-                        cacheControl: '3600',
-                        upsert:       false,
-                        contentType:  'image/jpeg'
-                    });
+                // 2ª tentativa: raiz do bucket. O painel também esconde
+                // esse formato, então funciona mesmo se a policy do
+                // bucket não permitir criar pastas.
+                console.warn('Aviso: falhou em originais/, tentando a raiz:', error.message);
+                const { error: erroRaiz } = await subirOriginal(nomeBase, blobOrig);
 
-                // Falha no original não pode derrubar o envio da foto emoldurada
-                if (error) console.warn('Aviso: original nao enviada:', error);
+                if (erroRaiz) {
+                    console.warn('Aviso: original nao enviada:', erroRaiz.message);
+                }
             } catch (err) {
                 console.warn('Aviso: original nao enviada:', err);
             }
