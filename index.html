@@ -799,6 +799,11 @@
         let imagemOriginal = null;
         let fotoJaEnviada  = false;
 
+        // Foto de origem (sem moldura) do envio atual.
+        // Vai para o servidor como "orig-..." e é usada no "Ajustar foto" do painel admin.
+        let origemEnvio = null;
+        const LADO_MAX_ORIGINAL = 2000;
+
         let ajuste = { x: 0, y: 0, scale: 1, initialScale: 1 };
 
         let fotosLote          = [];
@@ -1058,6 +1063,7 @@
                 const img  = new Image();
                 img.onload = () => {
                     imagemOriginal = img;
+                    origemEnvio    = img;
                     mostrarTela('ajuste');
                     setTimeout(() => {
                         iniciarAjuste();
@@ -1511,6 +1517,13 @@
                 ctx.drawImage(moldura, 0, 0, MOLDURA.larguraTotal, MOLDURA.alturaTotal);
             }
 
+            // Guarda o quadro original da câmera (sem moldura) para o painel admin
+            const canvasOrigem = document.createElement('canvas');
+            canvasOrigem.width  = video.videoWidth;
+            canvasOrigem.height = video.videoHeight;
+            canvasOrigem.getContext('2d').drawImage(video, 0, 0);
+            origemEnvio = canvasOrigem;
+
             fotoJaEnviada = false;
             mostrarTela('resultado');
         });
@@ -1636,15 +1649,53 @@
             });
         }
 
-        // Helper pra extrair Blob da imagem original enviada
-        async function obterBlobOriginal() {
-            if (!imagemOriginal) return null;
+        // Helper pra extrair Blob da imagem original enviada (sem moldura)
+        async function obterBlobOriginal(fonte) {
+            if (!fonte) return null;
+
+            const larguraOrig = fonte.naturalWidth  || fonte.width;
+            const alturaOrig  = fonte.naturalHeight || fonte.height;
+            if (!larguraOrig || !alturaOrig) return null;
+
+            const fator = Math.min(1, LADO_MAX_ORIGINAL / Math.max(larguraOrig, alturaOrig));
+
             const canvasOrig = document.createElement('canvas');
-            canvasOrig.width = imagemOriginal.naturalWidth || imagemOriginal.width;
-            canvasOrig.height = imagemOriginal.naturalHeight || imagemOriginal.height;
+            canvasOrig.width  = Math.max(1, Math.round(larguraOrig * fator));
+            canvasOrig.height = Math.max(1, Math.round(alturaOrig  * fator));
+
             const ctxOrig = canvasOrig.getContext('2d');
-            ctxOrig.drawImage(imagemOriginal, 0, 0);
-            return new Promise(res => canvasOrig.toBlob(res, 'image/jpeg', 0.85));
+            ctxOrig.imageSmoothingEnabled = true;
+            ctxOrig.imageSmoothingQuality = 'high';
+            ctxOrig.drawImage(fonte, 0, 0, canvasOrig.width, canvasOrig.height);
+
+            return new Promise(res => canvasOrig.toBlob(res, 'image/jpeg', 0.88));
+        }
+
+        // Envia a foto original (sem moldura) junto da foto emoldurada.
+        // Ex.: foto-123-abc.jpg  ->  orig-123-abc.jpg
+        // É essa imagem que o painel admin usa ao clicar em "Ajustar foto".
+        async function enviarFotoOriginal(nomeArquivoFoto, fonte) {
+            try {
+                const blobOrig = await obterBlobOriginal(fonte);
+                if (!blobOrig) return;
+
+                const nomeOriginal = nomeArquivoFoto.replace('foto-', 'orig-');
+                if (nomeOriginal === nomeArquivoFoto) return;
+
+                const { error } = await supabaseClient
+                    .storage
+                    .from(BUCKET_FOTOS)
+                    .upload(nomeOriginal, blobOrig, {
+                        cacheControl: '3600',
+                        upsert:       false,
+                        contentType:  'image/jpeg'
+                    });
+
+                // Falha no original não pode derrubar o envio da foto emoldurada
+                if (error) console.warn('Aviso: original nao enviada:', error);
+            } catch (err) {
+                console.warn('Aviso: original nao enviada:', err);
+            }
         }
 
         // ENVIAR FOTO ÚNICA
@@ -1733,6 +1784,9 @@
 
                 if (error) throw error;
 
+                // 2. Upload da foto original (sem moldura), usada no "Ajustar foto" do admin
+                await enviarFotoOriginal(nomeArquivo, origemEnvio);
+
                            clearInterval(intervalUpload);
 
                 atualizarProgresso(100);
@@ -1819,6 +1873,9 @@
                         });
 
                     if (error) throw error;
+
+                    // Envia a foto original (sem moldura) da mesma imagem
+                    await enviarFotoOriginal(nomeArquivo, foto.imagemOriginal);
 
                                         enviadas++;
                     atualizarProgresso(pctFim, `Foto ${numero} enviada!`, `${numero} de ${total}`);

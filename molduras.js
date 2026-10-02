@@ -25,6 +25,42 @@ const supabaseAdmin =
 
 
 // ============================================================
+// NOMES DOS ARQUIVOS NO BUCKET
+// ============================================================
+//
+// Cada foto enviada pelo cliente gera 2 arquivos:
+//
+//   foto-<timestamp>-<aleatorio>.jpg  → foto com a moldura aplicada (impressão)
+//   orig-<timestamp>-<aleatorio>.jpg  → foto original, sem moldura (ajustes)
+//
+// O editor do painel admin trabalha SEMPRE em cima do "orig-",
+// senão a moldura é aplicada duas vezes (moldura duplicada).
+
+const PREFIXO_FOTO     = "foto-";
+const PREFIXO_ORIGINAL = "orig-";
+
+
+function nomeDaFotoOriginal(nomeFoto) {
+
+  const nome =
+    String(nomeFoto || "");
+
+  if (nome.indexOf(PREFIXO_FOTO) !== 0) {
+    return nome;
+  }
+
+  return PREFIXO_ORIGINAL +
+    nome.slice(PREFIXO_FOTO.length);
+}
+
+
+function ehFotoOriginal(nome) {
+
+  return String(nome || "").indexOf(PREFIXO_ORIGINAL) === 0;
+}
+
+
+// ============================================================
 // VARIÁVEIS GLOBAIS
 // ============================================================
 
@@ -50,6 +86,13 @@ let fotoReajustandoNome = null;
 
 let imgOriginalReajuste = null;
 
+// Imagem mostrada dentro da área de recorte do modal de reajuste.
+// Pode ser a URL da foto original ou um dataURL extraído da foto emoldurada.
+let fonteReajusteUrl = null;
+
+// Avisa que a foto não tem "orig-" no bucket (fotos antigas)
+let reajusteVeioDaMoldura = false;
+
 let adminCrop = {
   x: 0,
   y: 0,
@@ -59,6 +102,9 @@ let adminCrop = {
   winW: 0,
   winH: 0
 };
+
+// Ajuste com que o modal de reajuste abriu (para detectar se mexeram na foto)
+let adminCropInicial = null;
 
 
 // ============================================================
@@ -3415,6 +3461,88 @@ function () {
 
 
 // ============================================================
+// LISTAR ARQUIVOS DO BUCKET (COM PAGINAÇÃO)
+// ============================================================
+//
+// Cada foto tem 2 arquivos (foto- e orig-), então uma única
+// chamada com limite 1000 esconderia metade das fotos.
+
+async function listarArquivosDoBucket() {
+
+  const todos =
+    [];
+
+  const passo =
+    1000;
+
+  let offset =
+    0;
+
+
+  while (true) {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseAdmin
+        .storage
+        .from(
+          BUCKET_FOTOS
+        )
+        .list(
+          "",
+          {
+            limit:
+              passo,
+
+            offset:
+              offset,
+
+            sortBy: {
+              column:
+                "created_at",
+
+              order:
+                "asc"
+            }
+          }
+        );
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    if (
+      !data ||
+      data.length === 0
+    ) {
+      break;
+    }
+
+
+    todos.push(
+      ...data
+    );
+
+
+    if (data.length < passo) {
+      break;
+    }
+
+
+    offset +=
+      passo;
+  }
+
+
+  return todos;
+}
+
+
+// ============================================================
 // CARREGAR FOTOS
 // ============================================================
 
@@ -3467,34 +3595,8 @@ async function () {
     await carregarStatusFotos();
 
 
-    const {
-      data: arquivos,
-      error
-    } =
-      await supabaseAdmin
-        .storage
-        .from(
-          BUCKET_FOTOS
-        )
-        .list(
-          "",
-          {
-            limit: 1000,
-
-            sortBy: {
-              column:
-                "created_at",
-
-              order:
-                "asc"
-            }
-          }
-        );
-
-
-    if (error) {
-      throw error;
-    }
+    const arquivos =
+      await listarArquivosDoBucket();
 
 
     if (
@@ -3533,13 +3635,17 @@ async function () {
 
     // ========================================================
     // IGNORA ARQUIVOS SEM METADATA
+    // E AS FOTOS ORIGINAIS (orig-...), QUE NÃO SÃO FOTOS EMOLDURADAS
     // ========================================================
 
     fotosCarregadas =
       arquivos.filter(
         f =>
           f.name &&
-          f.metadata
+          f.metadata &&
+          !ehFotoOriginal(
+            f.name
+          )
       );
 
 
@@ -3752,6 +3858,50 @@ async function (
 
     if (error) {
       throw error;
+    }
+
+
+    // Remove também a foto original (sem moldura), quando existir
+    const nomeOriginal =
+      nomeDaFotoOriginal(
+        nome
+      );
+
+
+    if (
+      nomeOriginal !==
+      nome
+    ) {
+
+      try {
+
+        const {
+          error: errOriginal
+        } =
+          await supabaseAdmin
+            .storage
+            .from(
+              BUCKET_FOTOS
+            )
+            .remove([
+              nomeOriginal
+            ]);
+
+
+        if (errOriginal) {
+          console.warn(
+            "Aviso ao remover foto original:",
+            errOriginal
+          );
+        }
+
+      } catch (errOriginal) {
+
+        console.warn(
+          "Aviso ao remover foto original:",
+          errOriginal
+        );
+      }
     }
 
 
@@ -4163,34 +4313,27 @@ async function apagarTudo() {
     limparMensagem();
 
 
-    const {
-      data: arquivos,
-      error
-    } =
-      await supabaseAdmin
-        .storage
-        .from(
-          BUCKET_FOTOS
-        )
-        .list(
-          "",
-          {
-            limit: 1000
-          }
-        );
+    const arquivos =
+      await listarArquivosDoBucket();
 
 
-    if (error) {
-      throw error;
-    }
-
-
+    // Apaga tudo, inclusive as fotos originais (orig-...)
     const fotos =
       arquivos.filter(
         f =>
           f.name &&
           f.metadata
       );
+
+
+    // Nas mensagens conta apenas as fotos emolduradas
+    const totalFotosEmolduradas =
+      fotos.filter(
+        f =>
+          !ehFotoOriginal(
+            f.name
+          )
+      ).length;
 
 
     if (
@@ -4227,7 +4370,7 @@ async function apagarTudo() {
     if (progressoTexto) {
 
       progressoTexto.textContent =
-        `Apagando ${fotos.length} foto(s)...`;
+        `Apagando ${totalFotosEmolduradas} foto(s)...`;
     }
 
 
@@ -4292,7 +4435,7 @@ async function apagarTudo() {
 
 
         window.mostrarMensagem(
-          `${fotos.length} foto(s) apagada(s)! Bucket limpo.`,
+          `${totalFotosEmolduradas} foto(s) apagada(s)! Bucket limpo.`,
           "sucesso"
         );
 
@@ -4378,16 +4521,48 @@ async function (
   fotoReajustandoNome =
     nomeArquivo;
 
+  fonteReajusteUrl =
+    null;
+
+  reajusteVeioDaMoldura =
+    false;
+
 
   // ==========================================================
-  // PROCURA FOTO ORIGINAL
+  // URLS DAS FOTOS (EMOLDURADA E ORIGINAL)
   // ==========================================================
 
   const nomeOriginal =
-    nomeArquivo.replace(
-      "foto-",
-      "orig-"
+    nomeDaFotoOriginal(
+      nomeArquivo
     );
+
+
+  const urlFoto =
+    supabaseAdmin
+      .storage
+      .from(
+        BUCKET_FOTOS
+      )
+      .getPublicUrl(
+        nomeArquivo
+      )
+      .data.publicUrl;
+
+
+  const urlOriginal =
+    nomeOriginal !==
+    nomeArquivo
+      ? supabaseAdmin
+          .storage
+          .from(
+            BUCKET_FOTOS
+          )
+          .getPublicUrl(
+            nomeOriginal
+          )
+          .data.publicUrl
+      : null;
 
 
   window.mostrarMensagem(
@@ -4396,39 +4571,185 @@ async function (
   );
 
 
-  const {
-    data: dO
-  } =
-    supabaseAdmin
-      .storage
-      .from(
-        BUCKET_FOTOS
+  try {
+
+    // ========================================================
+    // 1) TENTA A FOTO ORIGINAL (SEM MOLDURA)
+    // ========================================================
+
+    let imagemFonte =
+      null;
+
+
+    if (
+      urlOriginal &&
+      await arquivoExisteNoStorage(
+        urlOriginal
       )
-      .getPublicUrl(
-        nomeOriginal
+    ) {
+
+      try {
+
+        imagemFonte =
+          await carregarImagemDeUrl(
+            urlOriginal
+          );
+
+      } catch (errOriginal) {
+
+        console.warn(
+          "Aviso: não foi possível abrir a foto original:",
+          errOriginal
+        );
+
+        imagemFonte =
+          null;
+      }
+    }
+
+
+    // ========================================================
+    // 2) USA A FOTO ORIGINAL
+    // ========================================================
+
+    if (imagemFonte) {
+
+      imgOriginalReajuste =
+        imagemFonte;
+
+
+      fonteReajusteUrl =
+        imagemFonte.src;
+
+    } else {
+
+      // ======================================================
+      // 3) FOTO ANTIGA: NÃO TEM ORIGINAL SALVO
+      //
+      // Usa a foto já emoldurada, mas recortando somente a
+      // área da janela (onde está a foto). Assim a moldura
+      // não é desenhada de novo por cima da foto.
+      // ======================================================
+
+      const imagemEmoldurada =
+        await carregarImagemDeUrl(
+          urlFoto
+        );
+
+
+      const canvasFoto =
+        extrairFotoDaMoldura(
+          imagemEmoldurada
+        );
+
+
+      imgOriginalReajuste =
+        canvasFoto;
+
+
+      fonteReajusteUrl =
+        canvasFoto.toDataURL(
+          "image/jpeg",
+          0.92
+        );
+
+
+      reajusteVeioDaMoldura =
+        true;
+    }
+
+
+    exibirModalReajusteAdmin();
+
+
+    if (reajusteVeioDaMoldura) {
+
+      window.mostrarMensagem(
+        "Esta foto não tem a original salva. Use o zoom para reposicionar a foto dentro da janela.",
+        "aviso"
       );
+    }
 
 
-  const {
-    data: dN
-  } =
-    supabaseAdmin
-      .storage
-      .from(
-        BUCKET_FOTOS
-      )
-      .getPublicUrl(
-        nomeArquivo
-      );
+  } catch (err) {
+
+    console.error(
+      "Erro ao abrir ajuste:",
+      err
+    );
 
 
-  let url =
-    dO.publicUrl;
+    window.mostrarMensagem(
+      "Não foi possível carregar a foto para ajuste.",
+      "erro"
+    );
+  }
+};
 
 
-  // ==========================================================
-  // TESTA ORIGINAL
-  // ==========================================================
+// ============================================================
+// CARREGAR IMAGEM DE UMA URL
+// ============================================================
+
+function carregarImagemDeUrl(
+  url
+) {
+
+  return new Promise(
+    function (
+      resolve,
+      reject
+    ) {
+
+      const img =
+        new Image();
+
+
+      img.crossOrigin =
+        "anonymous";
+
+
+      img.onload =
+        function () {
+
+          resolve(
+            img
+          );
+        };
+
+
+      img.onerror =
+        function () {
+
+          reject(
+            new Error(
+              "Não foi possível carregar a imagem."
+            )
+          );
+        };
+
+
+      img.src =
+        url +
+        (
+          url.includes("?")
+            ? "&"
+            : "?"
+        ) +
+        "t=" +
+        Date.now();
+    }
+  );
+}
+
+
+// ============================================================
+// VERIFICA SE O ARQUIVO EXISTE NO STORAGE
+// ============================================================
+
+async function arquivoExisteNoStorage(
+  url
+) {
 
   try {
 
@@ -4442,62 +4763,177 @@ async function (
       );
 
 
-    if (!response.ok) {
-      url =
-        dN.publicUrl;
-    }
-
+    return response.ok;
 
   } catch (e) {
 
-    url =
-      dN.publicUrl;
+    return false;
   }
+}
 
 
-  // ==========================================================
-  // CARREGA IMAGEM
-  // ==========================================================
+// ============================================================
+// EXTRAI A FOTO DE DENTRO DA MOLDURA
+// ============================================================
+//
+// Usado apenas em fotos antigas, enviadas antes de existir o
+// arquivo "orig-" no bucket.
+//
+// A janela da moldura é justamente o buraco por onde a foto
+// aparece. Recortando esse retângulo, sobra só a foto — sem
+// nenhum pedaço da moldura.
 
-  const img =
-    new Image();
+function extrairFotoDaMoldura(
+  imagemEmoldurada
+) {
 
-
-  img.crossOrigin =
-    "anonymous";
-
-
-  img.onload =
-    function () {
-
-      imgOriginalReajuste =
-        img;
-
-
-      exibirModalReajusteAdmin();
-    };
+  const larguraFoto =
+    imagemEmoldurada.naturalWidth ||
+    imagemEmoldurada.width;
 
 
-  img.onerror =
-    function () {
-
-      window.mostrarMensagem(
-        "Não foi possível carregar a foto para ajuste.",
-        "erro"
-      );
-    };
+  const alturaFoto =
+    imagemEmoldurada.naturalHeight ||
+    imagemEmoldurada.height;
 
 
-  img.src =
-    url +
-    (
-      url.includes("?")
-        ? "&"
-        : "?"
-    ) +
-    "t=" +
-    Date.now();
-};
+  const totalW =
+    configAtual.largura_total ||
+    larguraFoto;
+
+
+  const totalH =
+    configAtual.altura_total ||
+    alturaFoto;
+
+
+  const escalaX =
+    larguraFoto /
+    totalW;
+
+
+  const escalaY =
+    alturaFoto /
+    totalH;
+
+
+  let x =
+    Math.round(
+      (
+        configAtual.janela_x ||
+        0
+      ) *
+      escalaX
+    );
+
+  let y =
+    Math.round(
+      (
+        configAtual.janela_y ||
+        0
+      ) *
+      escalaY
+    );
+
+  let w =
+    Math.round(
+      (
+        configAtual.janela_largura ||
+        totalW
+      ) *
+      escalaX
+    );
+
+  let h =
+    Math.round(
+      (
+        configAtual.janela_altura ||
+        totalH
+      ) *
+      escalaY
+    );
+
+
+  // Garante que o recorte fique dentro da imagem
+
+  x =
+    Math.max(
+      0,
+      Math.min(
+        x,
+        larguraFoto - 1
+      )
+    );
+
+  y =
+    Math.max(
+      0,
+      Math.min(
+        y,
+        alturaFoto - 1
+      )
+    );
+
+  w =
+    Math.max(
+      1,
+      Math.min(
+        w,
+        larguraFoto - x
+      )
+    );
+
+  h =
+    Math.max(
+      1,
+      Math.min(
+        h,
+        alturaFoto - y
+      )
+    );
+
+
+  const canvas =
+    document.createElement(
+      "canvas"
+    );
+
+
+  canvas.width =
+    w;
+
+  canvas.height =
+    h;
+
+
+  const ctx =
+    canvas.getContext(
+      "2d"
+    );
+
+
+  ctx.imageSmoothingEnabled =
+    true;
+
+  ctx.imageSmoothingQuality =
+    "high";
+
+
+  ctx.drawImage(
+    imagemEmoldurada,
+    x,
+    y,
+    w,
+    h,
+    0,
+    0,
+    w,
+    h
+  );
+
+
+  return canvas;
+}
 
 
 // ============================================================
@@ -4685,7 +5121,7 @@ function exibirModalReajusteAdmin() {
 
             <img
               id="imgCropperAdmin"
-              src="${imgOriginalReajuste.src}"
+              src="${fonteReajusteUrl}"
               style="
                 position:absolute;
                 top:0;
@@ -4923,6 +5359,20 @@ function iniciarInteracaoReajusteAdmin() {
 
 
   atualizarTransformAdmin();
+
+
+  // Guarda o ajuste inicial para saber se o admin mexeu na foto
+
+  adminCropInicial = {
+    x:
+      adminCrop.x,
+
+    y:
+      adminCrop.y,
+
+    scale:
+      adminCrop.scale
+  };
 
 
   // ==========================================================
@@ -5312,6 +5762,41 @@ async function () {
     );
 
     return;
+  }
+
+
+  // ==========================================================
+  // AVISA QUANDO A FOTO NÃO FOI MEXIDA
+  //
+  // Em fotos novas o admin trabalha com a foto original inteira,
+  // então salvar sem mexer em nada reenquadraria a foto.
+  // Nas fotos antigas (recorte da própria janela) salvar sem
+  // mexer devolve exatamente a mesma imagem.
+  // ==========================================================
+
+  const semAlteracao =
+    adminCropInicial &&
+    adminCrop.x === adminCropInicial.x &&
+    adminCrop.y === adminCropInicial.y &&
+    adminCrop.scale === adminCropInicial.scale;
+
+
+  if (
+    semAlteracao &&
+    !reajusteVeioDaMoldura
+  ) {
+
+    const continuar =
+      confirm(
+        "Você não mexeu na foto.\n\n" +
+        "Salvar vai refazer o enquadramento usando o ajuste que está na tela.\n\n" +
+        "Continuar?"
+      );
+
+
+    if (!continuar) {
+      return;
+    }
   }
 
 
