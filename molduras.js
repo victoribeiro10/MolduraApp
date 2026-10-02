@@ -39,7 +39,13 @@ const supabaseAdmin =
 const PREFIXO_FOTO     = "foto-";
 const PREFIXO_ORIGINAL = "orig-";
 
+// Pasta do bucket onde ficam as fotos originais (sem moldura).
+// Ficam separadas porque sao arquivos de apoio: nao podem
+// aparecer na galeria do painel como se fossem fotos.
+const PASTA_ORIGINAIS = "originais/";
 
+
+// Nome do arquivo original: foto-123-abc.jpg -> orig-123-abc.jpg
 function nomeDaFotoOriginal(nomeFoto) {
 
   const nome =
@@ -54,9 +60,40 @@ function nomeDaFotoOriginal(nomeFoto) {
 }
 
 
+// Caminho completo dentro do bucket: originais/orig-123-abc.jpg
+function caminhoDaFotoOriginal(nomeFoto) {
+
+  const nome =
+    nomeDaFotoOriginal(
+      nomeFoto
+    );
+
+  if (nome === nomeFoto) {
+    return null;
+  }
+
+  return PASTA_ORIGINAIS +
+    nome;
+}
+
+
+// Aceita tanto "orig-..." (formato antigo, solto na raiz)
+// quanto "originais/orig-..."
 function ehFotoOriginal(nome) {
 
-  return String(nome || "").indexOf(PREFIXO_ORIGINAL) === 0;
+  const texto =
+    String(nome || "");
+
+
+  return (
+    texto.indexOf(
+      PREFIXO_ORIGINAL
+    ) === 0 ||
+    texto.indexOf(
+      PASTA_ORIGINAIS +
+      PREFIXO_ORIGINAL
+    ) === 0
+  );
 }
 
 
@@ -3467,7 +3504,12 @@ function () {
 // Cada foto tem 2 arquivos (foto- e orig-), então uma única
 // chamada com limite 1000 esconderia metade das fotos.
 
-async function listarArquivosDoBucket() {
+async function listarArquivosDoBucket(
+  pasta
+) {
+
+  const prefixo =
+    pasta || "";
 
   const todos =
     [];
@@ -3491,7 +3533,7 @@ async function listarArquivosDoBucket() {
           BUCKET_FOTOS
         )
         .list(
-          "",
+          prefixo,
           {
             limit:
               passo,
@@ -3538,7 +3580,19 @@ async function listarArquivosDoBucket() {
   }
 
 
-  return todos;
+  // Guarda o caminho completo de cada arquivo
+  // (ao listar uma pasta o Supabase devolve so o nome do arquivo)
+
+  return todos.map(
+    item => ({
+
+      ...item,
+
+      caminho:
+        prefixo +
+        item.name
+    })
+  );
 }
 
 
@@ -3639,14 +3693,25 @@ async function () {
     // ========================================================
 
     fotosCarregadas =
-      arquivos.filter(
-        f =>
-          f.name &&
-          f.metadata &&
-          !ehFotoOriginal(
-            f.name
-          )
-      );
+      arquivos
+        .filter(
+          f =>
+            f.name &&
+            f.metadata &&
+            !ehFotoOriginal(
+              f.name
+            )
+        )
+        .map(
+          f => ({
+
+            ...f,
+
+            // nome limpo, como no storage list("")
+            name:
+              f.caminho
+          })
+        );
 
 
     const total =
@@ -3824,6 +3889,71 @@ async function (
 
 
 // ============================================================
+// REMOVER FOTO ORIGINAL (SEM MOLDURA)
+// ============================================================
+
+async function removerFotoOriginal(
+  nomeFoto
+) {
+
+  const nomeOriginal =
+    nomeDaFotoOriginal(
+      nomeFoto
+    );
+
+
+  if (
+    !nomeOriginal ||
+    nomeOriginal ===
+      nomeFoto
+  ) {
+    return;
+  }
+
+
+  const caminhos =
+    [
+      PASTA_ORIGINAIS +
+        nomeOriginal,
+
+      // formato antigo (solto na raiz do bucket)
+      nomeOriginal
+    ];
+
+
+  try {
+
+    const {
+      error
+    } =
+      await supabaseAdmin
+        .storage
+        .from(
+          BUCKET_FOTOS
+        )
+        .remove(
+          caminhos
+        );
+
+
+    if (error) {
+      console.warn(
+        "Aviso ao remover foto original:",
+        error
+      );
+    }
+
+  } catch (err) {
+
+    console.warn(
+      "Aviso ao remover foto original:",
+      err
+    );
+  }
+}
+
+
+// ============================================================
 // APAGAR FOTO
 // ============================================================
 
@@ -3861,48 +3991,12 @@ async function (
     }
 
 
-    // Remove também a foto original (sem moldura), quando existir
-    const nomeOriginal =
-      nomeDaFotoOriginal(
-        nome
-      );
-
-
-    if (
-      nomeOriginal !==
+    // Remove também a foto original (sem moldura), quando existir.
+    // Fica em "originais/", mas pode haver alguma no formato antigo
+    // (solto na raiz do bucket).
+    await removerFotoOriginal(
       nome
-    ) {
-
-      try {
-
-        const {
-          error: errOriginal
-        } =
-          await supabaseAdmin
-            .storage
-            .from(
-              BUCKET_FOTOS
-            )
-            .remove([
-              nomeOriginal
-            ]);
-
-
-        if (errOriginal) {
-          console.warn(
-            "Aviso ao remover foto original:",
-            errOriginal
-          );
-        }
-
-      } catch (errOriginal) {
-
-        console.warn(
-          "Aviso ao remover foto original:",
-          errOriginal
-        );
-      }
-    }
+    );
 
 
     await supabaseAdmin
@@ -4314,16 +4408,43 @@ async function apagarTudo() {
 
 
     const arquivos =
-      await listarArquivosDoBucket();
-
-
-    // Apaga tudo, inclusive as fotos originais (orig-...)
-    const fotos =
-      arquivos.filter(
-        f =>
-          f.name &&
-          f.metadata
+      await listarArquivosDoBucket(
+        ""
       );
+
+
+    // Inclui os originais que ficam em "originais/"
+    let originais =
+      [];
+
+
+    try {
+
+      originais =
+        await listarArquivosDoBucket(
+          PASTA_ORIGINAIS
+        );
+
+    } catch (errOriginais) {
+
+      console.warn(
+        "Aviso ao listar originais:",
+        errOriginais
+      );
+    }
+
+
+    // Apaga tudo, inclusive as fotos originais
+    const fotos =
+      arquivos
+        .concat(
+          originais
+        )
+        .filter(
+          f =>
+            f.name &&
+            f.metadata
+        );
 
 
     // Nas mensagens conta apenas as fotos emolduradas
@@ -4331,6 +4452,7 @@ async function apagarTudo() {
       fotos.filter(
         f =>
           !ehFotoOriginal(
+            f.caminho ||
             f.name
           )
       ).length;
@@ -4382,7 +4504,9 @@ async function apagarTudo() {
 
     const nomes =
       fotos.map(
-        f => f.name
+        f =>
+          f.caminho ||
+          f.name
       );
 
 
@@ -4532,36 +4656,40 @@ async function (
   // URLS DAS FOTOS (EMOLDURADA E ORIGINAL)
   // ==========================================================
 
-  const nomeOriginal =
-    nomeDaFotoOriginal(
+  const urlDe =
+    function (
+      nome
+    ) {
+
+      return supabaseAdmin
+        .storage
+        .from(
+          BUCKET_FOTOS
+        )
+        .getPublicUrl(
+          nome
+        )
+        .data.publicUrl;
+    };
+
+
+  const urlFoto =
+    urlDe(
       nomeArquivo
     );
 
 
-  const urlFoto =
-    supabaseAdmin
-      .storage
-      .from(
-        BUCKET_FOTOS
-      )
-      .getPublicUrl(
-        nomeArquivo
-      )
-      .data.publicUrl;
+  const caminhoOriginal =
+    caminhoDaFotoOriginal(
+      nomeArquivo
+    );
 
 
   const urlOriginal =
-    nomeOriginal !==
-    nomeArquivo
-      ? supabaseAdmin
-          .storage
-          .from(
-            BUCKET_FOTOS
-          )
-          .getPublicUrl(
-            nomeOriginal
-          )
-          .data.publicUrl
+    caminhoOriginal
+      ? urlDe(
+          caminhoOriginal
+        )
       : null;
 
 
@@ -4581,19 +4709,41 @@ async function (
       null;
 
 
-    if (
-      urlOriginal &&
-      await arquivoExisteNoStorage(
-        urlOriginal
-      )
-    ) {
+    if (urlOriginal) {
 
       try {
 
-        imagemFonte =
-          await carregarImagemDeUrl(
-            urlOriginal
+        // Formato antigo: original solto na raiz do bucket
+        const urlOriginalAntiga =
+          urlDe(
+            nomeDaFotoOriginal(
+              nomeArquivo
+            )
           );
+
+
+        if (
+          await arquivoExisteNoStorage(
+            urlOriginal
+          )
+        ) {
+
+          imagemFonte =
+            await carregarImagemDeUrl(
+              urlOriginal
+            );
+
+        } else if (
+          await arquivoExisteNoStorage(
+            urlOriginalAntiga
+          )
+        ) {
+
+          imagemFonte =
+            await carregarImagemDeUrl(
+              urlOriginalAntiga
+            );
+        }
 
       } catch (errOriginal) {
 
@@ -4664,10 +4814,20 @@ async function (
 
     if (reajusteVeioDaMoldura) {
 
-      window.mostrarMensagem(
-        "Esta foto não tem a original salva. Use o zoom para reposicionar a foto dentro da janela.",
-        "aviso"
-      );
+      const aviso =
+        document.getElementById(
+          "avisoCropperAdmin"
+        );
+
+
+      if (aviso) {
+
+        aviso.textContent =
+          "Esta foto não tem a imagem original salva: o ajuste é feito recortando só a área da moldura. Arraste e use o zoom para reposicionar.";
+
+        aviso.style.color =
+          "var(--dourado)";
+      }
     }
 
 
@@ -5020,6 +5180,79 @@ function exibirModalReajusteAdmin() {
 
 
   // ==========================================================
+  // TAMANHO DO PREVIEW
+  //
+  // O container tem SEMPRE a proporção real da moldura.
+  // Antes era "width:100% + max-height:50vh + aspect-ratio":
+  // quando o max-height cortava, o aspect-ratio era ignorado e a
+  // moldura era espremida (foto e moldura desalinhadas).
+  //
+  // Agora o tamanho é calculado em pixels, respeitando a
+  // proporção, para caber na tela sem distorcer nada.
+  // ==========================================================
+
+  const proporcaoMoldura =
+    totalW /
+    totalH;
+
+
+  const alturaMaxContainer =
+    Math.max(
+      200,
+      Math.min(
+        window.innerHeight * 0.52,
+        560
+      )
+    );
+
+
+  // 380px = largura útil do modal (max-width 420px - padding/bordas).
+  // Assim o preview nunca estoura a caixa do modal.
+  const larguraMaxContainer =
+    Math.max(
+      200,
+      Math.min(
+        380,
+        window.innerWidth - 70
+      )
+    );
+
+
+  let alturaContainer =
+    larguraMaxContainer /
+    proporcaoMoldura;
+
+
+  let larguraContainer =
+    larguraMaxContainer;
+
+
+  if (
+    alturaContainer >
+    alturaMaxContainer
+  ) {
+
+    alturaContainer =
+      alturaMaxContainer;
+
+    larguraContainer =
+      alturaContainer *
+      proporcaoMoldura;
+  }
+
+
+  alturaContainer =
+    Math.round(
+      alturaContainer
+    );
+
+  larguraContainer =
+    Math.round(
+      larguraContainer
+    );
+
+
+  // ==========================================================
   // MODAL
   // ==========================================================
 
@@ -5094,9 +5327,8 @@ function exibirModalReajusteAdmin() {
           id="containerCropperAdmin"
           style="
             position:relative;
-            width:100%;
-            max-height:50vh;
-            aspect-ratio:${totalW}/${totalH};
+            width:${larguraContainer}px;
+            height:${alturaContainer}px;
             background:#000;
             overflow:hidden;
             border:1px solid var(--dourado);
@@ -5115,7 +5347,7 @@ function exibirModalReajusteAdmin() {
               height:${hP}%;
               overflow:hidden;
               cursor:grab;
-              background:#111;
+              background:#FFFFFF;
             "
           >
 
@@ -5240,6 +5472,20 @@ function exibirModalReajusteAdmin() {
 
         </div>
 
+
+        <div
+          id="avisoCropperAdmin"
+          style="
+            margin-top:12px;
+            font-size:12px;
+            line-height:1.5;
+            color:var(--cinza-suave);
+            opacity:0.9;
+          "
+        >
+          Arraste a foto para posicionar • use o zoom para aproximar
+        </div>
+
       </div>
 
     </div>
@@ -5288,6 +5534,23 @@ function iniciarInteracaoReajusteAdmin() {
 
   const rect =
     area.getBoundingClientRect();
+
+
+  // Layout ainda não calculado? Tenta de novo em instantes
+  if (
+    rect.width <
+      10 ||
+    rect.height <
+      10
+  ) {
+
+    setTimeout(
+      iniciarInteracaoReajusteAdmin,
+      100
+    );
+
+    return;
+  }
 
 
   const sX =

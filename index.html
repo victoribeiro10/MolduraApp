@@ -1672,15 +1672,19 @@
         }
 
         // Envia a foto original (sem moldura) junto da foto emoldurada.
-        // Ex.: foto-123-abc.jpg  ->  orig-123-abc.jpg
-        // É essa imagem que o painel admin usa ao clicar em "Ajustar foto".
+        // Ex.: foto-123-abc.jpg  ->  originais/orig-123-abc.jpg
+        // Fica numa pasta separada para não aparecer na galeria do painel.
+        const PASTA_ORIGINAIS = 'originais/';
+
         async function enviarFotoOriginal(nomeArquivoFoto, fonte) {
             try {
                 const blobOrig = await obterBlobOriginal(fonte);
                 if (!blobOrig) return;
 
-                const nomeOriginal = nomeArquivoFoto.replace('foto-', 'orig-');
-                if (nomeOriginal === nomeArquivoFoto) return;
+                const nomeBase = nomeArquivoFoto.replace('foto-', 'orig-');
+                if (nomeBase === nomeArquivoFoto) return;
+
+                const nomeOriginal = PASTA_ORIGINAIS + nomeBase;
 
                 const { error } = await supabaseClient
                     .storage
