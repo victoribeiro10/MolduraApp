@@ -15,8 +15,6 @@ const SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 const BUCKET_FOTOS    = "fotos-eventos";
 const BUCKET_MOLDURAS = "molduras";
 
-const SENHA_ADMIN = "admin";
-
 // Mostrado no rodapé do editor e no console.
 // Serve para conferir rapidamente qual versão está publicada.
 const VERSAO_ADMIN = "v3";
@@ -149,56 +147,18 @@ let adminCropInicial = null;
 
 
 // ============================================================
-// LOGIN
+// AUTORIZAÇÃO CENTRALIZADA PELO HUB
 // ============================================================
 
-window.fazerLogin = function () {
-
-  const campoSenha =
-    document.getElementById("senhaInput");
-
-  const erro =
-    document.getElementById("erroLogin");
-
-  if (!campoSenha) return;
-
-  const senha =
-    campoSenha.value;
-
-  if (senha === SENHA_ADMIN) {
-
-    sessionStorage.setItem(
-      "moldura_admin_logado",
-      "sim"
-    );
-
-    window.mostrarPainel();
-
-  } else {
-
-    if (erro) {
-      erro.textContent =
-        "senha incorreta";
-    }
-
-    campoSenha.value = "";
-
-    campoSenha.focus();
-  }
-};
-
-
-// ============================================================
-// SAIR
-// ============================================================
+let hubAuthorized = false;
 
 window.sair = function () {
-
-  sessionStorage.removeItem(
-    "moldura_admin_logado"
-  );
-
-  location.reload();
+  if (window.parent !== window) {
+    window.parent.postMessage(
+      { type: "EC_HUB_RETURN_TO_HUB" },
+      "https://entreclicks-gestao.vercel.app"
+    );
+  }
 };
 
 
@@ -207,6 +167,8 @@ window.sair = function () {
 // ============================================================
 
 window.mostrarPainel = function () {
+
+  if (!hubAuthorized) return;
 
   const telaLogin =
     document.getElementById("telaLogin");
@@ -235,16 +197,24 @@ window.mostrarPainel = function () {
 // ============================================================
 
 function restaurarSessao() {
-
-  if (
-    sessionStorage.getItem(
-      "moldura_admin_logado"
-    ) === "sim"
-  ) {
-
-    window.mostrarPainel();
+  // Não usa sessão local para liberar acesso direto: o HUB precisa autorizar.
+  if (window.parent !== window) {
+    window.parent.postMessage(
+      { type: "EC_HUB_AUTH_REQUEST" },
+      "https://entreclicks-gestao.vercel.app"
+    );
   }
 }
+
+window.addEventListener("message", function (event) {
+  if (event.origin !== "https://entreclicks-gestao.vercel.app") return;
+  if (event.source !== window.parent) return;
+  if (event.data?.type !== "EC_HUB_AUTHORIZED") return;
+
+  hubAuthorized = true;
+  sessionStorage.setItem("moldura_admin_logado", "sim");
+  window.mostrarPainel();
+});
 
 
 // ============================================================
