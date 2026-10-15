@@ -150,21 +150,14 @@ let adminCropInicial = null;
 // AUTORIZAÇÃO CENTRALIZADA PELO HUB
 // ============================================================
 
-const HUB_ORIGEM_PRODUCAO = "https://entreclicks-gestao.vercel.app";
+const HUB_ORIGENS_AUTORIZADAS = [
+  "https://entreclicks-gestao.vercel.app",
+  "https://entreclicks-gestao-git-feat-mimo-anfitriao-entreclicks-projects.vercel.app"
+];
 
 function origemHubAutorizada(origin) {
-  if (origin === HUB_ORIGEM_PRODUCAO) return true;
-
-  // Permite prévias HTTPS do projeto EntreClicks na Vercel,
-  // sem aceitar origens genéricas ou qualquer site externo.
-  try {
-    const url = new URL(origin);
-    return url.protocol === "https:" &&
-      url.hostname.startsWith("entreclicks-gestao-") &&
-      url.hostname.endsWith("-entreclicks-projects.vercel.app");
-  } catch (err) {
-    return false;
-  }
+  // Autoriza apenas a produção e a prévia específica que estamos testando.
+  return HUB_ORIGENS_AUTORIZADAS.includes(origin);
 }
 
 function obterOrigemHub() {
