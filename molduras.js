@@ -150,13 +150,42 @@ let adminCropInicial = null;
 // AUTORIZAÇÃO CENTRALIZADA PELO HUB
 // ============================================================
 
+const HUB_ORIGEM_PRODUCAO = "https://entreclicks-gestao.vercel.app";
+
+function origemHubAutorizada(origin) {
+  if (origin === HUB_ORIGEM_PRODUCAO) return true;
+
+  // Permite prévias HTTPS do projeto EntreClicks na Vercel,
+  // sem aceitar origens genéricas ou qualquer site externo.
+  try {
+    const url = new URL(origin);
+    return url.protocol === "https:" &&
+      url.hostname.startsWith("entreclicks-gestao-") &&
+      url.hostname.endsWith("-entreclicks-projects.vercel.app");
+  } catch (err) {
+    return false;
+  }
+}
+
+function obterOrigemHub() {
+  try {
+    const origemReferenciadora = new URL(document.referrer).origin;
+    if (origemHubAutorizada(origemReferenciadora)) {
+      return origemReferenciadora;
+    }
+  } catch (err) {
+    // Em caso de referrer indisponível, usa a origem oficial.
+  }
+  return HUB_ORIGEM_PRODUCAO;
+}
+
 let hubAuthorized = false;
 
 window.sair = function () {
   if (window.parent !== window) {
     window.parent.postMessage(
       { type: "EC_HUB_RETURN_TO_HUB" },
-      "https://entreclicks-gestao.vercel.app"
+      obterOrigemHub()
     );
   }
 };
@@ -201,13 +230,13 @@ function restaurarSessao() {
   if (window.parent !== window) {
     window.parent.postMessage(
       { type: "EC_HUB_AUTH_REQUEST" },
-      "https://entreclicks-gestao.vercel.app"
+      obterOrigemHub()
     );
   }
 }
 
 window.addEventListener("message", function (event) {
-  if (event.origin !== "https://entreclicks-gestao.vercel.app") return;
+  if (!origemHubAutorizada(event.origin)) return;
   if (event.source !== window.parent) return;
   if (event.data?.type !== "EC_HUB_AUTHORIZED") return;
 
