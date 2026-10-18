@@ -1431,6 +1431,14 @@
       .header-titulo          { font-size: 16px; letter-spacing: 3px; }
       .moldura-form-simples   { grid-template-columns: 1fr 1fr; }
     }
+    .controle-recebimento { display:flex; align-items:center; justify-content:space-between; gap:16px; margin:18px auto; padding:16px 18px; max-width:1200px; border:1px solid rgba(212,175,122,.28); border-radius:10px; background:linear-gradient(135deg,rgba(212,175,122,.08),rgba(20,20,20,.92)); }
+    .controle-recebimento-info { display:flex; flex-direction:column; gap:5px; }
+    .controle-recebimento-info strong { color:var(--branco); font-size:13px; }
+    .controle-recebimento-info span { color:var(--cinza-suave); font-size:12px; line-height:1.5; }
+    .btn-recebimento { border:0; border-radius:5px; padding:11px 15px; cursor:pointer; font-family:'Inter',sans-serif; font-size:11px; font-weight:700; letter-spacing:.3px; white-space:nowrap; background:#4ade80; color:#111; }
+    .btn-recebimento.pausado { background:#f87171; color:#111; }
+    .btn-recebimento:disabled { opacity:.6; cursor:wait; }
+    @media(max-width:560px) { .controle-recebimento { align-items:flex-start; flex-direction:column; } .btn-recebimento { width:100%; } }
   </style>
 </head>
 <body>
@@ -1469,6 +1477,15 @@
       </div>
       <button class="btn-sair" onclick="sair()">Sair</button>
     </header>
+
+    <!-- CONTROLE DE RECEBIMENTO -->
+    <section class="controle-recebimento" aria-live="polite">
+      <div class="controle-recebimento-info">
+        <strong id="statusRecebimentoTitulo">Recebimento de fotos</strong>
+        <span id="statusRecebimentoTexto">Verificando status...</span>
+      </div>
+      <button id="btnAlternarRecebimento" class="btn-recebimento" onclick="alternarRecebimentoFotos()" disabled>Carregando...</button>
+    </section>
 
     <!-- STATS -->
     <div class="stats">
