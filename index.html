@@ -451,9 +451,25 @@
             .btn-escolha { padding: 15px 14px; }
             .btn-escolha .titulo-btn { font-size: 13px; }
         }
+        /* AVISO DE EVENTO ENCERRADO */
+        .aviso-envios-encerrados { position:fixed; inset:0; z-index:100000; display:none; align-items:center; justify-content:center; padding:22px; background:rgba(10,10,10,.97); backdrop-filter:blur(10px); }
+        .aviso-envios-encerrados.visivel { display:flex; }
+        .aviso-envios-card { width:100%; max-width:390px; padding:34px 25px; text-align:center; border:1px solid rgba(212,175,122,.45); border-radius:12px; background:linear-gradient(145deg,#1c1c1c,#101010); box-shadow:0 24px 60px rgba(0,0,0,.65); }
+        .aviso-envios-icone { width:58px; height:58px; display:flex; align-items:center; justify-content:center; margin:0 auto 18px; border:1px solid #d4af7a; border-radius:50%; color:#d4af7a; font-size:25px; }
+        .aviso-envios-titulo { font-family:'Playfair Display',serif; font-size:23px; color:#f5f5f5; margin-bottom:14px; }
+        .aviso-envios-texto { color:#c9c9c9; font-size:13px; line-height:1.8; margin-bottom:22px; }
+        .aviso-envios-instagram { display:inline-block; padding:12px 18px; border:1px solid rgba(212,175,122,.55); border-radius:5px; color:#e8c99a; text-decoration:none; font-size:12px; letter-spacing:.5px; }
     </style>
 </head>
 <body>
+    <div id="avisoEnviosEncerrados" class="aviso-envios-encerrados" role="status" aria-live="polite">
+      <div class="aviso-envios-card">
+        <div class="aviso-envios-icone">✓</div>
+        <h1 class="aviso-envios-titulo">Este evento foi finalizado!</h1>
+        <p class="aviso-envios-texto">Agradecemos por compartilhar esse momento com a EntreClicks.<br><br>As fotos recebidas até o encerramento continuam disponíveis para impressão. No momento, não estamos recebendo novas fotos.</p>
+        <a class="aviso-envios-instagram" href="https://instagram.com/entreclicks.oficial" target="_blank" rel="noopener">Acompanhe nosso Instagram</a>
+      </div>
+    </div>
 
     <!-- LOADING INICIAL -->
     <div id="loadingInicial" class="loading-inicial">
@@ -884,6 +900,35 @@
             });
         }
 
+        // CONTROLE SIMPLES DE RECEBIMENTO DE FOTOS
+        let enviosAtivos = true;
+        function aplicarEstadoEnvios(ativo) {
+          enviosAtivos = ativo !== false;
+          const aviso = document.getElementById('avisoEnviosEncerrados');
+          if (aviso) aviso.classList.toggle('visivel', !enviosAtivos);
+          document.body.style.overflow = enviosAtivos ? '' : 'hidden';
+        }
+        async function consultarEnviosAtivos() {
+          const { data, error } = await supabaseClient.from('configuracao').select('recebendo_fotos').order('id', { ascending: false }).limit(1).single();
+          if (error) throw error;
+          const ativo = !data || data.recebendo_fotos !== false;
+          aplicarEstadoEnvios(ativo);
+          return ativo;
+        }
+        async function garantirEnviosAtivos() {
+          try {
+            const ativo = await consultarEnviosAtivos();
+            if (!ativo) {
+              mostrarModal('info', 'Envios encerrados', 'Este evento foi finalizado e não estamos recebendo novas fotos no momento.');
+              return false;
+            }
+            return true;
+          } catch (err) {
+            console.error('Não foi possível confirmar o recebimento de fotos:', err);
+            return true;
+          }
+        }
+
         // CARREGA CONFIGURAÇÃO
         async function carregarConfiguracao() {
             try {
@@ -897,6 +942,7 @@
                 if (error) throw error;
                 if (!data)  throw new Error('Sem configuração cadastrada');
 
+                aplicarEstadoEnvios(data.recebendo_fotos !== false);
                 MOLDURA.janelaX       = data.janela_x;
                 MOLDURA.janelaY       = data.janela_y;
                 MOLDURA.janelaLargura = data.janela_largura;
@@ -1714,6 +1760,7 @@
 
         // ENVIAR FOTO ÚNICA
         btnEnviarImpressao.addEventListener('click', async () => {
+            if (!(await garantirEnviosAtivos())) return;
             if (fotoJaEnviada) {
                 mostrarModal('info', 'Foto já enviada', 'Essa foto já foi enviada para impressão!');
                 return;
@@ -1827,6 +1874,7 @@
 
         // ENVIAR LOTE
         btnEnviarLote.addEventListener('click', async () => {
+            if (!(await garantirEnviosAtivos())) return;
             if (fotosLote.length === 0) return;
 
             const overlay      = document.getElementById('overlayEnvio');
