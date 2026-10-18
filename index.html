@@ -925,7 +925,9 @@
             return true;
           } catch (err) {
             console.error('Não foi possível confirmar o recebimento de fotos:', err);
-            return true;
+            aplicarEstadoEnvios(false);
+            mostrarModal('erro', 'Não foi possível confirmar', 'Por segurança, não podemos enviar fotos neste momento. Verifique a conexão e tente novamente.');
+            return false;
           }
         }
 
@@ -1905,6 +1907,11 @@
             }
 
             for (let i = 0; i < fotosLote.length; i++) {
+                // Confere novamente antes de cada foto para respeitar uma pausa feita durante o envio em lote.
+                if (!(await garantirEnviosAtivos())) {
+                    erros += fotosLote.length - i;
+                    break;
+                }
                 const foto      = fotosLote[i];
                 const numero    = i + 1;
                 const pctInicio = (i / total) * 100;
