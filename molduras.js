@@ -328,6 +328,7 @@ async function carregarConfiguracao() {
 
 
     configAtual = data;
+    atualizarControleRecebimento(data.recebendo_fotos !== false);
 
 
     // ========================================================
@@ -433,6 +434,43 @@ async function carregarConfiguracao() {
   }
 }
 
+
+// ============================================================
+// CONTROLE SIMPLES DE RECEBIMENTO DE FOTOS
+// ============================================================
+
+function atualizarControleRecebimento(ativo) {
+  const titulo = document.getElementById("statusRecebimentoTitulo");
+  const texto = document.getElementById("statusRecebimentoTexto");
+  const botao = document.getElementById("btnAlternarRecebimento");
+  if (!titulo || !texto || !botao) return;
+  configAtual = configAtual || {};
+  configAtual.recebendo_fotos = ativo !== false;
+  titulo.textContent = configAtual.recebendo_fotos ? "Recebendo fotos dos convidados" : "Recebimento de fotos pausado";
+  texto.textContent = configAtual.recebendo_fotos ? "O QR Code está ativo e os convidados podem enviar fotos." : "Os convidados verão uma mensagem de evento encerrado. As fotos já recebidas continuam disponíveis.";
+  botao.textContent = configAtual.recebendo_fotos ? "Pausar recebimento" : "Reativar recebimento";
+  botao.classList.toggle("pausado", configAtual.recebendo_fotos);
+  botao.disabled = false;
+}
+
+window.alternarRecebimentoFotos = async function () {
+  const botao = document.getElementById("btnAlternarRecebimento");
+  if (!configAtual || !botao) return;
+  const novoEstado = configAtual.recebendo_fotos === false;
+  botao.disabled = true;
+  botao.textContent = "Salvando...";
+  try {
+    const { error } = await supabaseAdmin.from("configuracao").update({ recebendo_fotos: novoEstado }).eq("id", configAtual.id);
+    if (error) throw error;
+    configAtual.recebendo_fotos = novoEstado;
+    atualizarControleRecebimento(novoEstado);
+    window.mostrarMensagem(novoEstado ? "Recebimento de fotos reativado." : "Recebimento de fotos pausado.", "sucesso");
+  } catch (err) {
+    console.error("Erro ao alterar recebimento de fotos:", err);
+    window.mostrarMensagem("Não foi possível alterar o recebimento. Confirme se a coluna recebendo_fotos foi criada no Supabase.", "erro");
+    atualizarControleRecebimento(configAtual.recebendo_fotos !== false);
+  }
+};
 
 // ============================================================
 // MODAL — AJUSTAR JANELA DA MOLDURA
