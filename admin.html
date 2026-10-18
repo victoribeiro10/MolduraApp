@@ -1518,6 +1518,22 @@
       </div>
     </div>
 
+    <!-- CONTROLE DE RECEBIMENTO DE FOTOS -->
+    <section id="controleRecebimentoFotos" class="card-moldura-compact" style="margin-bottom:14px;align-items:center;border-color:rgba(212,175,122,.4);">
+      <div style="width:44px;height:44px;flex:0 0 44px;border:1px solid rgba(212,175,122,.4);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--dourado);font-size:18px;">
+        <span aria-hidden="true">📷</span>
+      </div>
+      <div class="moldura-info-compact" style="flex:1;min-width:220px;">
+        <h4 id="statusRecebimentoTitulo">Carregando recebimento de fotos...</h4>
+        <p id="statusRecebimentoTexto">Consultando configuração do evento.</p>
+      </div>
+      <div class="btns-moldura">
+        <button id="btnAlternarRecebimento" type="button" class="btn-galeria-molduras" onclick="alternarRecebimentoFotos()" disabled>
+          Carregando...
+        </button>
+      </div>
+    </section>
+
     <!-- CARD MOLDURA -->
     <div class="card-moldura-compact">
       <div class="moldura-mini" id="molduraMini">
