@@ -1234,7 +1234,12 @@
                                     ? Math.max(minimoSeguro, Math.min(maximoSeguro, desejado))
                                     : Math.max(0, Math.min(img.width - sW, desejado));
                             } else {
-                                sx = (img.width - sW) / 2;
+                                // Plano B quando o detector não carrega ou não encontra rosto:
+                                // desloca levemente a janela para a direita da foto, fazendo a pessoa
+                                // aparecer mais à esquerda no recorte e preservando margem no lado direito.
+                                const corteDisponivel = img.width - sW;
+                                sx = Math.max(0, Math.min(corteDisponivel,
+                                    (corteDisponivel / 2) + (corteDisponivel * 0.12)));
                             }
                             sy = 0;
                         } else {
