@@ -478,8 +478,8 @@
         <p>Carregando</p>
     </div>
 
-    <!-- BANNER DE AVISO INICIAL -->
-    <div id="bannerAviso" class="banner-aviso-inicial">
+    <!-- BANNER DE AVISO INICIAL (mantido no projeto; desativado por padrão) -->
+    <div id="bannerAviso" class="banner-aviso-inicial hidden">
         <div class="banner-card">
             <div class="banner-icone">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -825,7 +825,9 @@
         let fotosLote          = [];
         let indiceEditandoLote = -1;
 
-        // AÇÃO DO BANNER INICIAL
+        // BANNER DE AVISO INICIAL: mantido para possível reativação futura.
+        // Para reativar, remova a classe 'hidden' do elemento #bannerAviso
+        // e ajuste a inicialização para aguardar o aceite do convidado.
         function aceitarAviso() {
             bannerAviso.classList.add('hidden');
             mostrarTela('escolha');
@@ -2014,7 +2016,8 @@
             const ok = await carregarConfiguracao();
             if (ok) {
                 loadingInicial.style.display = 'none';
-                telaEscolha.classList.add('hidden');
+                bannerAviso.classList.add('hidden');
+                mostrarTela('escolha');
             }
         })();
     </script>
