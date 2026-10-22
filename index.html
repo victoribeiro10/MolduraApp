@@ -347,6 +347,7 @@
         .lote-titulo { text-align: center; margin-bottom: 16px; }
         .lote-titulo h2 { font-family: 'Playfair Display', serif; font-weight: 500; font-size: 20px; color: var(--branco); margin-bottom: 4px; }
         .lote-titulo p { font-size: 10px; color: var(--cinza-suave); letter-spacing: 2px; text-transform: uppercase; }
+        .lote-titulo .lote-dica { max-width: 310px; margin: 10px auto 0; padding: 9px 11px; border: 1px solid rgba(212, 175, 122, 0.35); border-radius: 6px; color: var(--branco); font-size: 11px; line-height: 1.5; letter-spacing: .2px; text-transform: none; }
         .lote-titulo p span { color: var(--dourado); font-weight: 600; }
         
         .grade-lote { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
@@ -607,6 +608,7 @@
         <div class="lote-titulo">
             <h2>Suas fotos</h2>
             <p><span id="contadorLote">0</span> de 5 fotos</p>
+            <p class="lote-dica">Toque em cada foto para ajustar o enquadramento antes de enviar.</p>
         </div>
 
         <div id="loteProcessando" class="lote-processando hidden">
