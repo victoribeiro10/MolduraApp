@@ -1222,15 +1222,37 @@
                         if (propImg > propJanela) {
                             sH = img.height;
                             sW = img.height * propJanela;
-                            const centroX = rostosLote ? rostosLote.centerX : img.width / 2;
-                            sx = Math.max(0, Math.min(img.width - sW, centroX - sW / 2));
+                            if (rostosLote) {
+                                // Mantém uma margem ao redor do rosto e desloca o enquadramento
+                                // para dentro da foto quando a pessoa está perto de uma borda.
+                                const margem = Math.max(24, (rostosLote.maxX - rostosLote.minX) * 0.22);
+                                const minimoSeguro = Math.max(0, rostosLote.maxX + margem - sW);
+                                const maximoSeguro = Math.min(img.width - sW, rostosLote.minX - margem);
+                                const posicaoAlvo = rostosLote.centerX > img.width / 2 ? 0.42 : 0.58;
+                                const desejado = rostosLote.centerX - sW * posicaoAlvo;
+                                sx = minimoSeguro <= maximoSeguro
+                                    ? Math.max(minimoSeguro, Math.min(maximoSeguro, desejado))
+                                    : Math.max(0, Math.min(img.width - sW, desejado));
+                            } else {
+                                sx = (img.width - sW) / 2;
+                            }
                             sy = 0;
                         } else {
                             sW = img.width;
                             sH = img.width / propJanela;
                             sx = 0;
-                            const centroY = rostosLote ? rostosLote.centerY : img.height / 2;
-                            sy = Math.max(0, Math.min(img.height - sH, centroY - sH / 2));
+                            if (rostosLote) {
+                                const margem = Math.max(24, (rostosLote.maxY - rostosLote.minY) * 0.22);
+                                const minimoSeguro = Math.max(0, rostosLote.maxY + margem - sH);
+                                const maximoSeguro = Math.min(img.height - sH, rostosLote.minY - margem);
+                                const posicaoAlvo = rostosLote.centerY > img.height / 2 ? 0.42 : 0.58;
+                                const desejado = rostosLote.centerY - sH * posicaoAlvo;
+                                sy = minimoSeguro <= maximoSeguro
+                                    ? Math.max(minimoSeguro, Math.min(maximoSeguro, desejado))
+                                    : Math.max(0, Math.min(img.height - sH, desejado));
+                            } else {
+                                sy = (img.height - sH) / 2;
+                            }
                         }
 
                         const canvasLuz = document.createElement('canvas');
@@ -1373,7 +1395,7 @@
                 const y1 = Math.min(...rostos.map(b => b.originY));
                 const x2 = Math.max(...rostos.map(b => b.originX + b.width));
                 const y2 = Math.max(...rostos.map(b => b.originY + b.height));
-                return { centerX: (x1 + x2) / 2, centerY: (y1 + y2) / 2 };
+                return { minX: x1, minY: y1, maxX: x2, maxY: y2, centerX: (x1 + x2) / 2, centerY: (y1 + y2) / 2 };
             } catch (err) {
                 console.warn('Enquadramento automático indisponível; usando centralização padrão.', err);
                 detectorRostosPromise = null;
@@ -1408,10 +1430,12 @@
             if (rostos) {
                 const centroX = rectArea.width / 2;
                 const centroY = rectArea.height / 2;
-                ajuste.x = Math.max(rectArea.width - imagemOriginal.width * ajuste.scale,
-                    Math.min(0, centroX - rostos.centerX * ajuste.scale));
-                ajuste.y = Math.max(rectArea.height - imagemOriginal.height * ajuste.scale,
-                    Math.min(0, centroY - rostos.centerY * ajuste.scale));
+                const rostoMaisADireita = rostos.centerX > imagemOriginal.width / 2;
+                const rostoMaisEmbaixo = rostos.centerY > imagemOriginal.height / 2;
+                const alvoX = centroX - rostos.centerX * ajuste.scale + (rostoMaisADireita ? rectArea.width * 0.08 : -rectArea.width * 0.08);
+                const alvoY = centroY - rostos.centerY * ajuste.scale + (rostoMaisEmbaixo ? rectArea.height * 0.04 : -rectArea.height * 0.04);
+                ajuste.x = Math.max(rectArea.width - imagemOriginal.width * ajuste.scale, Math.min(0, alvoX));
+                ajuste.y = Math.max(rectArea.height - imagemOriginal.height * ajuste.scale, Math.min(0, alvoY));
             }
 
             aplicarTransform();
