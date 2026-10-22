@@ -1341,8 +1341,44 @@
             }
         });
 
+        // ENQUADRAMENTO AUTOMÁTICO: tenta priorizar rostos; se a análise não estiver disponível,
+        // mantém o enquadramento central tradicional para que o envio nunca fique bloqueado.
+        let detectorRostosPromise = null;
+        async function detectarRostos(img) {
+            try {
+                if (!detectorRostosPromise) {
+                    detectorRostosPromise = (async () => {
+                        const vision = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.22/+esm');
+                        const fileset = await vision.FilesetResolver.forVisionTasks(
+                            'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.22/wasm'
+                        );
+                        return vision.FaceDetector.createFromOptions(fileset, {
+                            baseOptions: {
+                                modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite'
+                            },
+                            runningMode: 'IMAGE',
+                            minDetectionConfidence: 0.45
+                        });
+                    })();
+                }
+                const detector = await detectorRostosPromise;
+                const resultado = detector.detect(img);
+                const rostos = (resultado.detections || []).map(d => d.boundingBox).filter(Boolean);
+                if (!rostos.length) return null;
+                const x1 = Math.min(...rostos.map(b => b.originX));
+                const y1 = Math.min(...rostos.map(b => b.originY));
+                const x2 = Math.max(...rostos.map(b => b.originX + b.width));
+                const y2 = Math.max(...rostos.map(b => b.originY + b.height));
+                return { centerX: (x1 + x2) / 2, centerY: (y1 + y2) / 2 };
+            } catch (err) {
+                console.warn('Enquadramento automático indisponível; usando centralização padrão.', err);
+                detectorRostosPromise = null;
+                return null;
+            }
+        }
+
         // AJUSTE DE FOTO
-        function iniciarAjuste() {
+        async function iniciarAjuste() {
             fotoAjuste.src          = imagemOriginal.src;
             fotoAjuste.style.width  = imagemOriginal.width  + 'px';
             fotoAjuste.style.height = imagemOriginal.height + 'px';
@@ -1361,6 +1397,18 @@
             ajuste.initialScale = scaleCover;
             ajuste.x = (rectArea.width  - imagemOriginal.width  * scaleCover) / 2;
             ajuste.y = (rectArea.height - imagemOriginal.height * scaleCover) / 2;
+
+            // Reposiciona o centro dos rostos detectados no centro da abertura, mantendo
+            // a escala de cobertura e limitando o movimento para não revelar áreas vazias.
+            const rostos = await detectarRostos(imagemOriginal);
+            if (rostos) {
+                const centroX = rectArea.width / 2;
+                const centroY = rectArea.height / 2;
+                ajuste.x = Math.max(rectArea.width - imagemOriginal.width * ajuste.scale,
+                    Math.min(0, centroX - rostos.centerX * ajuste.scale));
+                ajuste.y = Math.max(rectArea.height - imagemOriginal.height * ajuste.scale,
+                    Math.min(0, centroY - rostos.centerY * ajuste.scale));
+            }
 
             aplicarTransform();
         }
