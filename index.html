@@ -205,6 +205,33 @@
         .titulo-secao h1 em { font-style: italic; color: var(--dourado); font-weight: 500; }
         .titulo-secao p { color: var(--cinza-suave); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; font-weight: 400; }
 
+        .guia-rapido {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid rgba(212, 175, 122, 0.28);
+            border-radius: 8px;
+            background: rgba(212, 175, 122, 0.055);
+            display: grid;
+            gap: 11px;
+        }
+        .guia-rapido-titulo {
+            color: var(--dourado-claro);
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 1px;
+        }
+        .guia-etapa { display: flex; align-items: flex-start; gap: 10px; }
+        .guia-etapa > span {
+            display: flex; align-items: center; justify-content: center;
+            flex: 0 0 24px; height: 24px; border-radius: 50%;
+            border: 1px solid var(--dourado); color: var(--dourado);
+            font-size: 12px; font-weight: 600;
+        }
+        .guia-etapa div { display: grid; gap: 3px; }
+        .guia-etapa strong { font-size: 12px; font-weight: 600; color: var(--branco); }
+        .guia-etapa small { font-size: 11px; line-height: 1.45; color: var(--cinza-suave); }
+
         /* BOTÕES DE ESCOLHA */
         .btn-escolha {
             width: 100%;
@@ -521,6 +548,13 @@
             <p>escolha como registrar</p>
         </div>
 
+        <div class="guia-rapido" role="note" aria-label="Como enviar sua foto">
+            <div class="guia-rapido-titulo">É rapidinho!</div>
+            <div class="guia-etapa"><span>1</span><div><strong>Escolha sua foto</strong><small>Use a câmera ou selecione uma imagem da galeria.</small></div></div>
+            <div class="guia-etapa"><span>2</span><div><strong>Ajuste a moldura</strong><small>Arraste a foto e use dois dedos para aproximar ou afastar.</small></div></div>
+            <div class="guia-etapa"><span>3</span><div><strong>Envie e pronto</strong><small>Confira o resultado e toque em “Enviar para impressão”.</small></div></div>
+        </div>
+
         <button class="btn-escolha" id="btnAbrirCamera">
             <div class="icone">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -661,7 +695,9 @@
     </div>
 
     <div class="dica-ajuste hidden" id="dicaAjuste">
-        Arraste <span class="separador">•</span> pinça para zoom
+        <strong>Personalize sua foto</strong><br>
+        Arraste para posicionar <span class="separador">•</span> use dois dedos para zoom<br>
+        <small>Quando estiver do seu jeito, toque em “Confirmar”.</small>
     </div>
 
     <!-- BOTÕES RESULTADO -->
@@ -1868,11 +1904,14 @@
             } catch (err) {
                 console.error('Erro upload:', err);
                 clearInterval(intervalSimulado);
+                if (typeof intervalUpload !== 'undefined') clearInterval(intervalUpload);
                 overlay.classList.remove('ativo');
-                btnEnviarImpressao.disabled    = false;
+                btnEnviarImpressao.disabled = false;
                 btnEnviarImpressao.textContent = 'Enviar para impressão';
-                mostrarModal('erro', 'Algo deu errado',
-                    'Não foi possível enviar. Verifique sua internet e tente novamente.<br><br><small>' + err.message + '</small>');
+                // Mantém a foto e o resultado na tela para a pessoa poder tentar de novo.
+                const detalhe = (err && err.message) ? String(err.message) : 'Falha de conexão ou envio interrompido.';
+                mostrarModal('erro', 'Não conseguimos enviar ainda',
+                    'Sua foto continua aqui. Confira se a internet está funcionando e toque em “Enviar para impressão” para tentar novamente.<br><br><small>Detalhe: ' + detalhe.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) + '</small>');
             }
         });
 
