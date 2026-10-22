@@ -393,6 +393,8 @@
         .modal-cta-botoes a.insta:hover { background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCB045); border-color: transparent; color: var(--branco); transform: translateY(-2px); }
 
         /* RODAPÉ */
+        body.ajustando-foto .rodape { display: none; }
+
         .rodape {
             position: fixed;
             bottom: 0; left: 0; right: 0;
@@ -1084,6 +1086,7 @@
         }
 
         function mostrarTela(tela) {
+            document.body.classList.toggle('ajustando-foto', tela === 'ajuste');
             telaEscolha.classList.add('hidden');
             telaLote.classList.add('hidden');
             areaCamera.classList.add('hidden');
