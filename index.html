@@ -1217,16 +1217,20 @@
                         const propImg    = img.width / img.height;
                         let sx, sy, sW, sH;
 
+                        // Detecta rostos também na montagem inicial do lote, não apenas ao abrir o editor.
+                        const rostosLote = await detectarRostos(img);
                         if (propImg > propJanela) {
                             sH = img.height;
                             sW = img.height * propJanela;
-                            sx = (img.width - sW) / 2;
+                            const centroX = rostosLote ? rostosLote.centerX : img.width / 2;
+                            sx = Math.max(0, Math.min(img.width - sW, centroX - sW / 2));
                             sy = 0;
                         } else {
                             sW = img.width;
                             sH = img.width / propJanela;
                             sx = 0;
-                            sy = (img.height - sH) / 2;
+                            const centroY = rostosLote ? rostosLote.centerY : img.height / 2;
+                            sy = Math.max(0, Math.min(img.height - sH, centroY - sH / 2));
                         }
 
                         const canvasLuz = document.createElement('canvas');
