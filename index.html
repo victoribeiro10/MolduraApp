@@ -205,6 +205,33 @@
         .titulo-secao h1 em { font-style: italic; color: var(--dourado); font-weight: 500; }
         .titulo-secao p { color: var(--cinza-suave); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; font-weight: 400; }
 
+        .guia-rapido {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid rgba(212, 175, 122, 0.28);
+            border-radius: 8px;
+            background: rgba(212, 175, 122, 0.055);
+            display: grid;
+            gap: 11px;
+        }
+        .guia-rapido-titulo {
+            color: var(--dourado-claro);
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 1px;
+        }
+        .guia-etapa { display: flex; align-items: flex-start; gap: 10px; }
+        .guia-etapa > span {
+            display: flex; align-items: center; justify-content: center;
+            flex: 0 0 24px; height: 24px; border-radius: 50%;
+            border: 1px solid var(--dourado); color: var(--dourado);
+            font-size: 12px; font-weight: 600;
+        }
+        .guia-etapa div { display: grid; gap: 3px; }
+        .guia-etapa strong { font-size: 12px; font-weight: 600; color: var(--branco); }
+        .guia-etapa small { font-size: 11px; line-height: 1.45; color: var(--cinza-suave); }
+
         /* BOTÕES DE ESCOLHA */
         .btn-escolha {
             width: 100%;
@@ -366,6 +393,8 @@
         .modal-cta-botoes a.insta:hover { background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCB045); border-color: transparent; color: var(--branco); transform: translateY(-2px); }
 
         /* RODAPÉ */
+        body.ajustando-foto .rodape { display: none; }
+
         .rodape {
             position: fixed;
             bottom: 0; left: 0; right: 0;
@@ -390,6 +419,8 @@
         }
 
         .rodape-redes { display: flex; gap: 12px; pointer-events: auto; }
+
+        .rodape-creditos { font-size: 9px; line-height: 1.3; letter-spacing: .3px; color: rgba(245,245,245,.55); text-transform: none; font-style: normal; margin-top: 1px; }
 
         .rodape-redes a { 
             width: 42px; 
@@ -478,8 +509,8 @@
         <p>Carregando</p>
     </div>
 
-    <!-- BANNER DE AVISO INICIAL -->
-    <div id="bannerAviso" class="banner-aviso-inicial">
+    <!-- BANNER DE AVISO INICIAL (mantido no projeto; desativado por padrão) -->
+    <div id="bannerAviso" class="banner-aviso-inicial hidden">
         <div class="banner-card">
             <div class="banner-icone">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -516,9 +547,13 @@
     <!-- TELA ESCOLHA -->
     <div class="tela-escolha hidden" id="telaEscolha">
 
-        <div class="titulo-secao">
-            <h1>Eternize <em>este</em> momento</h1>
-            <p>escolha como registrar</p>
+        <!-- Título removido para deixar o fluxo mais compacto. -->
+
+        <div class="guia-rapido" role="note" aria-label="Como enviar sua foto">
+            <div class="guia-rapido-titulo">Como enviar</div>
+            <div class="guia-etapa"><span>1</span><div><strong>Escolha sua foto</strong><small>Use a câmera ou selecione uma imagem da galeria.</small></div></div>
+            <div class="guia-etapa"><span>2</span><div><strong>Ajuste sua foto</strong><small>Arraste a foto e use dois dedos para aproximar ou afastar.</small></div></div>
+            <div class="guia-etapa"><span>3</span><div><strong>Envie e pronto</strong><small>Confira o resultado e toque em “Enviar para impressão”.</small></div></div>
         </div>
 
         <button class="btn-escolha" id="btnAbrirCamera">
@@ -661,7 +696,9 @@
     </div>
 
     <div class="dica-ajuste hidden" id="dicaAjuste">
-        Arraste <span class="separador">•</span> pinça para zoom
+        <strong>Personalize sua foto</strong><br>
+        Arraste para posicionar <span class="separador">•</span> use dois dedos para zoom<br>
+        <small>Quando estiver do seu jeito, toque em “Confirmar”.</small>
     </div>
 
     <!-- BOTÕES RESULTADO -->
@@ -706,6 +743,7 @@
                 </svg>
             </a>
         </div>
+        <div class="rodape-creditos">Desenvolvido por Victor Ribeiro</div>
     </div>
 
     <!-- OVERLAY DE ENVIO -->
@@ -825,7 +863,9 @@
         let fotosLote          = [];
         let indiceEditandoLote = -1;
 
-        // AÇÃO DO BANNER INICIAL
+        // BANNER DE AVISO INICIAL: mantido para possível reativação futura.
+        // Para reativar, remova a classe 'hidden' do elemento #bannerAviso
+        // e ajuste a inicialização para aguardar o aceite do convidado.
         function aceitarAviso() {
             bannerAviso.classList.add('hidden');
             mostrarTela('escolha');
@@ -1049,6 +1089,7 @@
         }
 
         function mostrarTela(tela) {
+            document.body.classList.toggle('ajustando-foto', tela === 'ajuste');
             telaEscolha.classList.add('hidden');
             telaLote.classList.add('hidden');
             areaCamera.classList.add('hidden');
@@ -1866,11 +1907,14 @@
             } catch (err) {
                 console.error('Erro upload:', err);
                 clearInterval(intervalSimulado);
+                if (typeof intervalUpload !== 'undefined') clearInterval(intervalUpload);
                 overlay.classList.remove('ativo');
-                btnEnviarImpressao.disabled    = false;
+                btnEnviarImpressao.disabled = false;
                 btnEnviarImpressao.textContent = 'Enviar para impressão';
-                mostrarModal('erro', 'Algo deu errado',
-                    'Não foi possível enviar. Verifique sua internet e tente novamente.<br><br><small>' + err.message + '</small>');
+                // Mantém a foto e o resultado na tela para a pessoa poder tentar de novo.
+                const detalhe = (err && err.message) ? String(err.message) : 'Falha de conexão ou envio interrompido.';
+                mostrarModal('erro', 'Não conseguimos enviar ainda',
+                    'Sua foto continua aqui. Confira se a internet está funcionando e toque em “Enviar para impressão” para tentar novamente.<br><br><small>Detalhe: ' + detalhe.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) + '</small>');
             }
         });
 
@@ -2014,7 +2058,8 @@
             const ok = await carregarConfiguracao();
             if (ok) {
                 loadingInicial.style.display = 'none';
-                telaEscolha.classList.add('hidden');
+                bannerAviso.classList.add('hidden');
+                mostrarTela('escolha');
             }
         })();
     </script>
