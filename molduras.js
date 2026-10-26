@@ -152,6 +152,7 @@ let adminCropInicial = null;
 
 const HUB_ORIGENS_AUTORIZADAS = [
   "https://entreclicks-gestao.vercel.app",
+  "https://entreclicks-gestao-git-test-integra-2ae683-entreclicks-projects.vercel.app",
   "https://entreclicks-gestao-git-feat-mimo-anfitriao-entreclicks-projects.vercel.app"
 ];
 
