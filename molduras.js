@@ -169,7 +169,7 @@ function obterOrigemHub() {
   } catch (err) {
     // Em caso de referrer indisponível, usa a origem oficial.
   }
-  return HUB_ORIGEM_PRODUCAO;
+  return HUB_ORIGENS_AUTORIZADAS[0];
 }
 
 let hubAuthorized = false;
