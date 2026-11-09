@@ -477,6 +477,38 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+
+        /* Prévia: interface compacta para celulares, sem alterar o arquivo impresso. */
+        @media (max-width: 600px) {
+            body { padding: 8px 10px 20px; }
+            .marca { margin: 3px 0 7px; }
+            .marca-logo { font-size: 19px; letter-spacing: 4px; }
+            .marca-linha { margin-top: 2px; }
+            .marca-subtitulo { font-size: 10px; }
+            .container {
+                width: min(100%, calc((100dvh - 205px) * 2000 / 2666));
+                max-width: 380px;
+                margin: 0 auto 7px;
+            }
+            .botoes { gap: 6px; padding: 3px 0 8px; }
+            .btn { padding: 10px 9px; min-width: 78px; letter-spacing: .7px; font-size: 11px; }
+            .btn-enviar-impressao { padding: 12px 10px; font-size: 12px; letter-spacing: 1px; min-height: 43px; }
+            .dica-ajuste { font-size: 9px; margin-top: 2px; }
+            .tela-escolha { gap: 10px; padding: 8px 8px 18px; }
+            .guia-rapido { padding: 10px 12px; gap: 7px; }
+            .btn-escolha { padding: 12px; gap: 11px; }
+            .btn-escolha .icone { width: 35px; height: 35px; }
+            .tela-lote { padding: 4px 6px; }
+            .lote-titulo { margin-bottom: 8px; }
+            .lote-titulo .lote-dica { margin-top: 6px; padding: 6px 9px; }
+            .grade-lote { gap: 5px; margin-bottom: 8px; }
+        }
+        @media (max-width: 600px) and (max-height: 680px) {
+            .container { width: min(100%, calc((100dvh - 185px) * 2000 / 2666)); }
+            .marca { margin-bottom: 4px; }
+            .marca-subtitulo { font-size: 9px; }
+        }
+
         @media (max-width: 360px) {
             .marca-logo { font-size: 18px; letter-spacing: 4px; }
             .titulo-secao h1 { font-size: 20px; }
