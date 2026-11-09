@@ -393,6 +393,20 @@
         .modal-cta-botoes a.whats:hover { background: var(--whatsapp); border-color: var(--whatsapp); color: var(--branco); transform: translateY(-2px); }
         .modal-cta-botoes a.insta:hover { background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCB045); border-color: transparent; color: var(--branco); transform: translateY(-2px); }
 
+        /* Confirmação de envio: ação principal clara e lembrete do QR Code. */
+        .modal-conteudo:has(.modal-dica-qr) { padding: 28px 22px 22px; max-height: calc(100dvh - 32px); overflow-y: auto; }
+        .modal-conteudo:has(.modal-dica-qr) .modal-icone { width: 50px; height: 50px; margin-bottom: 12px; }
+        .modal-conteudo:has(.modal-dica-qr) .modal-titulo { margin-bottom: 8px; font-size: 21px; }
+        .modal-conteudo:has(.modal-dica-qr) .modal-texto { margin-bottom: 14px; font-size: 12px; line-height: 1.5; }
+        .modal-dica-qr { display: flex; flex-direction: column; gap: 7px; background: rgba(212,175,122,.11); border: 1px solid rgba(212,175,122,.3); border-radius: 7px; padding: 13px 10px; margin-bottom: 13px; }
+        .modal-dica-qr strong { font-size: 13px; color: var(--dourado-claro); }
+        .modal-dica-qr span { font-size: 12px; color: var(--branco); line-height: 1.4; }
+        .modal button.btn-outra-foto { width: 100%; background: linear-gradient(135deg,var(--dourado),var(--dourado-escuro)); color: var(--preto); border: 0; border-radius: 4px; padding: 14px 10px; font: 700 12px 'Inter',sans-serif; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; min-height: 44px; }
+        .modal-instagram-link { display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: 17px; color: var(--dourado-claro); text-decoration: none; font-size: 12px; }
+        .modal-instagram-link svg { width: 19px; height: 19px; }
+        .modal-dica-fechar { font-size: 10px; color: var(--cinza-suave); margin-top: 14px; }
+        .modal button.modal-fechar-sucesso { display: block; margin: 10px auto 0; padding: 8px 14px; border: 0; background: transparent; color: var(--cinza-suave); font: 500 12px 'Inter',sans-serif; text-decoration: underline; cursor: pointer; }
+
         /* RODAPÉ */
         body.ajustando-foto .rodape { display: none; }
 
@@ -1903,7 +1917,7 @@
                 overlay.classList.remove('ativo');
 
                 mostrarModal('sucesso', 'Foto enviada',
-                    'Sua foto será impressa e entregue durante o evento.<br><br>Você também pode baixar ou compartilhar sua foto agora.',
+                    'Sua foto será impressa e entregue durante o evento.',
                     true);
 
             } catch (err) {
@@ -2011,7 +2025,7 @@
                 fotosLote = [];
                 mostrarTela('escolha');
                 mostrarModal('sucesso', `${enviadas} fotos enviadas`,
-                    `Suas ${enviadas} fotos serão impressas e entregues durante o evento.<br><br>Obrigado por eternizar esses momentos com a gente!`,
+                    `Suas ${enviadas} fotos serão impressas e entregues durante o evento.`,
                     true);
             } else if (enviadas > 0) {
                 mostrarModal('info', 'Envio parcial',
@@ -2032,14 +2046,13 @@
             const icone = ICONES_MODAL[tipo] || ICONES_MODAL.info;
 
             const ctaHTML = mostrarCTA ? `
-                <div class="modal-cta">
-                    <div class="modal-cta-titulo">Gostou da experiência?</div>
-                    <div class="modal-cta-subtitulo">conheça a Entre Clicks</div>
-                    <div class="modal-cta-botoes">
-                        <a href="https://wa.me/5528999281772" target="_blank" rel="noopener" class="whats" title="WhatsApp">${ICONE_WHATS}</a>
-                        <a href="https://instagram.com/entreclicks.oficial" target="_blank" rel="noopener" class="insta" title="Instagram">${ICONE_INSTA}</a>
-                    </div>
-                </div>` : '';
+                <div class="modal-dica-qr">
+                    <strong>Não precisa ler o QR Code de novo!</strong>
+                    <span>Continue nesta página para enviar mais fotos.</span>
+                </div>
+                <button type="button" class="btn-outra-foto" id="btnOutraFotoModal">Enviar outra foto</button>
+                <a class="modal-instagram-link" href="https://instagram.com/entreclicks.oficial" target="_blank" rel="noopener noreferrer">${ICONE_INSTA}<span>Gostou? Siga @entreclicks.oficial</span></a>
+                <div class="modal-dica-fechar">Ou feche para baixar ou compartilhar sua foto.</div>` : '';
 
             const modal = document.createElement('div');
             modal.className = 'modal';
@@ -2048,11 +2061,21 @@
                     <div class="modal-icone">${icone}</div>
                     <div class="modal-titulo">${titulo}</div>
                     <div class="modal-texto">${texto}</div>
-                    <button class="btn-ok" onclick="this.closest('.modal').remove()">OK</button>
+                    ${mostrarCTA ? '' : '<button class="btn-ok" type="button">OK</button>'}
                     ${ctaHTML}
+                    ${mostrarCTA ? '<button type="button" class="modal-fechar-sucesso">Fechar</button>' : ''}
                 </div>
             `;
             document.body.appendChild(modal);
+            const botaoOk = modal.querySelector('.btn-ok');
+            if (botaoOk) botaoOk.addEventListener('click', () => modal.remove());
+            const botaoFechar = modal.querySelector('.modal-fechar-sucesso');
+            if (botaoFechar) botaoFechar.addEventListener('click', () => modal.remove());
+            const botaoOutra = modal.querySelector('#btnOutraFotoModal');
+            if (botaoOutra) botaoOutra.addEventListener('click', () => {
+                modal.remove();
+                mostrarTela('escolha');
+            });
         }
 
         // INICIALIZAÇÃO
