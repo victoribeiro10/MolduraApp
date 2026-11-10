@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>EntreClicks | Acesso do Operador (Homologação)</title>
-<style>:root{font-family:Inter,system-ui,sans-serif;color:#f4f0e9;background:#12161c}*{box-sizing:border-box}body{min-height:100vh;display:grid;place-items:center;margin:0;padding:20px}.painel{width:min(100%,420px);background:#1d232b;border:1px solid #45403a;border-radius:18px;padding:32px;box-shadow:0 18px 65px #0005}h1{font-size:24px;margin:0 0 6px}.sub{color:#b7a78c;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:28px}label{display:block;font-size:13px;margin:16px 0 7px}input{width:100%;padding:13px;background:#10151a;color:#fff;border:1px solid #4a5159;border-radius:9px;font:inherit}button{width:100%;margin-top:22px;padding:13px;background:#d6b47c;border:0;border-radius:9px;color:#171717;font-weight:700;cursor:pointer}button:disabled{opacity:.6;cursor:wait}.msg{min-height:22px;color:#f2aa9e;margin-top:14px;font-size:13px}.evento{padding:14px;border:1px solid #4a5159;border-radius:9px;margin-top:12px}.aviso{font-size:12px;color:#aab2ba;margin-top:22px}</style></head>
+<style>:root{font-family:Inter,system-ui,sans-serif;color:#f4f0e9;background:#12161c}*{box-sizing:border-box}body{min-height:100vh;display:grid;place-items:center;margin:0;padding:20px}.painel{width:min(100%,420px);background:#1d232b;border:1px solid #45403a;border-radius:18px;padding:32px;box-shadow:0 18px 65px #0005}h1{font-size:24px;margin:0 0 6px}.sub{color:#b7a78c;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:28px}label{display:block;font-size:13px;margin:16px 0 7px}input{width:100%;padding:13px;background:#10151a;color:#fff;border:1px solid #4a5159;border-radius:9px;font:inherit}button{width:100%;margin-top:22px;padding:13px;background:#d6b47c;border:0;border-radius:9px;color:#171717;font-weight:700;cursor:pointer}button:disabled{opacity:.6;cursor:wait}.msg{min-height:22px;color:#f2aa9e;margin-top:14px;font-size:13px}.evento{padding:14px;border:1px solid #4a5159;border-radius:9px;margin-top:12px}.foto-status{font-size:13px;color:#c4cbd1;margin-top:9px}.foto-titulo{font-size:13px;font-weight:700;margin-top:14px}.aviso{font-size:12px;color:#aab2ba;margin-top:22px}</style></head>
 <body><main class="painel"><h1>EntreClicks</h1><div class="sub">Central de Impressão · Homologação</div>
 <form id="login"><label for="usuario">Usuário</label><input id="usuario" autocomplete="username" required minlength="3" maxlength="32" pattern="[a-zA-Z0-9._-]+" placeholder="operador01">
 <label for="senha">Senha</label><input id="senha" type="password" autocomplete="current-password" required minlength="6"><button id="entrar" type="submit">Entrar</button></form>
@@ -21,7 +21,17 @@ async function exibirSessao(){
  document.getElementById('boasvindas').textContent='Acesso autenticado.';
  const container=document.getElementById('eventos');container.replaceChildren();
  if(!data?.length){container.textContent='Nenhum evento atribuído. Solicite ao administrador.';return}
- for(const item of data){const div=document.createElement('div');div.className='evento';div.textContent=(item.eventos_operacao?.nome||'Evento')+' · '+item.perfil;container.append(div)}
+ for(const item of data){
+ const div=document.createElement('div');div.className='evento';
+ const nome=document.createElement('div');nome.textContent=(item.eventos_operacao?.nome||'Evento')+' · '+item.perfil;div.append(nome);
+ const titulo=document.createElement('div');titulo.className='foto-titulo';titulo.textContent='Fotos deste evento';div.append(titulo);
+ const status=document.createElement('div');status.className='foto-status';status.textContent='Consultando fotos...';div.append(status);container.append(div);
+ // O filtro por evento é redundante de propósito: a RLS no Supabase também restringe os dados.
+ const {data:fotos,error:fotosErro}=await sb.from('fotos_evento').select('id,baixada,created_at').eq('evento_id',item.evento_id).order('created_at',{ascending:false}).limit(100);
+ if(fotosErro){status.textContent='Não foi possível consultar as fotos deste evento.';continue}
+ const pendentes=(fotos||[]).filter(f=>!f.baixada).length;
+ status.textContent=fotos?.length ? fotos.length+' foto(s) encontrada(s) · '+pendentes+' pendente(s)'+(fotos.length===100?' · mostrando as 100 mais recentes':'') : 'Nenhuma foto recebida neste evento.';
+}
 }
 form.addEventListener('submit',async e=>{
  e.preventDefault();msg.textContent='';btn.disabled=true;
