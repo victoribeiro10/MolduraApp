@@ -20,7 +20,7 @@ const {data,error}=await sb.from('operadores_evento').select('evento_id,perfil,e
 if(error||!data?.length){aviso('Nenhum evento autorizado.');return}
 const membro=data.find(x=>x.perfil==='operador')||data[0];eventoId=membro.evento_id;$('evento').textContent=(membro.eventos_operacao?.nome||'Evento')+' · '+membro.perfil;
 recebendoFotos=!!membro.eventos_operacao?.recebendo_fotos;atualizarRecebimentoUI();
-molduraUrl=membro.eventos_operacao?.moldura_url;$('moldura').textContent=molduraUrl?'Moldura cadastrada para este evento':'Moldura ainda não configurada neste teste';if(molduraUrl&&/^https:\/\//.test(molduraUrl)){const img=document.createElement('img');img.src=molduraUrl;img.alt='Moldura do evento';img.style.cssText='width:43px;height:55px;object-fit:contain';$('molduraPreview').replaceWith(img)}
+molduraUrl=membro.eventos_operacao?.moldura_url;$('moldura').textContent=molduraUrl?'Moldura cadastrada para este evento':'Moldura ainda não configurada neste teste';
 await atualizarMolduraAtiva();await atualizar();}
 function atualizarRecebimentoUI(){
  $('recebendo').textContent=recebendoFotos?'Recebendo fotos dos convidados':'Recebimento de fotos pausado';
