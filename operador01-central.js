@@ -3,7 +3,7 @@
 const URL_SUPA='https://aukbkykkoeovouflijlz.supabase.co';
 const ANON='sb_publishable_SZs299aBOzg9Xm_sKZXUiA_faIkIFXr';
 const sb=window.supabase.createClient(URL_SUPA,ANON);
-const EVENTO_A='f8e81f0e-5afc-4d10-bcd2-b43327b22ab8';
+const EVENTO_B='d64a9d07-92da-4561-bc75-90e58a8b886b';
 const $=id=>document.getElementById(id);
 let evento=null,fotos=[],molduras=[],aba='pendentes',janela=null,editorFrame=null,imgW=0,imgH=0,drag=null,refreshing=false;
 const frameAPI=URL_SUPA+'/functions/v1/molduras-operador-homologacao';
@@ -12,13 +12,13 @@ function mensagem(t){$('mensagem').textContent=t||''}
 async function autenticar(){
  const {data:{user}}=await sb.auth.getUser();
  if(!user){location.replace('./operador-login.html');return false}
- const {data,error}=await sb.from('operadores_evento').select('evento_id').eq('usuario_id',user.id).eq('evento_id',EVENTO_A).maybeSingle();
- if(error||!data){$('telaLogin').querySelector('.login-box').textContent='Acesso negado: este usuário não está autorizado para o Evento A.';return false}
+ const {data,error}=await sb.from('operadores_evento').select('evento_id').eq('usuario_id',user.id).eq('evento_id',EVENTO_B).maybeSingle();
+ if(error||!data){$('telaLogin').querySelector('.login-box').textContent='Acesso negado: este usuário não está autorizado para o Evento B.';return false}
  $('telaLogin').style.display='none';$('painelAdmin').style.display='block';return true;
 }
 async function sair(){await sb.auth.signOut();location.replace('./operador-login.html')}
 async function atualizarEvento(){
- const {data,error}=await sb.from('eventos_operacao').select('*').eq('id',EVENTO_A).single();
+ const {data,error}=await sb.from('eventos_operacao').select('*').eq('id',EVENTO_B).single();
  if(error)throw error;evento=data;
  const on=data.recebendo_fotos&&data.status!=='encerrado';
  $('statusRecebimentoTitulo').textContent=on?'Recebendo fotos dos convidados':'Recebimento de fotos pausado';
@@ -32,7 +32,7 @@ async function atualizarEvento(){
 }
 async function api(dados){
  const {data:{session}}=await sb.auth.getSession();if(!session)throw Error('Sessão expirada');
- dados.set('evento_id',EVENTO_A);
+ dados.set('evento_id',EVENTO_B);
  const r=await fetch(frameAPI,{method:'POST',headers:{authorization:'Bearer '+session.access_token},body:dados});
  const d=await r.json();if(!r.ok||!d.ok)throw Error(d.error||'Não foi possível salvar');return d;
 }
@@ -40,12 +40,12 @@ async function alternarRecebimentoFotos(){
  const {data:{session}}=await sb.auth.getSession();if(!session)throw Error('Sessão expirada');
  const btn=$('btnAlternarRecebimento');btn.disabled=true;
  try{
-  const r=await fetch(controleAPI,{method:'POST',headers:{authorization:'Bearer '+session.access_token,'content-type':'application/json'},body:JSON.stringify({evento_id:EVENTO_A,recebendo_fotos:!evento.recebendo_fotos})});
+  const r=await fetch(controleAPI,{method:'POST',headers:{authorization:'Bearer '+session.access_token,'content-type':'application/json'},body:JSON.stringify({evento_id:EVENTO_B,recebendo_fotos:!evento.recebendo_fotos})});
   const d=await r.json();if(!r.ok)throw Error(d.error||'Erro ao alterar recebimento');await atualizarEvento();
  }catch(e){mensagem(e.message)}finally{btn.disabled=false}
 }
 async function carregarMolduras(){
- const {data,error}=await sb.from('molduras_evento').select('*').eq('evento_id',EVENTO_A).order('created_at',{ascending:false});
+ const {data,error}=await sb.from('molduras_evento').select('*').eq('evento_id',EVENTO_B).order('created_at',{ascending:false});
  if(error)throw error;molduras=data||[];$('totalMoldurasGaleria').textContent=molduras.length;
 }
 function modal(id,show){$(id).classList.toggle('ativo',show)}
@@ -149,7 +149,7 @@ function mudarAba(n){aba=n;document.querySelectorAll('[data-filtro]').forEach(b=
 async function carregarFotos(silent=false){
  if(refreshing)return;refreshing=true;
  try{
-  const {data,error}=await sb.from('fotos_evento').select('*').eq('evento_id',EVENTO_A).order('created_at',{ascending:false});
+  const {data,error}=await sb.from('fotos_evento').select('*').eq('evento_id',EVENTO_B).order('created_at',{ascending:false});
   if(error)throw error;fotos=data||[];
   $('totalFotos').textContent=fotos.length;$('contadorPendentes').textContent=fotos.filter(f=>!f.baixada).length;
   $('contadorBaixadas').textContent=fotos.filter(f=>f.baixada).length;$('contadorTodas').textContent=fotos.length;
@@ -165,7 +165,7 @@ async function arquivo(f){
 function salvar(blob,name){const a=document.createElement('a'),url=URL.createObjectURL(blob);a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000)}
 async function baixar(f){
  const blob=await arquivo(f);salvar(blob,'EntreClicks-'+f.id+'.jpg');
- if(!f.baixada){const {error}=await sb.from('fotos_evento').update({baixada:true,data_baixada:new Date().toISOString()}).eq('id',f.id).eq('evento_id',EVENTO_A);if(error)throw error;await carregarFotos(true)}
+ if(!f.baixada){const {error}=await sb.from('fotos_evento').update({baixada:true,data_baixada:new Date().toISOString()}).eq('id',f.id).eq('evento_id',EVENTO_B);if(error)throw error;await carregarFotos(true)}
 }
 async function carregarOriginal(f){
  const base=f.arquivo_path.replace(/\.[^.]+$/,'');
@@ -242,7 +242,7 @@ async function abrirReajuste(f){
    const result=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.92));
    if(!result)throw Error('Não foi possível gerar o JPEG.');
    const {data:{session}}=await sb.auth.getSession();if(!session)throw Error('Sessão expirada.');
-   const fd=new FormData();fd.set('foto_id',f.id);fd.set('evento_id',EVENTO_A);fd.set('foto',result,'reajustada.jpg');
+   const fd=new FormData();fd.set('foto_id',f.id);fd.set('evento_id',EVENTO_B);fd.set('foto',result,'reajustada.jpg');
    const res=await fetch(URL_SUPA+'/functions/v1/reajustar-foto-homologacao',{method:'POST',headers:{authorization:'Bearer '+session.access_token},body:fd});
    const payload=await res.json();if(!res.ok||!payload.ok)throw Error(payload.error||'Erro ao salvar.');
    fechar();mensagem('Foto reajustada com sucesso!');await carregarFotos(true);
@@ -274,15 +274,15 @@ function renderFotos(){
  }
 }
 async function apagarFoto(f){
- if(!confirm('Apagar esta foto e seu original do Evento A?'))return;
+ if(!confirm('Apagar esta foto e seu original do Evento B?'))return;
  const base=f.arquivo_path.replace(/\.[^.]+$/,'');
  const paths=[f.arquivo_path,...['jpg','png','webp'].map(ext=>base.replace(/\/([^/]+)$/,'/originais/$1')+'.'+ext)];
  const {error}=await sb.storage.from('fotos-eventos-teste').remove(paths);if(error)return mensagem(error.message);
- const {error:e}=await sb.from('fotos_evento').delete().eq('id',f.id).eq('evento_id',EVENTO_A);if(e)return mensagem(e.message);
+ const {error:e}=await sb.from('fotos_evento').delete().eq('id',f.id).eq('evento_id',EVENTO_B);if(e)return mensagem(e.message);
  await carregarFotos(true)
 }
 async function confirmarApagar(){
- if(!confirm('Apagar TODAS as fotos do Evento A? Esta ação não pode ser desfeita.'))return;
+ if(!confirm('Apagar TODAS as fotos do Evento B? Esta ação não pode ser desfeita.'))return;
  for(const f of [...fotos])await apagarFotoSemConfirmar(f);
  await carregarFotos()
 }
@@ -290,7 +290,7 @@ async function apagarFotoSemConfirmar(f){
  const base=f.arquivo_path.replace(/\.[^.]+$/,'');
  const paths=[f.arquivo_path,...['jpg','png','webp'].map(ext=>base.replace(/\/([^/]+)$/,'/originais/$1')+'.'+ext)];
  await sb.storage.from('fotos-eventos-teste').remove(paths);
- await sb.from('fotos_evento').delete().eq('id',f.id).eq('evento_id',EVENTO_A);
+ await sb.from('fotos_evento').delete().eq('id',f.id).eq('evento_id',EVENTO_B);
 }
 async function baixarPendentesZip(){
  if(!window.JSZip)return mensagem('ZIP indisponível');
