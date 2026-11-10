@@ -167,14 +167,88 @@ async function baixar(f){
  const blob=await arquivo(f);salvar(blob,'EntreClicks-'+f.id+'.jpg');
  if(!f.baixada){const {error}=await sb.from('fotos_evento').update({baixada:true,data_baixada:new Date().toISOString()}).eq('id',f.id).eq('evento_id',EVENTO_A);if(error)throw error;await carregarFotos(true)}
 }
-async function baixarOriginal(f){
+async function carregarOriginal(f){
  const base=f.arquivo_path.replace(/\.[^.]+$/,'');
  for(const ext of ['jpg','png','webp']){
   const p=base.replace(/\/([^/]+)$/,'/originais/$1')+'.'+ext;
   const {data,error}=await sb.storage.from('fotos-eventos-teste').download(p);
-  if(!error&&data){salvar(data,'Original-'+f.id+'.'+ext);return}
+  if(!error&&data)return {blob:data,original:true};
  }
- throw Error('Original indisponível para esta foto');
+ return {blob:await arquivo(f),original:false};
+}
+let cropState=null;
+async function abrirReajuste(f){
+ if(!evento?.moldura_url)return mensagem('Ative uma moldura primeiro.');
+ const {blob,original}=await carregarOriginal(f);
+ const url=URL.createObjectURL(blob);
+ const fonte=new Image();fonte.src=url;
+ try{await fonte.decode()}catch{URL.revokeObjectURL(url);return mensagem('Não foi possível abrir a imagem.')}
+ URL.revokeObjectURL(url);
+ const moldura=new Image();moldura.crossOrigin='anonymous';moldura.src=evento.moldura_url;
+ try{await moldura.decode()}catch{return mensagem('Não foi possível carregar a moldura.')}
+ const w=moldura.naturalWidth,h=moldura.naturalHeight;
+ let x=Number(evento.janela_x)||0,y=Number(evento.janela_y)||0,jw=Number(evento.janela_largura)||w,jh=Number(evento.janela_altura)||h;
+ x=Math.max(0,Math.min(x,w-1));y=Math.max(0,Math.min(y,h-1));jw=Math.max(1,Math.min(jw,w-x));jh=Math.max(1,Math.min(jh,h-y));
+ const existing=$('modalReajusteAdmin');if(existing)existing.remove();
+ const overlay=document.createElement('div');overlay.id='modalReajusteAdmin';overlay.className='modal-config ativo';
+ const panel=document.createElement('div');panel.className='modal-config-conteudo';panel.style.cssText='max-width:420px;max-height:95vh;overflow:auto;margin:10px auto';
+ const head=document.createElement('div');head.className='modal-config-header';
+ const title=document.createElement('h3');title.textContent='✏️ Reajustar Foto';
+ const close=document.createElement('button');close.className='btn-fechar-modal';close.textContent='×';head.append(title,close);
+ const body=document.createElement('div');body.className='modal-config-body';body.style.cssText='text-align:center;padding:16px';
+ const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;canvas.style.cssText='display:block;margin:auto;max-width:100%;max-height:52vh;object-fit:contain;border:1px solid #c5a36b;touch-action:none;cursor:grab';
+ const ctx=canvas.getContext('2d');
+ const bar=document.createElement('div');bar.style.cssText='display:flex;gap:12px;justify-content:center;margin:15px 0';
+ const less=document.createElement('button'),more=document.createElement('button'),save=document.createElement('button'),cancel=document.createElement('button');
+ less.className=more.className=cancel.className='btn-sair';save.className='btn-salvar-coords';
+ less.textContent='🔍 −';more.textContent='🔍 +';save.textContent='SALVAR FOTO';cancel.textContent='CANCELAR';
+ bar.append(less,more);const actions=document.createElement('div');actions.style.cssText='display:flex;gap:10px';
+ save.style.flex='1';cancel.style.flex='1';actions.append(cancel,save);
+ const note=document.createElement('p');note.style.cssText='font-size:11px;color:#c5a36b;margin:12px 0';note.textContent=original?'Arraste a foto para ajustar e use o zoom. A imagem original será preservada.':'Foto antiga sem original: o ajuste será feito a partir da área da foto já emoldurada.';
+ body.append(canvas,bar,note,actions);panel.append(head,body);overlay.append(panel);document.body.append(overlay);
+ const fechar=()=>overlay.remove();close.onclick=cancel.onclick=fechar;
+ const aspect=jw/jh,sw=fonte.naturalWidth,sh=fonte.naturalHeight;
+ let source=fonte;
+ if(!original){
+  const rec=document.createElement('canvas');rec.width=Math.round(jw);rec.height=Math.round(jh);
+  rec.getContext('2d').drawImage(fonte,x/w*sw,y/h*sh,jw/w*sw,jh/h*sh,0,0,rec.width,rec.height);
+  source=rec;
+ }
+ const fw=source.width||source.naturalWidth,fh=source.height||source.naturalHeight;
+ const baseScale=Math.max(jw/fw,jh/fh);
+ const state={dx:(jw-fw*baseScale)/2,dy:(jh-fh*baseScale)/2,scale:1};
+ const draw=()=>{
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);
+  ctx.save();ctx.beginPath();ctx.rect(x,y,jw,jh);ctx.clip();
+  ctx.drawImage(source,x+state.dx,y+state.dy,fw*baseScale*state.scale,fh*baseScale*state.scale);
+  ctx.restore();ctx.drawImage(moldura,0,0,w,h);
+ };
+ const clamp=()=>{
+  const iw=fw*baseScale*state.scale,ih=fh*baseScale*state.scale;
+  state.dx=Math.max(jw-iw,Math.min(0,state.dx));state.dy=Math.max(jh-ih,Math.min(0,state.dy));draw();
+ };
+ const zoom=delta=>{
+  const next=Math.max(1,Math.min(4,state.scale+delta)),ratio=next/state.scale;
+  state.dx=jw/2-(jw/2-state.dx)*ratio;state.dy=jh/2-(jh/2-state.dy)*ratio;state.scale=next;clamp();
+ };
+ less.onclick=()=>zoom(-.15);more.onclick=()=>zoom(.15);
+ let dragging=null;
+ canvas.onpointerdown=e=>{e.preventDefault();dragging={x:e.clientX,y:e.clientY,dx:state.dx,dy:state.dy};canvas.setPointerCapture(e.pointerId)};
+ canvas.onpointermove=e=>{if(!dragging)return;const r=canvas.getBoundingClientRect();state.dx=dragging.dx+(e.clientX-dragging.x)*w/r.width;state.dy=dragging.dy+(e.clientY-dragging.y)*h/r.height;clamp()};
+ canvas.onpointerup=canvas.onpointercancel=()=>dragging=null;
+ save.onclick=async()=>{
+  save.disabled=true;note.textContent='Salvando foto reajustada...';
+  try{
+   const result=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.92));
+   if(!result)throw Error('Não foi possível gerar o JPEG.');
+   const {data:{session}}=await sb.auth.getSession();if(!session)throw Error('Sessão expirada.');
+   const fd=new FormData();fd.set('foto_id',f.id);fd.set('evento_id',EVENTO_A);fd.set('foto',result,'reajustada.jpg');
+   const res=await fetch(URL_SUPA+'/functions/v1/reajustar-foto-homologacao',{method:'POST',headers:{authorization:'Bearer '+session.access_token},body:fd});
+   const payload=await res.json();if(!res.ok||!payload.ok)throw Error(payload.error||'Erro ao salvar.');
+   fechar();mensagem('Foto reajustada com sucesso!');await carregarFotos(true);
+  }catch(e){note.textContent=e.message}finally{save.disabled=false}
+ };
+ draw();
 }
 function renderFotos(){
  const el=$('galeria');el.replaceChildren();
@@ -194,8 +268,7 @@ function renderFotos(){
   const buttons=document.createElement('div');buttons.className='foto-acoes';
   const btn=document.createElement('button');btn.className='btn-download-item';btn.textContent='BAIXAR';
   btn.onclick=()=>baixar(f).catch(e=>mensagem(e.message));buttons.append(btn);
-  const orig=document.createElement('button');orig.className='btn-download-item';orig.textContent='ORIGINAL';orig.title='Baixar arquivo original sem moldura';
-  orig.onclick=()=>baixarOriginal(f).catch(e=>mensagem(e.message));buttons.append(orig);
+  const editar=document.createElement('button');editar.className='btn-desmarcar';editar.textContent='✏️';editar.title='Ajustar foto na moldura';editar.onclick=()=>abrirReajuste(f).catch(e=>mensagem(e.message));buttons.append(editar);
   const del=document.createElement('button');del.className='btn-apagar-item';del.textContent='APAGAR';del.onclick=()=>apagarFoto(f);buttons.append(del);
   card.append(img,info,buttons);el.append(card);
  }
