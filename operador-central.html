@@ -11,7 +11,7 @@
 </main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.10/dist/umd/supabase.min.js"></script><script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script><script>
 'use strict';
 const sb=window.supabase.createClient('https://aukbkykkoeovouflijlz.supabase.co','sb_publishable_SZs299aBOzg9Xm_sKZXUiA_faIkIFXr',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
-const $=id=>document.getElementById(id);let eventoId=null,fotos=[],tab='pendentes',molduraUrl=null,recebendoFotos=null;
+const $=id=>document.getElementById(id);let eventoId=null,fotos=[],tab='pendentes',molduraUrl=null,recebendoFotos=null,atualizando=false,ultimaAssinatura=null;
 const aviso=t=>$('aviso').textContent=t;
 async function iniciar(){const {data:{user}}=await sb.auth.getUser();if(!user){location.replace('./operador-login.html');return}
 const {data,error}=await sb.from('operadores_evento').select('evento_id,perfil,eventos_operacao(nome,recebendo_fotos,moldura_url)').eq('usuario_id',user.id).order('evento_id').limit(2);
@@ -43,7 +43,7 @@ $('pausar').onclick=async()=>{
    aviso(recebendoFotos?'Recebimento retomado somente neste evento.':'Recebimento pausado somente neste evento. Fotos anteriores preservadas.');
  }catch(e){aviso(e.message||'Falha ao alterar recebimento.')}finally{$('pausar').disabled=false}
 };
-async function atualizar(){if(!eventoId)return;aviso('Atualizando fotos...');const {data,error}=await sb.from('fotos_evento').select('id,arquivo_path,baixada,created_at').eq('evento_id',eventoId).order('created_at',{ascending:false}).limit(500);if(error){aviso('Falha ao consultar fotos.');return}fotos=data||[];$('total').textContent=fotos.length+(fotos.length===500?'+':'');$('espaco').textContent='—';$('qpendentes').textContent=fotos.filter(f=>!f.baixada).length;$('qbaixadas').textContent=fotos.filter(f=>f.baixada).length;$('qtodas').textContent=fotos.length;await render();aviso(fotos.length===500?'Mostrando as 500 fotos mais recentes.':'');}
+async function atualizar(silencioso=false){if(!eventoId||atualizando)return;atualizando=true;if(!silencioso)aviso('Atualizando fotos...');const {data,error}=await sb.from('fotos_evento').select('id,arquivo_path,baixada,created_at').eq('evento_id',eventoId).order('created_at',{ascending:false}).limit(500);if(error){aviso('Falha ao consultar fotos.');atualizando=false;return}const novas=data||[];const assinatura=novas.map(f=>f.id+':'+f.baixada).join('|');if(silencioso&&assinatura===ultimaAssinatura){atualizando=false;return}const recebidas=fotos.length?novas.filter(f=>!fotos.some(anterior=>anterior.id===f.id)).length:0;fotos=novas;ultimaAssinatura=assinatura;$('total').textContent=fotos.length+(fotos.length===500?'+':'');$('espaco').textContent='—';$('qpendentes').textContent=fotos.filter(f=>!f.baixada).length;$('qbaixadas').textContent=fotos.filter(f=>f.baixada).length;$('qtodas').textContent=fotos.length;await render();if(recebidas&&silencioso)aviso(recebidas+' nova(s) foto(s) recebida(s) neste evento.');else if(!silencioso)aviso(fotos.length===500?'Mostrando as 500 fotos mais recentes.':'Lista atualizada.');atualizando=false;}
 async function baixarArquivo(f){const {data,error}=await sb.storage.from('fotos-eventos-teste').download(f.arquivo_path);if(error||!data)throw Error('Arquivo indisponível no armazenamento de testes.');return data}
 function salvar(blob,nome){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=nome;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000)}
 function nomeFoto(f){const ext=(f.arquivo_path.split('.').pop()||'jpg').toLowerCase();return 'EntreClicks-'+f.id+'.'+(['jpg','jpeg','png','webp'].includes(ext)?ext:'jpg')}
@@ -56,4 +56,6 @@ document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.
 $('atualizar').onclick=atualizar;$('sair').onclick=async()=>{await sb.auth.signOut();location.replace('./operador-login.html')};
 $('zip').onclick=async()=>{const pendentes=fotos.filter(f=>!f.baixada);if(!pendentes.length){aviso('Não há fotos pendentes.');return}if(!window.JSZip){aviso('Biblioteca ZIP indisponível.');return}const btn=$('zip');btn.disabled=true;const zip=new JSZip();let adicionadas=0;for(const f of pendentes){try{const b=await baixarArquivo(f);zip.file(nomeFoto(f),b);adicionadas++}catch{}}if(!adicionadas){aviso('Nenhuma foto disponível para compactar.');btn.disabled=false;return}aviso('Compactando '+adicionadas+' fotos...');try{salvar(await zip.generateAsync({type:'blob'}),'EntreClicks-pendentes.zip');aviso('ZIP gerado com '+adicionadas+' foto(s). O status não foi alterado.')}catch{aviso('Falha ao gerar ZIP.')}finally{btn.disabled=false}};
 iniciar();
+// Atualiza somente o evento autorizado, a cada 8 segundos, sem recarregar a página.
+setInterval(()=>{if(!document.hidden&&eventoId)atualizar(true)},8000);
 </script></body></html>
