@@ -15,7 +15,7 @@ Deno.serve(async(req)=>{
  if(req.method==="GET")return reply({nome:evento.nome,recebendo_fotos:evento.recebendo_fotos,status:evento.status,moldura_url:evento.moldura_url,janela_x:evento.janela_x,janela_y:evento.janela_y,janela_largura:evento.janela_largura,janela_altura:evento.janela_altura});
  if(!evento.recebendo_fotos||evento.status==="encerrado")return reply({error:"O recebimento de fotos está pausado."},403);
  const tamanho=Number(req.headers.get("content-length")||0);
- if(tamanho>9*1024*1024)return reply({error:"Arquivo muito grande."},413);
+ if(tamanho>18*1024*1024)return reply({error:"Arquivo muito grande."},413);
  let form:FormData;try{form=await req.formData()}catch{return reply({error:"Envio inválido."},400)}
  const arquivo=form.get("foto");
  if(!(arquivo instanceof File)||arquivo.size===0||arquivo.size>8*1024*1024)return reply({error:"Escolha uma imagem de até 8 MB."},400);
@@ -24,10 +24,26 @@ Deno.serve(async(req)=>{
  const png=bytes[0]===137&&bytes[1]===80&&bytes[2]===78&&bytes[3]===71&&bytes[4]===13&&bytes[5]===10;
  const webp=bytes[0]===82&&bytes[1]===73&&bytes[2]===70&&bytes[3]===70&&bytes[8]===87&&bytes[9]===69&&bytes[10]===66&&bytes[11]===80;
  if(!jpeg&&!png&&!webp)return reply({error:"Formato inválido. Use JPG, PNG ou WebP."},415);
+ const original=form.get("original");
+ let originalBytes:Uint8Array|null=null,originalExt="jpg";
+ if(original instanceof File){
+  if(original.size===0||original.size>8*1024*1024)return reply({error:"Foto original inválida."},400);
+  originalBytes=new Uint8Array(await original.arrayBuffer());
+  const oj=originalBytes[0]===255&&originalBytes[1]===216&&originalBytes[2]===255;
+  const op=originalBytes[0]===137&&originalBytes[1]===80&&originalBytes[2]===78&&originalBytes[3]===71;
+  const ow=originalBytes[0]===82&&originalBytes[1]===73&&originalBytes[2]===70&&originalBytes[3]===70&&originalBytes[8]===87&&originalBytes[9]===69&&originalBytes[10]===66&&originalBytes[11]===80;
+  if(!oj&&!op&&!ow)return reply({error:"Formato da foto original inválido."},415);
+  originalExt=oj?"jpg":op?"png":"webp";
+ }
  const extensao=jpeg?"jpg":png?"png":"webp",path=evento.id+"/"+crypto.randomUUID()+"."+extensao;
  const {error:uploadError}=await sb.storage.from("fotos-eventos-teste").upload(path,bytes,{contentType:jpeg?"image/jpeg":png?"image/png":"image/webp",upsert:false});
  if(uploadError)return reply({error:"Falha ao armazenar a imagem."},503);
+ const originalPath=originalBytes?evento.id+"/originais/"+path.split("/").pop()!.replace(/\.[^.]+$/,"")+"."+originalExt:null;
+ if(originalBytes&&originalPath){
+  const {error:originalError}=await sb.storage.from("fotos-eventos-teste").upload(originalPath,originalBytes,{contentType:originalExt==="jpg"?"image/jpeg":originalExt==="png"?"image/png":"image/webp",upsert:false});
+  if(originalError){await sb.storage.from("fotos-eventos-teste").remove([path]);return reply({error:"Falha ao armazenar original."},503)}
+ }
  const {error:insertError}=await sb.from("fotos_evento").insert({evento_id:evento.id,arquivo_path:path,baixada:false});
- if(insertError){await sb.storage.from("fotos-eventos-teste").remove([path]);return reply({error:"Falha ao registrar a imagem."},503)}
+ if(insertError){await sb.storage.from("fotos-eventos-teste").remove([path,...(originalPath?[originalPath]:[])]);return reply({error:"Falha ao registrar a imagem."},503)}
  return reply({ok:true,mensagem:"Foto recebida com sucesso."},201);
 });
