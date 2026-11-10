@@ -5,7 +5,7 @@
 <form id="login"><label for="usuario">Usuário</label><input id="usuario" autocomplete="username" required minlength="3" maxlength="32" pattern="[a-zA-Z0-9._-]+" placeholder="operador01">
 <label for="senha">Senha</label><input id="senha" type="password" autocomplete="current-password" required minlength="6"><button id="entrar" type="submit">Entrar</button></form>
 <section id="area" hidden><p id="boasvindas"></p><div id="eventos"></div><button id="sair" type="button">Sair</button></section>
-<p id="mensagem" class="msg" role="status" aria-live="polite"></p><p class="aviso">Ambiente de homologação. Os registros fictícios não possuem arquivos para visualizar ou baixar. Nenhum dado da produção é utilizado.</p></main>
+<p id="mensagem" class="msg" role="status" aria-live="polite"></p><p class="aviso">Ambiente de homologação. Acesso restrito ao evento autorizado.</p></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.10/dist/umd/supabase.min.js"></script>
 <script>
 'use strict';
@@ -15,72 +15,10 @@ const emailInterno=usuario=>usuario.toLowerCase()+'@operadores.entreclicks.inval
 async function exibirSessao(){
  const {data:{user},error:authError}=await sb.auth.getUser();
  if(authError||!user){form.hidden=false;area.hidden=true;return}
- const {data,error}=await sb.from('operadores_evento').select('evento_id,perfil,eventos_operacao(nome,status)').eq('usuario_id',user.id);
- if(error){msg.textContent='Não foi possível consultar as permissões.';return}
- form.hidden=true;area.hidden=false;msg.textContent='';
- document.getElementById('boasvindas').textContent='Acesso autenticado.';
- const container=document.getElementById('eventos');container.replaceChildren();
- const centralLink=document.createElement('a');centralLink.href='./operador-central.html';centralLink.textContent='ABRIR CENTRAL DE IMPRESSÃO · LAYOUT DO HUB';centralLink.style.cssText='display:block;margin:16px 0;padding:15px;background:#c5a36b;color:#18130d;text-align:center;text-decoration:none;font-weight:700;border-radius:5px';container.append(centralLink);
-
- if(!data?.length){container.textContent='Nenhum evento atribuído. Solicite ao administrador.';return}
- for(const item of data){
- const div=document.createElement('div');div.className='evento';
- const nome=document.createElement('div');nome.textContent=(item.eventos_operacao?.nome||'Evento')+' · '+item.perfil;div.append(nome);
- const titulo=document.createElement('div');titulo.className='foto-titulo';titulo.textContent='Fotos deste evento';div.append(titulo);
- const status=document.createElement('div');status.className='foto-status';status.textContent='Consultando fotos...';div.append(status);container.append(div);
- // O filtro por evento é redundante de propósito: a RLS no Supabase também restringe os dados.
- const {data:fotos,error:fotosErro}=await sb.from('fotos_evento').select('id,arquivo_path,baixada,created_at').eq('evento_id',item.evento_id).order('created_at',{ascending:false}).limit(100);
- if(fotosErro){status.textContent='Não foi possível consultar as fotos deste evento.';continue}
- const pendentes=(fotos||[]).filter(f=>!f.baixada).length;
- status.textContent=fotos?.length ? fotos.length+' foto(s) encontrada(s) · '+pendentes+' pendente(s)'+(fotos.length===100?' · mostrando as 100 mais recentes':'') : 'Nenhuma foto recebida neste evento.';
- const lista=document.createElement('div');div.append(lista);
- for(const foto of fotos||[]){
-   const linha=document.createElement('div');linha.className='foto-linha';lista.append(linha);
-   const mini=document.createElement('img');mini.alt='Prévia da foto';mini.hidden=true;linha.append(mini);
-   const meta=document.createElement('span');meta.className='meta';meta.textContent=(foto.baixada?'Baixada':'Pendente')+' · '+new Date(foto.created_at).toLocaleString('pt-BR');linha.append(meta);
-   const visualizar=document.createElement('button');visualizar.type='button';visualizar.textContent='Visualizar';linha.append(visualizar);
-   const baixar=document.createElement('button');baixar.type='button';baixar.textContent='Baixar foto';linha.append(baixar);
-   const marcar=document.createElement('button');marcar.type='button';marcar.textContent=foto.baixada?'Marcar pendente':'Marcar baixada';linha.append(marcar);
-   const aviso=document.createElement('span');aviso.className='foto-status';linha.append(aviso);
-   let previaUrl=null;
-   visualizar.addEventListener('click',async()=>{
-     if(previaUrl){URL.revokeObjectURL(previaUrl);previaUrl=null;mini.removeAttribute('src');mini.hidden=true;visualizar.textContent='Visualizar';return}
-     visualizar.disabled=true;aviso.textContent='Carregando prévia...';
-     try{
-       const {data:arquivo,error:erro}=await sb.storage.from('fotos-eventos-teste').download(foto.arquivo_path);
-       if(erro||!arquivo)throw Error('Arquivo não encontrado no armazenamento de testes.');
-       previaUrl=URL.createObjectURL(arquivo);mini.src=previaUrl;mini.hidden=false;visualizar.textContent='Ocultar prévia';aviso.textContent='';
-     }catch(e){aviso.textContent=e.message||'Falha ao visualizar a foto.'}finally{visualizar.disabled=false}
-   });
-   baixar.addEventListener('click',async()=>{
-     baixar.disabled=true;aviso.textContent='Preparando download...';
-     let arquivoUrl=null;
-     try{
-       const {data:arquivo,error:erro}=await sb.storage.from('fotos-eventos-teste').download(foto.arquivo_path);
-       if(erro||!arquivo)throw Error('Arquivo não encontrado no armazenamento de testes.');
-       const ext=(foto.arquivo_path.split('.').pop()||'jpg').toLowerCase();
-       const extensao=['jpg','jpeg','png','webp'].includes(ext)?ext:'jpg';
-       arquivoUrl=URL.createObjectURL(arquivo);
-       const a=document.createElement('a');a.href=arquivoUrl;a.download='EntreClicks-'+foto.id+'.'+extensao;
-       document.body.append(a);a.click();a.remove();
-       aviso.textContent='Download solicitado. Confira sua pasta de downloads.';
-     }catch(e){aviso.textContent=e.message||'Falha ao baixar a foto.'}
-     finally{baixar.disabled=false;if(arquivoUrl)setTimeout(()=>URL.revokeObjectURL(arquivoUrl),60000)}
-   });
-   marcar.addEventListener('click',async()=>{
-     marcar.disabled=true;aviso.textContent='Salvando...';
-     const novo=!foto.baixada;
-     const {data:alterada,error:erro}=await sb.from('fotos_evento').update({baixada:novo,data_baixada:novo?new Date().toISOString():null}).eq('id',foto.id).eq('evento_id',item.evento_id).select('id').single();
-     if(erro||!alterada){aviso.textContent='Não foi possível atualizar o status.';marcar.disabled=false;return}
-     foto.baixada=novo;meta.textContent=(novo?'Baixada':'Pendente')+' · '+new Date(foto.created_at).toLocaleString('pt-BR');
-     marcar.textContent=novo?'Marcar pendente':'Marcar baixada';
-     const restantes=fotos.filter(f=>!f.baixada).length;
-     status.textContent=fotos.length+' foto(s) encontrada(s) · '+restantes+' pendente(s)'+(fotos.length===100?' · mostrando as 100 mais recentes':'');
-     aviso.textContent='Status atualizado.';marcar.disabled=false;
-   });
- }
-
-}
+ const {data,error}=await sb.from('operadores_evento').select('evento_id').eq('usuario_id',user.id).limit(1);
+ if(error){msg.textContent='Não foi possível consultar as permissões.';form.hidden=false;return}
+ if(!data?.length){msg.textContent='Nenhum evento atribuído. Solicite ao administrador.';form.hidden=false;return}
+ msg.textContent='Abrindo Central de Impressão...';location.replace('./operador-central.html');
 }
 form.addEventListener('submit',async e=>{
  e.preventDefault();msg.textContent='';btn.disabled=true;
