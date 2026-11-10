@@ -819,8 +819,10 @@
         // ============================================
         // HOMOLOGAÇÃO: interface original, transporte exclusivo do Evento B.
         const ENDPOINT_EVENTO = "https://aukbkykkoeovouflijlz.supabase.co/functions/v1/receber-foto-homologacao";
-        const TOKEN_EVENTO = new URLSearchParams(location.search).get("token");
         const TOKEN_EVENTO_B = "d1281103-b626-4f68-a66c-c9ef38dfd9a4";
+        // Este endereço é exclusivo do Evento B: funciona também sem parâmetro na URL.
+        const tokenInformado = new URLSearchParams(location.search).get("token");
+        const TOKEN_EVENTO = tokenInformado || TOKEN_EVENTO_B;
         const BUCKET_FOTOS = "fotos-eventos-teste";
         if (TOKEN_EVENTO !== TOKEN_EVENTO_B) {
             document.addEventListener('DOMContentLoaded', () => {
