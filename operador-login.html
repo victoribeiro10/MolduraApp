@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>EntreClicks | Acesso do Operador (Homologação)</title>
-<style>:root{font-family:Inter,system-ui,sans-serif;color:#f4f0e9;background:#12161c}*{box-sizing:border-box}body{min-height:100vh;display:grid;place-items:center;margin:0;padding:20px}.painel{width:min(100%,420px);background:#1d232b;border:1px solid #45403a;border-radius:18px;padding:32px;box-shadow:0 18px 65px #0005}h1{font-size:24px;margin:0 0 6px}.sub{color:#b7a78c;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:28px}label{display:block;font-size:13px;margin:16px 0 7px}input{width:100%;padding:13px;background:#10151a;color:#fff;border:1px solid #4a5159;border-radius:9px;font:inherit}button{width:100%;margin-top:22px;padding:13px;background:#d6b47c;border:0;border-radius:9px;color:#171717;font-weight:700;cursor:pointer}button:disabled{opacity:.6;cursor:wait}.msg{min-height:22px;color:#f2aa9e;margin-top:14px;font-size:13px}.evento{padding:14px;border:1px solid #4a5159;border-radius:9px;margin-top:12px}.foto-status{font-size:13px;color:#c4cbd1;margin-top:9px}.foto-titulo{font-size:13px;font-weight:700;margin-top:14px}.aviso{font-size:12px;color:#aab2ba;margin-top:22px}</style></head>
+<style>:root{font-family:Inter,system-ui,sans-serif;color:#f4f0e9;background:#12161c}*{box-sizing:border-box}body{min-height:100vh;display:grid;place-items:center;margin:0;padding:20px}.painel{width:min(100%,420px);background:#1d232b;border:1px solid #45403a;border-radius:18px;padding:32px;box-shadow:0 18px 65px #0005}h1{font-size:24px;margin:0 0 6px}.sub{color:#b7a78c;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:28px}label{display:block;font-size:13px;margin:16px 0 7px}input{width:100%;padding:13px;background:#10151a;color:#fff;border:1px solid #4a5159;border-radius:9px;font:inherit}button{width:100%;margin-top:22px;padding:13px;background:#d6b47c;border:0;border-radius:9px;color:#171717;font-weight:700;cursor:pointer}button:disabled{opacity:.6;cursor:wait}.msg{min-height:22px;color:#f2aa9e;margin-top:14px;font-size:13px}.evento{padding:14px;border:1px solid #4a5159;border-radius:9px;margin-top:12px}.foto-status{font-size:13px;color:#c4cbd1;margin-top:9px}.foto-titulo{font-size:13px;font-weight:700;margin-top:14px}.foto-linha{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-top:1px solid #383e45}.foto-linha button{width:auto;margin:0;padding:8px 10px;font-size:12px}.foto-linha img{width:58px;height:70px;object-fit:contain;background:#10151a;border-radius:5px}.foto-linha .meta{flex:1;min-width:115px;font-size:12px}.aviso{font-size:12px;color:#aab2ba;margin-top:22px}</style></head>
 <body><main class="painel"><h1>EntreClicks</h1><div class="sub">Central de Impressão · Homologação</div>
 <form id="login"><label for="usuario">Usuário</label><input id="usuario" autocomplete="username" required minlength="3" maxlength="32" pattern="[a-zA-Z0-9._-]+" placeholder="operador01">
 <label for="senha">Senha</label><input id="senha" type="password" autocomplete="current-password" required minlength="6"><button id="entrar" type="submit">Entrar</button></form>
 <section id="area" hidden><p id="boasvindas"></p><div id="eventos"></div><button id="sair" type="button">Sair</button></section>
-<p id="mensagem" class="msg" role="status" aria-live="polite"></p><p class="aviso">Ambiente de testes. O acesso à Central completa será liberado após a integração e os testes de segurança.</p></main>
+<p id="mensagem" class="msg" role="status" aria-live="polite"></p><p class="aviso">Ambiente de homologação. Os registros fictícios não possuem arquivos para visualizar ou baixar. Nenhum dado da produção é utilizado.</p></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.10/dist/umd/supabase.min.js"></script>
 <script>
 'use strict';
@@ -27,10 +27,41 @@ async function exibirSessao(){
  const titulo=document.createElement('div');titulo.className='foto-titulo';titulo.textContent='Fotos deste evento';div.append(titulo);
  const status=document.createElement('div');status.className='foto-status';status.textContent='Consultando fotos...';div.append(status);container.append(div);
  // O filtro por evento é redundante de propósito: a RLS no Supabase também restringe os dados.
- const {data:fotos,error:fotosErro}=await sb.from('fotos_evento').select('id,baixada,created_at').eq('evento_id',item.evento_id).order('created_at',{ascending:false}).limit(100);
+ const {data:fotos,error:fotosErro}=await sb.from('fotos_evento').select('id,arquivo_path,baixada,created_at').eq('evento_id',item.evento_id).order('created_at',{ascending:false}).limit(100);
  if(fotosErro){status.textContent='Não foi possível consultar as fotos deste evento.';continue}
  const pendentes=(fotos||[]).filter(f=>!f.baixada).length;
  status.textContent=fotos?.length ? fotos.length+' foto(s) encontrada(s) · '+pendentes+' pendente(s)'+(fotos.length===100?' · mostrando as 100 mais recentes':'') : 'Nenhuma foto recebida neste evento.';
+ const lista=document.createElement('div');div.append(lista);
+ for(const foto of fotos||[]){
+   const linha=document.createElement('div');linha.className='foto-linha';lista.append(linha);
+   const mini=document.createElement('img');mini.alt='Prévia da foto';mini.hidden=true;linha.append(mini);
+   const meta=document.createElement('span');meta.className='meta';meta.textContent=(foto.baixada?'Baixada':'Pendente')+' · '+new Date(foto.created_at).toLocaleString('pt-BR');linha.append(meta);
+   const abrir=document.createElement('button');abrir.type='button';abrir.textContent='Visualizar / baixar';linha.append(abrir);
+   const marcar=document.createElement('button');marcar.type='button';marcar.textContent=foto.baixada?'Marcar pendente':'Marcar baixada';linha.append(marcar);
+   const aviso=document.createElement('span');aviso.className='foto-status';linha.append(aviso);
+   abrir.addEventListener('click',async()=>{
+     abrir.disabled=true;aviso.textContent='Preparando arquivo...';
+     try{
+       const {data:arquivo,error:erro}=await sb.storage.from('fotos-eventos-teste').createSignedUrl(foto.arquivo_path,60);
+       if(erro||!arquivo?.signedUrl)throw Error('Arquivo não encontrado no armazenamento de testes.');
+       mini.src=arquivo.signedUrl;mini.hidden=false;
+       const a=document.createElement('a');a.href=arquivo.signedUrl;a.download='EntreClicks-'+foto.id+'.jpg';a.rel='noopener';a.click();
+       aviso.textContent='Download solicitado. Confira se o arquivo foi salvo.';
+     }catch(e){aviso.textContent=e.message||'Falha ao abrir o arquivo.'}finally{abrir.disabled=false}
+   });
+   marcar.addEventListener('click',async()=>{
+     marcar.disabled=true;aviso.textContent='Salvando...';
+     const novo=!foto.baixada;
+     const {data:alterada,error:erro}=await sb.from('fotos_evento').update({baixada:novo,data_baixada:novo?new Date().toISOString():null}).eq('id',foto.id).eq('evento_id',item.evento_id).select('id').single();
+     if(erro||!alterada){aviso.textContent='Não foi possível atualizar o status.';marcar.disabled=false;return}
+     foto.baixada=novo;meta.textContent=(novo?'Baixada':'Pendente')+' · '+new Date(foto.created_at).toLocaleString('pt-BR');
+     marcar.textContent=novo?'Marcar pendente':'Marcar baixada';
+     const restantes=fotos.filter(f=>!f.baixada).length;
+     status.textContent=fotos.length+' foto(s) encontrada(s) · '+restantes+' pendente(s)'+(fotos.length===100?' · mostrando as 100 mais recentes':'');
+     aviso.textContent='Status atualizado.';marcar.disabled=false;
+   });
+ }
+
 }
 }
 form.addEventListener('submit',async e=>{
