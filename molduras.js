@@ -211,6 +211,7 @@ window.mostrarPainel = function () {
   carregarConfiguracao();
 
   carregarFotos();
+  iniciarAtualizacaoAutomaticaFotos();
 };
 
 
@@ -3824,6 +3825,49 @@ async function () {
   }
 };
 
+
+// ============================================================
+// ATUALIZAÇÃO AUTOMÁTICA DA GALERIA — 8 SEGUNDOS
+// Apenas quando o HUB está autorizado e visível.
+// ============================================================
+let ecAutoFotosTimer = null;
+let ecAutoFotosEmAndamento = false;
+let ecAutoFotosAssinatura = null;
+
+function assinaturaFotosNoStorage(arquivos) {
+  return (arquivos || [])
+    .filter(f => f.name && f.metadata && !ehFotoOriginal(f.name))
+    .map(f => [f.caminho || f.name, f.metadata.size || 0, f.updated_at || ""].join(":"))
+    .sort()
+    .join("|");
+}
+
+function iniciarAtualizacaoAutomaticaFotos() {
+  if (ecAutoFotosTimer) return;
+  ecAutoFotosTimer = window.setInterval(async () => {
+    if (!hubAuthorized || document.hidden || ecAutoFotosEmAndamento) return;
+    const painel = document.getElementById("painelAdmin");
+    if (!painel || getComputedStyle(painel).display === "none") return;
+    if (document.querySelector(".modal-foto, #modalReajusteAdmin")) return;
+    ecAutoFotosEmAndamento = true;
+    try {
+      const arquivos = await listarArquivosDoBucket();
+      const assinatura = assinaturaFotosNoStorage(arquivos);
+      if (ecAutoFotosAssinatura === null) {
+        ecAutoFotosAssinatura = assinatura;
+        return;
+      }
+      if (assinatura !== ecAutoFotosAssinatura) {
+        ecAutoFotosAssinatura = assinatura;
+        await carregarFotos();
+      }
+    } catch (erro) {
+      console.warn("EntreClicks: falha na atualização automática", erro);
+    } finally {
+      ecAutoFotosEmAndamento = false;
+    }
+  }, 8000);
+}
 
 // ============================================================
 // MODAL DE FOTO
