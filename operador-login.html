@@ -20,6 +20,8 @@ async function exibirSessao(){
  form.hidden=true;area.hidden=false;msg.textContent='';
  document.getElementById('boasvindas').textContent='Acesso autenticado.';
  const container=document.getElementById('eventos');container.replaceChildren();
+ const centralLink=document.createElement('a');centralLink.href='./operador-central.html';centralLink.textContent='ABRIR CENTRAL DE IMPRESSÃO · LAYOUT DO HUB';centralLink.style.cssText='display:block;margin:16px 0;padding:15px;background:#c5a36b;color:#18130d;text-align:center;text-decoration:none;font-weight:700;border-radius:5px';container.append(centralLink);
+
  if(!data?.length){container.textContent='Nenhum evento atribuído. Solicite ao administrador.';return}
  for(const item of data){
  const div=document.createElement('div');div.className='evento';
