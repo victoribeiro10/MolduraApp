@@ -36,18 +36,34 @@ async function exibirSessao(){
    const linha=document.createElement('div');linha.className='foto-linha';lista.append(linha);
    const mini=document.createElement('img');mini.alt='Prévia da foto';mini.hidden=true;linha.append(mini);
    const meta=document.createElement('span');meta.className='meta';meta.textContent=(foto.baixada?'Baixada':'Pendente')+' · '+new Date(foto.created_at).toLocaleString('pt-BR');linha.append(meta);
-   const abrir=document.createElement('button');abrir.type='button';abrir.textContent='Visualizar / baixar';linha.append(abrir);
+   const visualizar=document.createElement('button');visualizar.type='button';visualizar.textContent='Visualizar';linha.append(visualizar);
+   const baixar=document.createElement('button');baixar.type='button';baixar.textContent='Baixar foto';linha.append(baixar);
    const marcar=document.createElement('button');marcar.type='button';marcar.textContent=foto.baixada?'Marcar pendente':'Marcar baixada';linha.append(marcar);
    const aviso=document.createElement('span');aviso.className='foto-status';linha.append(aviso);
-   abrir.addEventListener('click',async()=>{
-     abrir.disabled=true;aviso.textContent='Preparando arquivo...';
+   let previaUrl=null;
+   visualizar.addEventListener('click',async()=>{
+     if(previaUrl){URL.revokeObjectURL(previaUrl);previaUrl=null;mini.removeAttribute('src');mini.hidden=true;visualizar.textContent='Visualizar';return}
+     visualizar.disabled=true;aviso.textContent='Carregando prévia...';
      try{
-       const {data:arquivo,error:erro}=await sb.storage.from('fotos-eventos-teste').createSignedUrl(foto.arquivo_path,60);
-       if(erro||!arquivo?.signedUrl)throw Error('Arquivo não encontrado no armazenamento de testes.');
-       mini.src=arquivo.signedUrl;mini.hidden=false;
-       const a=document.createElement('a');a.href=arquivo.signedUrl;a.download='EntreClicks-'+foto.id+'.jpg';a.rel='noopener';a.click();
-       aviso.textContent='Download solicitado. Confira se o arquivo foi salvo.';
-     }catch(e){aviso.textContent=e.message||'Falha ao abrir o arquivo.'}finally{abrir.disabled=false}
+       const {data:arquivo,error:erro}=await sb.storage.from('fotos-eventos-teste').download(foto.arquivo_path);
+       if(erro||!arquivo)throw Error('Arquivo não encontrado no armazenamento de testes.');
+       previaUrl=URL.createObjectURL(arquivo);mini.src=previaUrl;mini.hidden=false;visualizar.textContent='Ocultar prévia';aviso.textContent='';
+     }catch(e){aviso.textContent=e.message||'Falha ao visualizar a foto.'}finally{visualizar.disabled=false}
+   });
+   baixar.addEventListener('click',async()=>{
+     baixar.disabled=true;aviso.textContent='Preparando download...';
+     let arquivoUrl=null;
+     try{
+       const {data:arquivo,error:erro}=await sb.storage.from('fotos-eventos-teste').download(foto.arquivo_path);
+       if(erro||!arquivo)throw Error('Arquivo não encontrado no armazenamento de testes.');
+       const ext=(foto.arquivo_path.split('.').pop()||'jpg').toLowerCase();
+       const extensao=['jpg','jpeg','png','webp'].includes(ext)?ext:'jpg';
+       arquivoUrl=URL.createObjectURL(arquivo);
+       const a=document.createElement('a');a.href=arquivoUrl;a.download='EntreClicks-'+foto.id+'.'+extensao;
+       document.body.append(a);a.click();a.remove();
+       aviso.textContent='Download solicitado. Confira sua pasta de downloads.';
+     }catch(e){aviso.textContent=e.message||'Falha ao baixar a foto.'}
+     finally{baixar.disabled=false;if(arquivoUrl)setTimeout(()=>URL.revokeObjectURL(arquivoUrl),60000)}
    });
    marcar.addEventListener('click',async()=>{
      marcar.disabled=true;aviso.textContent='Salvando...';
