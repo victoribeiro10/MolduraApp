@@ -18,7 +18,7 @@ async function exibirSessao(){
  const {data,error}=await sb.from('operadores_evento').select('evento_id').eq('usuario_id',user.id).limit(1);
  if(error){msg.textContent='Não foi possível consultar as permissões.';form.hidden=false;return}
  if(!data?.length){msg.textContent='Nenhum evento atribuído. Solicite ao administrador.';form.hidden=false;return}
- msg.textContent='Abrindo Central de Impressão...';location.replace('./operador01.html');
+ msg.textContent='Abrindo Central de Impressão...';location.replace(data[0].evento_id==='f8e81f0e-5afc-4d10-bcd2-b43327b22ab8'?'./admin-evento-a.html':'./operador01.html');
 }
 form.addEventListener('submit',async e=>{
  e.preventDefault();msg.textContent='';btn.disabled=true;
