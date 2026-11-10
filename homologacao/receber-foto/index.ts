@@ -9,10 +9,10 @@ Deno.serve(async(req)=>{
  const sb=createClient(url,secret,{auth:{persistSession:false,autoRefreshToken:false}});
  const token=req.method==="GET"?new URL(req.url).searchParams.get("token"):req.headers.get("x-event-token");
  if(!token||!/^[0-9a-f-]{36}$/i.test(token))return reply({error:"Convite inválido."},400);
- const {data:evento,error:err}=await sb.from("eventos_operacao").select("id,nome,recebendo_fotos,status").eq("token_envio",token).maybeSingle();
+ const {data:evento,error:err}=await sb.from("eventos_operacao").select("id,nome,recebendo_fotos,status,moldura_url,janela_x,janela_y,janela_largura,janela_altura").eq("token_envio",token).maybeSingle();
  if(err)return reply({error:"Não foi possível consultar o evento."},503);
  if(!evento)return reply({error:"Convite não encontrado."},404);
- if(req.method==="GET")return reply({nome:evento.nome,recebendo_fotos:evento.recebendo_fotos,status:evento.status});
+ if(req.method==="GET")return reply({nome:evento.nome,recebendo_fotos:evento.recebendo_fotos,status:evento.status,moldura_url:evento.moldura_url,janela_x:evento.janela_x,janela_y:evento.janela_y,janela_largura:evento.janela_largura,janela_altura:evento.janela_altura});
  if(!evento.recebendo_fotos||evento.status==="encerrado")return reply({error:"O recebimento de fotos está pausado."},403);
  const tamanho=Number(req.headers.get("content-length")||0);
  if(tamanho>9*1024*1024)return reply({error:"Arquivo muito grande."},413);
