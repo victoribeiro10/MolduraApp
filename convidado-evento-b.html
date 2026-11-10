@@ -835,12 +835,29 @@
             return {...data, recebendo_fotos:data.recebendo_fotos&&data.status!=='encerrado'};
         }
         const supabaseClient = {
-            from(tabela){
-                if(tabela!=='configuracao') throw Error('Consulta não permitida');
-                return {select(){return {order(){return {limit(){return {async single(){
-                    try{return {data:await obterConfiguracaoEvento(),error:null}}
-                    catch(error){return {data:null,error}}
-                }}}}}}}};
+            from(tabela) {
+                if (tabela !== 'configuracao') throw Error('Consulta não permitida');
+                return {
+                    select() {
+                        return {
+                            order() {
+                                return {
+                                    limit() {
+                                        return {
+                                            async single() {
+                                                try {
+                                                    return { data: await obterConfiguracaoEvento(), error: null };
+                                                } catch (error) {
+                                                    return { data: null, error };
+                                                }
+                                            }
+                                        };
+                                    }
+                                };
+                            }
+                        };
+                    }
+                };
             }
         };
         async function enviarParaEvento(nome,imagem,fonte){
