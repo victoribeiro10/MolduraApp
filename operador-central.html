@@ -198,6 +198,19 @@ function nomeFoto(f){const ext=(f.arquivo_path.split('.').pop()||'jpg').toLowerC
 async function render(){const lista=fotos.filter(f=>tab==='todas'||(tab==='pendentes'?!f.baixada:f.baixada)),area=$('fotos');area.replaceChildren();if(!lista.length){const div=document.createElement('div');div.className='empty';div.textContent='Nenhuma foto nesta categoria';area.append(div);return}
 for(const f of lista){const card=document.createElement('article');card.className='photo';const img=document.createElement('div');img.className='missing';img.textContent='Carregando foto...';card.append(img);const footer=document.createElement('footer');const data=document.createElement('div');data.className='small';data.textContent=new Date(f.created_at).toLocaleString('pt-BR')+' · '+(f.baixada?'Baixada':'Pendente');footer.append(data);const buttons=document.createElement('div');buttons.className='buttons';footer.append(buttons);card.append(footer);area.append(card);
 const btnDownload=document.createElement('button');btnDownload.className='btn';btnDownload.textContent='Baixar';buttons.append(btnDownload);btnDownload.onclick=async()=>{btnDownload.disabled=true;try{const blob=await baixarArquivo(f);salvar(blob,nomeFoto(f));if(!f.baixada){const {data,error}=await sb.from('fotos_evento').update({baixada:true,data_baixada:new Date().toISOString()}).eq('id',f.id).eq('evento_id',eventoId).select('id').single();if(error||!data){aviso('Download iniciado, mas não foi possível marcar como baixada. Use o botão manual.');return}f.baixada=true;await atualizar();aviso('Download iniciado e foto movida para Baixadas.')}else{aviso('Download solicitado: '+nomeFoto(f))}}catch(e){aviso(e.message)}finally{btnDownload.disabled=false}};
+const btnOriginal=document.createElement('button');btnOriginal.className='btn';btnOriginal.textContent='Original';btnOriginal.title='Baixar a foto original preservada para reajuste';buttons.append(btnOriginal);
+btnOriginal.onclick=async()=>{btnOriginal.disabled=true;
+ try{
+  const base=f.arquivo_path.replace(/\.[^.]+$/,'');let blob=null,ext='';
+  for(const tipo of ['jpg','png','webp']){
+   const caminho=base.replace(/\/([^/]+)$/,'/originais/$1')+'.'+tipo;
+   const {data,error}=await sb.storage.from('fotos-eventos-teste').download(caminho);
+   if(!error&&data){blob=data;ext=tipo;break}
+  }
+  if(!blob)throw Error('Foto original indisponível para este registro.');
+  salvar(blob,'EntreClicks-original-'+f.id+'.'+ext);aviso('Foto original baixada para reajuste.');
+ }catch(e){aviso(e.message)}finally{btnOriginal.disabled=false}
+};
 const btnStatus=document.createElement('button');btnStatus.className='btn';btnStatus.textContent=f.baixada?'Pendente':'Marcar baixada';buttons.append(btnStatus);btnStatus.onclick=async()=>{btnStatus.disabled=true;const novo=!f.baixada;const {data,error}=await sb.from('fotos_evento').update({baixada:novo,data_baixada:novo?new Date().toISOString():null}).eq('id',f.id).eq('evento_id',eventoId).select('id').single();if(error||!data){aviso('Falha ao atualizar status.');btnStatus.disabled=false;return}f.baixada=novo;await atualizar()};
 baixarArquivo(f).then(blob=>{if(!card.isConnected)return;const url=URL.createObjectURL(blob),preview=document.createElement('img');preview.src=url;preview.alt='Foto recebida — clique para ampliar';preview.title='Clique para ampliar';preview.onclick=()=>baixarArquivo(f).then(blob=>abrirVisualizador(blob,'Foto do evento · '+new Date(f.created_at).toLocaleString('pt-BR'))).catch(e=>aviso(e.message));preview.onload=()=>URL.revokeObjectURL(url);preview.onerror=()=>URL.revokeObjectURL(url);img.replaceWith(preview)}).catch(()=>{img.textContent='Arquivo de teste indisponível'});}}
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));render()});
