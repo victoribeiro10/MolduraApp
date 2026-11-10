@@ -49,6 +49,10 @@ async function carregarMolduras(){
  if(error)throw error;molduras=data||[];$('totalMoldurasGaleria').textContent=molduras.length;
 }
 function modal(id,show){$(id).classList.toggle('ativo',show)}
+function fecharJanelasAposSalvar(){
+ document.querySelectorAll('.modal-config.ativo').forEach(el=>el.classList.remove('ativo'));
+ document.getElementById('modalReajusteAdmin')?.remove();
+}
 async function abrirModalGaleria(){
  try{await carregarMolduras();renderMolduras();modal('modalGaleriaMolduras',true)}catch(e){mensagem(e.message)}
 }
@@ -61,7 +65,7 @@ function renderMolduras(){
   const img=new Image();img.src=f.moldura_url;img.alt=f.nome;img.style.cssText='width:150px;height:190px;object-fit:contain';
   const label=document.createElement('span');label.textContent=f.nome+(f.moldura_url===evento?.moldura_url?' · ATIVA':'');
   const btn=document.createElement('button');btn.className='btn-adicionar-moldura';btn.textContent='Ativar moldura';btn.disabled=f.moldura_url===evento?.moldura_url;
-  btn.onclick=async()=>{btn.disabled=true;try{const fd=new FormData();fd.set('acao','ativar');fd.set('moldura_id',f.id);await api(fd);await atualizarEvento();renderMolduras()}catch(e){mensagem(e.message);btn.disabled=false}};
+  btn.onclick=async()=>{btn.disabled=true;try{const fd=new FormData();fd.set('acao','ativar');fd.set('moldura_id',f.id);await api(fd);fecharJanelasAposSalvar();await carregarMolduras();await atualizarEvento();renderMolduras();mensagem('Moldura ativada com sucesso!')}catch(e){mensagem(e.message);btn.disabled=false}};
   card.append(img,label,btn);el.append(card);
  }
 }
@@ -90,7 +94,7 @@ async function salvarNovaMoldura(){
  try{
   const coords=await janelaTransparente(file),fd=new FormData();fd.set('acao','adicionar');fd.set('nome',nome);fd.set('arquivo',file);
   for(const [k,v] of Object.entries(coords))fd.set(k,v);
-  await api(fd);$('nomeNovaMoldura').value='';$('inputNovaMoldura').value='';fecharModalAdicionarMoldura();
+  await api(fd);$('nomeNovaMoldura').value='';$('inputNovaMoldura').value='';fecharJanelasAposSalvar();await carregarMolduras();mensagem('Moldura cadastrada! Ative-a na galeria para usar no evento.');
  }catch(e){mensagem(e.message)}finally{btn.disabled=false}
 }
 async function abrirModalConfig(){
@@ -142,7 +146,7 @@ async function salvarCoordenadas(){
  try{
   const fd=new FormData();fd.set('acao','ajustar');fd.set('moldura_id',editorFrame.id);
   for(const [k,key] of Object.entries({x:'janela_x',y:'janela_y',w:'janela_largura',h:'janela_altura'}))fd.set(key,Math.round(janela[k]));
-  await api(fd);await carregarMolduras();await atualizarEvento();fecharModalConfig();mensagem('Coordenadas salvas!');
+  await api(fd);await carregarMolduras();await atualizarEvento();fecharJanelasAposSalvar();mensagem('Coordenadas salvas!');
  }catch(e){mensagem(e.message)}finally{btn.disabled=false}
 }
 function mudarAba(n){aba=n;document.querySelectorAll('[data-filtro]').forEach(b=>b.classList.toggle('ativa',b.dataset.filtro===n));renderFotos()}
@@ -245,7 +249,7 @@ async function abrirReajuste(f){
    const fd=new FormData();fd.set('foto_id',f.id);fd.set('evento_id',EVENTO_B);fd.set('foto',result,'reajustada.jpg');
    const res=await fetch(URL_SUPA+'/functions/v1/reajustar-foto-homologacao',{method:'POST',headers:{authorization:'Bearer '+session.access_token},body:fd});
    const payload=await res.json();if(!res.ok||!payload.ok)throw Error(payload.error||'Erro ao salvar.');
-   fechar();mensagem('Foto reajustada com sucesso!');await carregarFotos(true);
+   fecharJanelasAposSalvar();mensagem('Foto reajustada com sucesso!');await carregarFotos(true);
   }catch(e){note.textContent=e.message}finally{save.disabled=false}
  };
  draw();
