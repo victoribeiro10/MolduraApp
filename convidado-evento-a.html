@@ -1,0 +1,2121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Entre Clicks — Eternize esse momento</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        :root {
+            --preto:         #0a0a0a;
+            --preto-2:       #141414;
+            --grafite:       #1c1c1c;
+            --cinza:         #2a2a2a;
+            --dourado:       #d4af7a;
+            --dourado-claro: #e8c99a;
+            --dourado-escuro:#a88855;
+            --branco:        #f5f5f5;
+            --cinza-suave:   #888;
+            --whatsapp:      #25D366;
+            --instagram:     #E4405F;
+            --erro:          #e74c3c;
+            --vermelho:      #f87171;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100dvh; 
+            overflow-x: hidden;
+            background: var(--preto);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background:
+                radial-gradient(ellipse at top, #1a1a1a 0%, var(--preto) 70%),
+                var(--preto);
+            color: var(--branco);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 12px 70px 12px;
+            font-weight: 300;
+            letter-spacing: 0.3px;
+            min-height: 100dvh;
+            overflow-y: auto;
+        }
+
+        /* BANNER DE AVISO INICIAL */
+        .banner-aviso-inicial {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 10, 10, 0.96);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 9998;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .banner-aviso-inicial.hidden { display: none !important; }
+
+        .banner-card {
+            background: linear-gradient(145deg, var(--grafite), var(--preto-2));
+            border: 1px solid rgba(212, 175, 122, 0.4);
+            border-radius: 12px;
+            max-width: 380px;
+            width: 100%;
+            padding: 32px 24px 28px;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .banner-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 20%; right: 20%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--dourado), transparent);
+        }
+
+        .banner-icone {
+            width: 56px; height: 56px;
+            margin: 0 auto 16px;
+            border: 1.5px solid var(--dourado);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--dourado);
+        }
+
+        .banner-icone svg { width: 26px; height: 26px; }
+
+        .banner-titulo {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px; font-weight: 500;
+            color: var(--branco); margin-bottom: 4px;
+        }
+
+        .banner-subtitulo {
+            font-size: 10px; color: var(--dourado);
+            letter-spacing: 2px; text-transform: uppercase;
+            margin-bottom: 18px; font-weight: 500;
+        }
+
+        .banner-texto {
+            font-size: 13px; line-height: 1.65;
+            color: var(--cinza-claro); margin-bottom: 20px; font-weight: 300;
+        }
+
+        .banner-texto strong { color: var(--dourado-claro); font-weight: 600; }
+
+        .banner-destaque {
+            background: rgba(212, 175, 122, 0.12);
+            border: 1px solid rgba(212, 175, 122, 0.35);
+            border-radius: 6px; padding: 12px 14px;
+            margin-bottom: 24px; font-size: 11px;
+            color: var(--dourado); font-weight: 500; line-height: 1.5;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-banner-ok {
+            width: 100%; padding: 16px;
+            background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro));
+            color: var(--preto); border: none;
+            border-radius: 4px; font-size: 12px; font-weight: 700;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            cursor: pointer; font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(212, 175, 122, 0.3);
+        }
+
+        .btn-banner-ok:hover, .btn-banner-ok:active {
+            background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(212, 175, 122, 0.45);
+        }
+
+        /* MARCA */
+        .marca {
+            text-align: center;
+            margin: 8px 0 12px 0;
+            animation: fadeInDown 0.8s ease;
+            flex-shrink: 0;
+        }
+
+        .marca-logo {
+            font-family: 'Playfair Display', serif;
+            font-weight: 500;
+            font-size: 22px;
+            color: var(--dourado);
+            letter-spacing: 6px;
+            text-transform: uppercase;
+        }
+
+        .marca-linha {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 4px;
+            opacity: 0.7;
+        }
+
+        .marca-subtitulo {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 11px;
+            color: var(--dourado-claro);
+            letter-spacing: 2px;
+            text-transform: lowercase;
+        }
+
+        /* TELA ESCOLHA */
+        .tela-escolha {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+            width: 100%;
+            max-width: 380px;
+            padding: 20px 10px 40px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .titulo-secao { text-align: center; margin-bottom: 8px; }
+        .titulo-secao h1 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: 24px; color: var(--branco); margin-bottom: 6px; line-height: 1.3; }
+        .titulo-secao h1 em { font-style: italic; color: var(--dourado); font-weight: 500; }
+        .titulo-secao p { color: var(--cinza-suave); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; font-weight: 400; }
+
+        .guia-rapido {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid rgba(212, 175, 122, 0.28);
+            border-radius: 8px;
+            background: rgba(212, 175, 122, 0.055);
+            display: grid;
+            gap: 11px;
+        }
+        .guia-rapido-titulo {
+            color: var(--dourado-claro);
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 1px;
+        }
+        .guia-etapa { display: flex; align-items: flex-start; gap: 10px; }
+        .guia-etapa > span {
+            display: flex; align-items: center; justify-content: center;
+            flex: 0 0 24px; height: 24px; border-radius: 50%;
+            border: 1px solid var(--dourado); color: var(--dourado);
+            font-size: 12px; font-weight: 600;
+        }
+        .guia-etapa div { display: grid; gap: 3px; }
+        .guia-etapa strong { font-size: 12px; font-weight: 600; color: var(--branco); }
+        .guia-etapa small { font-size: 11px; line-height: 1.45; color: var(--cinza-suave); }
+
+        /* BOTÕES DE ESCOLHA */
+        .btn-escolha {
+            width: 100%;
+            padding: 18px 18px;
+            background: linear-gradient(135deg, var(--grafite), var(--preto-2));
+            border: 1px solid rgba(212, 175, 122, 0.3);
+            border-radius: 4px;
+            color: var(--branco);
+            cursor: pointer;
+            transition: all 0.4s ease;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-escolha::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 122, 0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn-escolha:hover::before, .btn-escolha:active::before { left: 100%; }
+
+        .btn-escolha:hover, .btn-escolha:active {
+            border-color: var(--dourado);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(212, 175, 122, 0.15);
+        }
+
+        .btn-escolha .icone {
+            width: 40px; height: 40px; border: 1px solid var(--dourado); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--dourado); transition: all 0.3s ease;
+        }
+
+        .btn-escolha:hover .icone { background: var(--dourado); color: var(--preto); }
+        .btn-escolha .icone svg { width: 20px; height: 20px; }
+        .btn-escolha .texto { display: flex; flex-direction: column; gap: 3px; text-align: left; flex: 1; }
+        .btn-escolha .titulo-btn { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 500; letter-spacing: 1px; color: var(--branco); }
+        .btn-escolha .desc { font-size: 10px; color: var(--cinza-suave); letter-spacing: 0.5px; font-weight: 300; }
+
+        .btn-escolha.destaque {
+            border-color: var(--dourado);
+            background: linear-gradient(135deg, rgba(212, 175, 122, 0.08), rgba(212, 175, 122, 0.02));
+        }
+
+        /* CONTAINER */
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 380px;
+            aspect-ratio: 2000 / 2666;
+            background: var(--preto-2);
+            border: 1px solid rgba(212, 175, 122, 0.2);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.5s ease;
+            flex-shrink: 0;
+        }
+
+        #video { position: absolute; object-fit: cover; display: block; }
+        #canvasResultado { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; display: block; }
+        .area-ajuste { position: absolute; overflow: hidden; background: var(--cinza); touch-action: none; cursor: grab; }
+        .area-ajuste:active { cursor: grabbing; }
+        #fotoAjuste { position: absolute; top: 0; left: 0; transform-origin: 0 0; will-change: transform; pointer-events: none; max-width: none; max-height: none; }
+        .moldura-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+
+        /* BOTÕES GERAIS */
+        .botoes {
+            display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+            width: 100%; max-width: 380px; padding: 5px 0 20px;
+        }
+
+        .btn {
+            background: var(--grafite); color: var(--branco); border: 1px solid rgba(212, 175, 122, 0.25);
+            padding: 12px 16px; font-size: 12px; font-weight: 500; font-family: 'Inter', sans-serif;
+            letter-spacing: 1.5px; text-transform: uppercase; border-radius: 3px; cursor: pointer;
+            flex: 1; min-width: 100px; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        }
+
+        .btn:hover:not(:disabled), .btn:active { background: var(--preto-2); border-color: var(--dourado); color: var(--dourado); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn svg { width: 14px; height: 14px; }
+        .btn-voltar { background: transparent; border-color: rgba(255,255,255,0.15); color: var(--cinza-suave); flex: 0 0 auto; min-width: 90px; }
+        .btn-voltar:hover:not(:disabled) { border-color: rgba(255,255,255,0.4); color: var(--branco); background: transparent; }
+        .btn-primario { background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro)); color: var(--preto); border: none; font-weight: 600; }
+        .btn-primario:hover:not(:disabled) { background: linear-gradient(135deg, var(--dourado-claro), var(--dourado)); color: var(--preto); box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4); }
+
+        .btn-enviar-impressao {
+            background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro));
+            color: var(--preto); border: none; width: 100%; padding: 15px; font-size: 12px; font-weight: 700;
+            letter-spacing: 2px; flex: 1 1 100%; box-shadow: 0 4px 20px rgba(212, 175, 122, 0.25);
+            position: relative; overflow: hidden;
+        }
+        .btn-enviar-impressao::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); transition: left 0.7s;
+        }
+        .btn-enviar-impressao:hover::before { left: 100%; }
+        .btn-enviar-impressao:hover:not(:disabled) { background: linear-gradient(135deg, var(--dourado-claro), var(--dourado)); box-shadow: 0 6px 30px rgba(212, 175, 122, 0.5); }
+
+        .hidden { display: none !important; }
+        #mensagem { padding: 5px; text-align: center; color: var(--dourado); font-size: 11px; min-height: 20px; letter-spacing: 1px; font-style: italic; font-family: 'Playfair Display', serif; }
+        #inputFoto, #inputFotoLote { display: none; }
+        .dica-ajuste { text-align: center; color: var(--cinza-suave); font-size: 10px; margin-top: 4px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 400; }
+        .dica-ajuste .separador { color: var(--dourado); margin: 0 8px; }
+
+        /* TELA DE LOTE */
+        .tela-lote { width: 100%; max-width: 380px; padding: 10px; animation: fadeIn 0.4s ease; flex: 1; }
+        .lote-titulo { text-align: center; margin-bottom: 16px; }
+        .lote-titulo h2 { font-family: 'Playfair Display', serif; font-weight: 500; font-size: 20px; color: var(--branco); margin-bottom: 4px; }
+        .lote-titulo p { font-size: 10px; color: var(--cinza-suave); letter-spacing: 2px; text-transform: uppercase; }
+        .lote-titulo .lote-dica { max-width: 310px; margin: 10px auto 0; padding: 9px 11px; border: 1px solid rgba(212, 175, 122, 0.35); border-radius: 6px; color: var(--branco); font-size: 11px; line-height: 1.5; letter-spacing: .2px; text-transform: none; }
+        .lote-titulo p span { color: var(--dourado); font-weight: 600; }
+        
+        .grade-lote { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+        .item-lote { position: relative; aspect-ratio: 2000 / 2666; background: var(--preto-2); border: 1px solid rgba(212, 175, 122, 0.2); border-radius: 4px; overflow: hidden; cursor: pointer; transition: all 0.3s ease; }
+        .item-lote:hover, .item-lote:active { border-color: var(--dourado); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(212, 175, 122, 0.2); }
+        .item-lote img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        
+        .item-lote-btn-remover { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; color: var(--branco); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; font-weight: bold; z-index: 5; transition: all 0.2s ease; }
+        .item-lote-btn-remover:hover, .item-lote-btn-remover:active { background: var(--erro); border-color: var(--erro); transform: scale(1.1); }
+        .item-lote-numero { position: absolute; top: 4px; left: 4px; width: 22px; height: 22px; background: rgba(212, 175, 122, 0.95); color: var(--preto); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; font-family: 'Playfair Display', serif; }
+        .item-lote-editar { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(180deg, transparent, rgba(0,0,0,0.8)); color: var(--dourado); font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; text-align: center; padding: 8px 4px 4px; font-weight: 500; }
+        .item-lote-adicionar { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; background: transparent; border: 1px dashed rgba(212, 175, 122, 0.4); color: var(--dourado); aspect-ratio: 2000 / 2666; border-radius: 4px; cursor: pointer; transition: all 0.3s ease; }
+        .item-lote-adicionar:hover, .item-lote-adicionar:active { border-color: var(--dourado); background: rgba(212, 175, 122, 0.05); transform: translateY(-2px); }
+        .item-lote-adicionar svg { width: 24px; height: 24px; }
+        .item-lote-adicionar span { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 500; }
+        .lote-processando { text-align: center; padding: 40px 20px; color: var(--dourado); }
+        .lote-processando .loading-spinner { margin: 0 auto 16px; }
+        .lote-processando p { font-family: 'Playfair Display', serif; font-style: italic; font-size: 14px; }
+
+        /* LOADING INICIAL */
+        .loading-inicial { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--preto); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; gap: 24px; }
+        .loading-spinner { width: 50px; height: 50px; border: 1px solid rgba(212, 175, 122, 0.15); border-top: 1px solid var(--dourado); border-radius: 50%; animation: spin 1s linear infinite; }
+        .loading-inicial .marca-logo { font-size: 18px; letter-spacing: 8px; opacity: 0.9; }
+        .loading-inicial p { color: var(--cinza-suave); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; font-weight: 300; }
+
+        /* MODAL GERAL */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; animation: fadeIn 0.3s ease; }
+        .modal-conteudo { background: linear-gradient(135deg, var(--grafite), var(--preto-2)); color: var(--branco); padding: 40px 30px 30px 30px; border: 1px solid rgba(212, 175, 122, 0.3); border-radius: 6px; text-align: center; max-width: 360px; width: 100%; animation: slideUp 0.4s ease; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
+        .modal-conteudo::before { content: ''; position: absolute; top: 0; left: 20%; right: 20%; height: 1px; background: linear-gradient(90deg, transparent, var(--dourado), transparent); }
+        .modal-icone { width: 60px; height: 60px; margin: 0 auto 20px; border: 1px solid var(--dourado); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--dourado); }
+        .modal-icone svg { width: 28px; height: 28px; }
+        .modal-titulo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 500; margin-bottom: 12px; color: var(--branco); }
+        .modal-texto { font-size: 13px; color: var(--cinza-suave); line-height: 1.7; margin-bottom: 24px; font-weight: 300; }
+        .modal-texto small { font-size: 10px; opacity: 0.6; }
+        .modal button.btn-ok { background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro)); color: var(--preto); padding: 12px 40px; border-radius: 3px; border: none; font-weight: 600; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.3s ease; }
+        .modal button.btn-ok:hover { background: linear-gradient(135deg, var(--dourado-claro), var(--dourado)); box-shadow: 0 4px 20px rgba(212, 175, 122, 0.4); }
+        .modal-cta { margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(212, 175, 122, 0.15); }
+        .modal-cta-titulo { font-family: 'Playfair Display', serif; font-style: italic; font-size: 13px; color: var(--dourado-claro); margin-bottom: 4px; }
+        .modal-cta-subtitulo { font-size: 10px; color: var(--cinza-suave); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+        .modal-cta-botoes { display: flex; gap: 10px; justify-content: center; }
+        .modal-cta-botoes a { width: 44px; height: 44px; border: 1px solid rgba(212, 175, 122, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--dourado); text-decoration: none; transition: all 0.3s ease; }
+        .modal-cta-botoes a svg { width: 20px; height: 20px; }
+        .modal-cta-botoes a.whats:hover { background: var(--whatsapp); border-color: var(--whatsapp); color: var(--branco); transform: translateY(-2px); }
+        .modal-cta-botoes a.insta:hover { background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCB045); border-color: transparent; color: var(--branco); transform: translateY(-2px); }
+
+        /* Confirmação de envio: ação principal clara e lembrete do QR Code. */
+        .modal-conteudo:has(.modal-dica-qr) { padding: 28px 22px 22px; max-height: calc(100dvh - 32px); overflow-y: auto; }
+        .modal-conteudo:has(.modal-dica-qr) .modal-icone { width: 50px; height: 50px; margin-bottom: 12px; }
+        .modal-conteudo:has(.modal-dica-qr) .modal-titulo { margin-bottom: 8px; font-size: 21px; }
+        .modal-conteudo:has(.modal-dica-qr) .modal-texto { margin-bottom: 14px; font-size: 12px; line-height: 1.5; }
+        .modal-dica-qr { display: flex; flex-direction: column; gap: 7px; background: rgba(212,175,122,.11); border: 1px solid rgba(212,175,122,.3); border-radius: 7px; padding: 13px 10px; margin-bottom: 13px; }
+        .modal-dica-qr strong { font-size: 13px; color: var(--dourado-claro); }
+        .modal-dica-qr span { font-size: 12px; color: var(--branco); line-height: 1.4; }
+        .modal button.btn-outra-foto { width: 100%; background: linear-gradient(135deg,var(--dourado),var(--dourado-escuro)); color: var(--preto); border: 0; border-radius: 4px; padding: 14px 10px; font: 700 12px 'Inter',sans-serif; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; min-height: 44px; }
+        .modal-instagram-link { display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: 17px; color: var(--dourado-claro); text-decoration: none; font-size: 12px; }
+        .modal-instagram-link svg { width: 19px; height: 19px; }
+        .modal-dica-fechar { font-size: 10px; color: var(--cinza-suave); margin-top: 14px; }
+        .modal button.modal-fechar-sucesso { display: block; margin: 10px auto 0; padding: 8px 14px; border: 0; background: transparent; color: var(--cinza-suave); font: 500 12px 'Inter',sans-serif; text-decoration: underline; cursor: pointer; }
+
+        /* RODAPÉ */
+        body.ajustando-foto .rodape { display: none; }
+
+        .rodape {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            padding: 12px 12px 16px;
+            background: linear-gradient(180deg, transparent, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0.98));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        .rodape-marca { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 10px; 
+            color: var(--dourado-claro); 
+            letter-spacing: 2px; 
+            text-transform: uppercase; 
+            font-style: italic;
+            opacity: 0.9;
+        }
+
+        .rodape-redes { display: flex; gap: 12px; pointer-events: auto; }
+
+        .rodape-creditos { font-size: 9px; line-height: 1.3; letter-spacing: .3px; color: rgba(245,245,245,.55); text-transform: none; font-style: normal; margin-top: 1px; }
+
+        .rodape-redes a { 
+            width: 42px; 
+            height: 42px; 
+            border: 1px solid rgba(212, 175, 122, 0.4); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: var(--dourado); 
+            text-decoration: none; 
+            transition: all 0.3s ease; 
+            background: rgba(28, 28, 28, 0.85); 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        .rodape-redes a svg { width: 20px; height: 20px; }
+
+        .rodape-redes a.whats:hover, .rodape-redes a.whats:active { 
+            background: var(--whatsapp); 
+            border-color: var(--whatsapp); 
+            color: var(--branco); 
+            transform: translateY(-2px); 
+        }
+
+        .rodape-redes a.insta:hover, .rodape-redes a.insta:active { 
+            background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCB045); 
+            border-color: transparent; 
+            color: var(--branco); 
+            transform: translateY(-2px); 
+        }
+
+        /* OVERLAY DE ENVIO */
+        .overlay-envio { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; padding: 20px; animation: fadeIn 0.3s ease; }
+        .overlay-envio.ativo { display: flex; }
+        .envio-conteudo { max-width: 340px; width: 100%; text-align: center; }
+        .envio-icone { width: 60px; height: 60px; margin: 0 auto 24px; border: 1px solid var(--dourado); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--dourado); animation: pulseGlow 2s ease-in-out infinite; }
+        .envio-icone svg { width: 28px; height: 28px; }
+        .envio-titulo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 500; color: var(--branco); margin-bottom: 6px; }
+        .envio-subtitulo { font-size: 10px; color: var(--cinza-suave); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 32px; font-weight: 400; }
+        .barra-progresso { width: 100%; height: 6px; background: rgba(212, 175, 122, 0.1); border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
+        .barra-progresso-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--dourado-escuro), var(--dourado), var(--dourado-claro)); border-radius: 10px; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+        .barra-progresso-fill::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); animation: shimmer 1.8s infinite; }
+        .envio-percentual { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 400; color: var(--dourado); margin-bottom: 20px; letter-spacing: 2px; }
+        .envio-mensagem { font-family: 'Playfair Display', serif; font-style: italic; font-size: 13px; color: var(--dourado-claro); letter-spacing: 1px; min-height: 22px; transition: opacity 0.3s ease; }
+        .envio-contador { font-size: 11px; color: var(--cinza-suave); letter-spacing: 2px; text-transform: uppercase; margin-top: 8px; font-weight: 400; }
+
+        @keyframes shimmer { 0% { left: -100%; } 100% { left: 100%; } }
+        @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 122, 0.4); } 50% { box-shadow: 0 0 0 15px rgba(212, 175, 122, 0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+
+        /* Prévia: interface compacta para celulares, sem alterar o arquivo impresso. */
+        @media (max-width: 600px) {
+            body { padding: 8px 10px 20px; }
+            .marca { margin: 3px 0 7px; }
+            .marca-logo { font-size: 19px; letter-spacing: 4px; }
+            .marca-linha { margin-top: 2px; }
+            .marca-subtitulo { font-size: 10px; }
+            .container {
+                width: min(100%, calc((100dvh - 205px) * 2000 / 2666));
+                max-width: 380px;
+                margin: 0 auto 7px;
+            }
+            .botoes { gap: 6px; padding: 3px 0 8px; }
+            .btn { padding: 10px 9px; min-width: 78px; letter-spacing: .7px; font-size: 11px; }
+            .btn-enviar-impressao { padding: 12px 10px; font-size: 12px; letter-spacing: 1px; min-height: 43px; }
+            .dica-ajuste { font-size: 9px; margin-top: 2px; }
+            .tela-escolha { gap: 10px; padding: 8px 8px 18px; }
+            .guia-rapido { padding: 10px 12px; gap: 7px; }
+            .btn-escolha { padding: 12px; gap: 11px; }
+            .btn-escolha .icone { width: 35px; height: 35px; }
+            .tela-lote { padding: 4px 6px; }
+            .lote-titulo { margin-bottom: 8px; }
+            .lote-titulo .lote-dica { margin-top: 6px; padding: 6px 9px; }
+            .grade-lote { gap: 5px; margin-bottom: 8px; }
+        }
+        @media (max-width: 600px) and (max-height: 680px) {
+            .container { width: min(100%, calc((100dvh - 185px) * 2000 / 2666)); }
+            .marca { margin-bottom: 4px; }
+            .marca-subtitulo { font-size: 9px; }
+        }
+
+        @media (max-width: 360px) {
+            .marca-logo { font-size: 18px; letter-spacing: 4px; }
+            .titulo-secao h1 { font-size: 20px; }
+            .btn-escolha { padding: 15px 14px; }
+            .btn-escolha .titulo-btn { font-size: 13px; }
+        }
+        /* AVISO DE EVENTO ENCERRADO */
+        .aviso-envios-encerrados { position:fixed; inset:0; z-index:100000; display:none; align-items:center; justify-content:center; padding:22px; background:rgba(10,10,10,.97); backdrop-filter:blur(10px); }
+        .aviso-envios-encerrados.visivel { display:flex; }
+        .aviso-envios-card { width:100%; max-width:390px; padding:34px 25px; text-align:center; border:1px solid rgba(212,175,122,.45); border-radius:12px; background:linear-gradient(145deg,#1c1c1c,#101010); box-shadow:0 24px 60px rgba(0,0,0,.65); }
+        .aviso-envios-icone { width:58px; height:58px; display:flex; align-items:center; justify-content:center; margin:0 auto 18px; border:1px solid #d4af7a; border-radius:50%; color:#d4af7a; font-size:25px; }
+        .aviso-envios-titulo { font-family:'Playfair Display',serif; font-size:23px; color:#f5f5f5; margin-bottom:14px; }
+        .aviso-envios-texto { color:#c9c9c9; font-size:13px; line-height:1.8; margin-bottom:22px; }
+        .aviso-envios-instagram { display:inline-block; padding:12px 18px; border:1px solid rgba(212,175,122,.55); border-radius:5px; color:#e8c99a; text-decoration:none; font-size:12px; letter-spacing:.5px; }
+    </style>
+</head>
+<body>
+    <div id="avisoEnviosEncerrados" class="aviso-envios-encerrados" role="status" aria-live="polite">
+      <div class="aviso-envios-card">
+        <div class="aviso-envios-icone">✓</div>
+        <h1 class="aviso-envios-titulo">Este evento foi finalizado!</h1>
+        <p class="aviso-envios-texto">Agradecemos por compartilhar esse momento com a EntreClicks.<br><br>As fotos recebidas até o encerramento continuam disponíveis para impressão. No momento, não estamos recebendo novas fotos.</p>
+        <a class="aviso-envios-instagram" href="https://instagram.com/entreclicks.oficial" target="_blank" rel="noopener">Acompanhe nosso Instagram</a>
+      </div>
+    </div>
+
+    <!-- LOADING INICIAL -->
+    <div id="loadingInicial" class="loading-inicial">
+        <div class="marca-logo">ENTRE CLICKS</div>
+        <div class="loading-spinner"></div>
+        <p>Carregando</p>
+    </div>
+
+    <!-- BANNER DE AVISO INICIAL (mantido no projeto; desativado por padrão) -->
+    <div id="bannerAviso" class="banner-aviso-inicial hidden">
+        <div class="banner-card">
+            <div class="banner-icone">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                </svg>
+            </div>
+
+            <div class="banner-titulo">Atenção, convidado!</div>
+            <div class="banner-subtitulo">regra importante do evento</div>
+
+            <div class="banner-texto">
+                Este é um serviço exclusivo deste evento.<br><br>
+                Envie <strong>somente fotos tiradas aqui hoje</strong>.
+            </div>
+
+            <div class="banner-destaque">
+                Fotos antigas, de outros eventos ou de fora do local <strong>não serão impressas</strong>.
+            </div>
+
+            <button class="btn-banner-ok" onclick="aceitarAviso()">
+                Entendi, quero enviar minhas fotos
+            </button>
+        </div>
+    </div>
+
+    <!-- MARCA -->
+    <div class="marca">
+        <div class="marca-logo">ENTRE CLICKS</div>
+        <div class="marca-linha">
+            <span class="marca-subtitulo">Sua Memória Revelada</span>
+        </div>
+    </div>
+
+    <!-- TELA ESCOLHA -->
+    <div class="tela-escolha hidden" id="telaEscolha">
+
+        <!-- Título removido para deixar o fluxo mais compacto. -->
+
+        <div class="guia-rapido" role="note" aria-label="Como enviar sua foto">
+            <div class="guia-rapido-titulo">Como enviar</div>
+            <div class="guia-etapa"><span>1</span><div><strong>Escolha sua foto</strong><small>Use a câmera ou selecione uma imagem da galeria.</small></div></div>
+            <div class="guia-etapa"><span>2</span><div><strong>Ajuste sua foto</strong><small>Arraste a foto e use dois dedos para aproximar ou afastar.</small></div></div>
+            <div class="guia-etapa"><span>3</span><div><strong>Envie e pronto</strong><small>Confira o resultado e toque em “Enviar para impressão”.</small></div></div>
+        </div>
+
+        <button class="btn-escolha" id="btnAbrirCamera">
+            <div class="icone">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z"/>
+                </svg>
+            </div>
+            <div class="texto">
+                <span class="titulo-btn">Câmera</span>
+                <span class="desc">Capture agora este instante</span>
+            </div>
+        </button>
+
+        <button class="btn-escolha" id="btnAbrirGaleria">
+            <div class="icone">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
+                </svg>
+            </div>
+            <div class="texto">
+                <span class="titulo-btn">Foto única</span>
+                <span class="desc">Escolha uma memória sua</span>
+            </div>
+        </button>
+
+        <button class="btn-escolha" id="btnAbrirGaleriaLote">
+            <div class="icone">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 3v3M16 3v3"/>
+                </svg>
+            </div>
+            <div class="texto">
+                <span class="titulo-btn">Múltiplas Fotos</span>
+                <span class="desc">Envie até 5 fotos de uma vez</span>
+            </div>
+        </button>
+
+        <input type="file" id="inputFoto" accept="image/*">
+        <input type="file" id="inputFotoLote" accept="image/*" multiple>
+    </div>
+
+    <!-- TELA LOTE -->
+    <div class="tela-lote hidden" id="telaLote">
+        <div class="lote-titulo">
+            <h2>Suas fotos</h2>
+            <p><span id="contadorLote">0</span> de 5 fotos</p>
+            <p class="lote-dica">Toque em cada foto para ajustar o enquadramento antes de enviar.</p>
+        </div>
+
+        <div id="loteProcessando" class="lote-processando hidden">
+            <div class="loading-spinner"></div>
+            <p>Aplicando molduras...</p>
+        </div>
+
+        <div class="grade-lote hidden" id="gradeLote"></div>
+
+        <div class="botoes hidden" id="botoesLote">
+            <button class="btn btn-voltar" id="btnVoltarLote">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+                </svg>
+                Voltar
+            </button>
+            <button class="btn btn-enviar-impressao" id="btnEnviarLote">
+                Enviar todas (<span id="qtdEnvio">0</span>)
+            </button>
+        </div>
+    </div>
+
+    <!-- ÁREA CÂMERA -->
+    <div class="container hidden" id="areaCamera">
+        <video id="video" autoplay playsinline muted></video>
+        <img class="moldura-overlay" id="molduraCamera" alt="Moldura">
+    </div>
+
+    <!-- ÁREA AJUSTE -->
+    <div class="container hidden" id="areaAjuste">
+        <div class="area-ajuste" id="areaFoto">
+            <img id="fotoAjuste" alt="Sua foto">
+        </div>
+        <img class="moldura-overlay" id="molduraAjuste" alt="Moldura">
+    </div>
+
+    <!-- ÁREA RESULTADO -->
+    <div class="container hidden" id="areaResultado">
+        <canvas id="canvasResultado"></canvas>
+    </div>
+
+    <div id="mensagem"></div>
+
+    <!-- BOTÕES CÂMERA -->
+    <div class="botoes hidden" id="botoesCamera">
+        <button class="btn btn-voltar" id="btnVoltarCamera">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+            </svg>
+            Voltar
+        </button>
+        <button class="btn btn-primario" id="btnTirarFoto">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="13" r="4"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/>
+            </svg>
+            Capturar
+        </button>
+        <button class="btn" id="btnVirarCamera">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
+            </svg>
+            Virar
+        </button>
+    </div>
+
+    <!-- BOTÕES AJUSTE -->
+    <div class="botoes hidden" id="botoesAjuste">
+        <button class="btn btn-voltar" id="btnVoltarAjuste">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+            </svg>
+            Voltar
+        </button>
+        <button class="btn" id="btnResetAjuste">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
+            </svg>
+            Resetar
+        </button>
+        <button class="btn btn-primario" id="btnConfirmarAjuste">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+            </svg>
+            Confirmar
+        </button>
+    </div>
+
+    <div class="dica-ajuste hidden" id="dicaAjuste">
+        <strong>Personalize sua foto</strong><br>
+        Arraste para posicionar <span class="separador">•</span> use dois dedos para zoom<br>
+        <small>Quando estiver do seu jeito, toque em “Confirmar”.</small>
+    </div>
+
+    <!-- BOTÕES RESULTADO -->
+    <div class="botoes hidden" id="botoesResultado">
+        <button class="btn btn-voltar" id="btnRefazer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/>
+            </svg>
+            Refazer
+        </button>
+        <button class="btn" id="btnBaixar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+            </svg>
+            Baixar
+        </button>
+        <button class="btn" id="btnCompartilhar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"/>
+            </svg>
+            Compartilhar
+        </button>
+        <button class="btn btn-enviar-impressao" id="btnEnviarImpressao">
+            Enviar para impressão
+        </button>
+    </div>
+
+    <!-- RODAPÉ -->
+    <div class="rodape">
+        <div class="rodape-marca">siga nossas redes sociais</div>
+        <div class="rodape-redes">
+            <a href="https://wa.me/5528999281772" target="_blank" rel="noopener" class="whats" title="WhatsApp">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
+            </a>
+            <a href="https://instagram.com/entreclicks.oficial" target="_blank" rel="noopener" class="insta" title="Instagram">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                </svg>
+            </a>
+        </div>
+        <div class="rodape-creditos">Desenvolvido por Victor Ribeiro</div>
+    </div>
+
+    <!-- OVERLAY DE ENVIO -->
+    <div class="overlay-envio" id="overlayEnvio">
+        <div class="envio-conteudo">
+            <div class="envio-icone">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/>
+                </svg>
+            </div>
+            <div class="envio-titulo">Enviando sua memória</div>
+            <div class="envio-subtitulo">momento sendo eternizado</div>
+            <div class="barra-progresso"><div class="barra-progresso-fill" id="barraFill"></div></div>
+            <div class="envio-percentual" id="envioPercentual">0%</div>
+            <div class="envio-mensagem" id="envioMensagem">Preparando sua foto...</div>
+            <div class="envio-contador hidden" id="envioContador"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // ============================================
+        // CONFIGURAÇÃO DO SUPABASE
+        // ============================================
+        // HOMOLOGAÇÃO: interface original, transporte exclusivo do Evento A.
+        const ENDPOINT_EVENTO = "https://aukbkykkoeovouflijlz.supabase.co/functions/v1/receber-foto-homologacao";
+        const TOKEN_EVENTO_A = "94fc043f-d0c6-4cd1-84f8-90639558d51f";
+        // Este endereço é exclusivo do Evento A: funciona também sem parâmetro na URL.
+        const tokenInformado = new URLSearchParams(location.search).get("token");
+        const TOKEN_EVENTO = tokenInformado || TOKEN_EVENTO_A;
+        const BUCKET_FOTOS = "fotos-eventos-teste";
+        if (TOKEN_EVENTO !== TOKEN_EVENTO_A) {
+            document.addEventListener('DOMContentLoaded', () => {
+                document.body.replaceChildren(Object.assign(document.createElement('p'),{textContent:'Convite indisponível para este evento.'}));
+            });
+            throw new Error('Token do Evento A inválido');
+        }
+        async function obterConfiguracaoEvento(){
+            const res = await fetch(ENDPOINT_EVENTO+'?token='+encodeURIComponent(TOKEN_EVENTO),{cache:'no-store'});
+            const data = await res.json();
+            if(!res.ok) throw new Error(data.error||'Não foi possível consultar o evento');
+            return {...data, recebendo_fotos:data.recebendo_fotos&&data.status!=='encerrado'};
+        }
+        const supabaseClient = {
+            from(tabela) {
+                if (tabela !== 'configuracao') throw Error('Consulta não permitida');
+                return {
+                    select() {
+                        return {
+                            order() {
+                                return {
+                                    limit() {
+                                        return {
+                                            async single() {
+                                                try {
+                                                    return { data: await obterConfiguracaoEvento(), error: null };
+                                                } catch (error) {
+                                                    return { data: null, error };
+                                                }
+                                            }
+                                        };
+                                    }
+                                };
+                            }
+                        };
+                    }
+                };
+            }
+        };
+        async function enviarParaEvento(nome,imagem,fonte){
+            const original = await obterBlobOriginal(fonte);
+            if(!original) throw Error('Não foi possível preparar a foto original');
+            const fd = new FormData();
+            fd.append('foto',imagem,nome);
+            fd.append('original',original,'original.jpg');
+            const res = await fetch(ENDPOINT_EVENTO,{method:'POST',headers:{'x-event-token':TOKEN_EVENTO},body:fd});
+            let data;try{data=await res.json()}catch{throw Error('Resposta inválida do servidor')}
+            if(!res.ok||!data.ok) throw Error(data.error||'Falha ao enviar foto');
+        }
+
+        // CONFIGURAÇÕES DE EXPORTAÇÃO
+        const LARGURA_IMPRESSAO = 1560;
+        const ALTURA_IMPRESSAO  = 2140;
+        const QUALIDADE_JPEG    = 0.85; 
+        const LIMITE_LOTE       = 5;
+
+        const ICONES_MODAL = {
+            sucesso: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>',
+            erro:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>',
+            info:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>'
+        };
+
+        const ICONE_WHATS = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>';
+        const ICONE_INSTA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
+
+        let MOLDURA = {
+            larguraTotal:  2000,
+            alturaTotal:   2666,
+            janelaX:       200,
+            janelaY:       87,
+            janelaLargura: 1600,
+            janelaAltura:  1936,
+            arquivo:       ''
+        };
+
+        // ELEMENTOS
+        const loadingInicial  = document.getElementById('loadingInicial');
+        const bannerAviso     = document.getElementById('bannerAviso');
+        const telaEscolha     = document.getElementById('telaEscolha');
+        const telaLote        = document.getElementById('telaLote');
+        const areaCamera      = document.getElementById('areaCamera');
+        const areaAjuste      = document.getElementById('areaAjuste');
+        const areaResultado   = document.getElementById('areaResultado');
+        const botoesCamera    = document.getElementById('botoesCamera');
+        const botoesAjuste    = document.getElementById('botoesAjuste');
+        const botoesResultado = document.getElementById('botoesResultado');
+        const botoesLote      = document.getElementById('botoesLote');
+        const dicaAjuste      = document.getElementById('dicaAjuste');
+
+        const video         = document.getElementById('video');
+        const canvas        = document.getElementById('canvasResultado');
+        const ctx           = canvas.getContext('2d');
+        const areaFoto      = document.getElementById('areaFoto');
+        const fotoAjuste    = document.getElementById('fotoAjuste');
+        const molduraCamera = document.getElementById('molduraCamera');
+        const molduraAjuste = document.getElementById('molduraAjuste');
+
+        const btnAbrirCamera      = document.getElementById('btnAbrirCamera');
+        const btnAbrirGaleria     = document.getElementById('btnAbrirGaleria');
+        const btnAbrirGaleriaLote = document.getElementById('btnAbrirGaleriaLote');
+        const btnVoltarCamera     = document.getElementById('btnVoltarCamera');
+        const btnTirarFoto        = document.getElementById('btnTirarFoto');
+        const btnVirarCamera      = document.getElementById('btnVirarCamera');
+        const btnVoltarAjuste     = document.getElementById('btnVoltarAjuste');
+        const btnResetAjuste      = document.getElementById('btnResetAjuste');
+        const btnConfirmarAjuste  = document.getElementById('btnConfirmarAjuste');
+        const btnRefazer          = document.getElementById('btnRefazer');
+        const btnBaixar           = document.getElementById('btnBaixar');
+        const btnCompartilhar     = document.getElementById('btnCompartilhar');
+        const btnEnviarImpressao  = document.getElementById('btnEnviarImpressao');
+        const btnVoltarLote       = document.getElementById('btnVoltarLote');
+        const btnEnviarLote       = document.getElementById('btnEnviarLote');
+        const inputFoto           = document.getElementById('inputFoto');
+        const inputFotoLote       = document.getElementById('inputFotoLote');
+        const mensagem            = document.getElementById('mensagem');
+        const gradeLote           = document.getElementById('gradeLote');
+        const contadorLote        = document.getElementById('contadorLote');
+        const qtdEnvio            = document.getElementById('qtdEnvio');
+        const loteProcessando     = document.getElementById('loteProcessando');
+
+        const moldura = new Image();
+        moldura.crossOrigin = 'anonymous';
+
+        let cameraAtual    = 'environment';
+        let streamAtual    = null;
+        let imagemOriginal = null;
+        let fotoJaEnviada  = false;
+
+        // Foto de origem (sem moldura) do envio atual.
+        // Vai para o servidor como "orig-..." e é usada no "Ajustar foto" do painel admin.
+        let origemEnvio = null;
+        const LADO_MAX_ORIGINAL = 2000;
+
+        let ajuste = { x: 0, y: 0, scale: 1, initialScale: 1 };
+
+        let fotosLote          = [];
+        let indiceEditandoLote = -1;
+
+        // BANNER DE AVISO INICIAL: mantido para possível reativação futura.
+        // Para reativar, remova a classe 'hidden' do elemento #bannerAviso
+        // e ajuste a inicialização para aguardar o aceite do convidado.
+        function aceitarAviso() {
+            bannerAviso.classList.add('hidden');
+            mostrarTela('escolha');
+        }
+
+        // CORREÇÃO INTELIGENTE DE LUZ
+        function calcularFiltroDeLuzInteligente(ctxFonte, larg, alt) {
+            try {
+                const imgData = ctxFonte.getImageData(0, 0, larg, alt);
+                const data = imgData.data;
+                let somaLuminosidade = 0;
+                let contador = 0;
+
+                for (let i = 0; i < data.length; i += 4 * 8) {
+                    const r = data[i];
+                    const g = data[i + 1];
+                    const b = data[i + 2];
+                    const lum = (0.299 * r) + (0.587 * g) + (0.114 * b);
+                    somaLuminosidade += lum;
+                    contador++;
+                }
+
+                const mediaLuminosidade = somaLuminosidade / contador;
+                const LIMIAR_FOTO_BOA = 115;
+
+                if (mediaLuminosidade >= LIMIAR_FOTO_BOA) {
+                    return 'none';
+                }
+
+                const deficit = LIMIAR_FOTO_BOA - mediaLuminosidade;
+                const boostBrilho = 1 + (deficit / 190);
+                const boostContraste = 1.05;
+                const boostSaturacao = 1.06;
+
+                return `brightness(${Math.round(boostBrilho * 100)}%) contrast(${Math.round(boostContraste * 100)}%) saturate(${Math.round(boostSaturacao * 100)}%)`;
+            } catch (err) {
+                return 'none';
+            }
+        }
+
+        // REDIMENSIONAMENTO
+        async function redimensionarCanvasComQualidade(canvasOrigem, larguraFinal, alturaFinal, qualidade = 0.85) {
+            let canvasAtual  = canvasOrigem;
+            let larguraAtual = canvasOrigem.width;
+            let alturaAtual  = canvasOrigem.height;
+
+            while (larguraAtual > larguraFinal * 2) {
+                const novaLargura = Math.floor(larguraAtual / 2);
+                const novaAltura  = Math.floor(alturaAtual / 2);
+                const canvasTemp  = document.createElement('canvas');
+                canvasTemp.width  = novaLargura;
+                canvasTemp.height = novaAltura;
+                const ctxTemp = canvasTemp.getContext('2d');
+                ctxTemp.imageSmoothingEnabled = true;
+                ctxTemp.imageSmoothingQuality = 'high';
+                ctxTemp.drawImage(canvasAtual, 0, 0, novaLargura, novaAltura);
+                canvasAtual  = canvasTemp;
+                larguraAtual = novaLargura;
+                alturaAtual  = novaAltura;
+            }
+
+            const canvasFinal  = document.createElement('canvas');
+            canvasFinal.width  = larguraFinal;
+            canvasFinal.height = alturaFinal;
+            const ctxFinal = canvasFinal.getContext('2d');
+            ctxFinal.imageSmoothingEnabled = true;
+            ctxFinal.imageSmoothingQuality = 'high';
+            ctxFinal.drawImage(canvasAtual, 0, 0, larguraFinal, alturaFinal);
+
+            return new Promise((resolve) => {
+                canvasFinal.toBlob(resolve, 'image/jpeg', qualidade);
+            });
+        }
+
+        // CONTROLE SIMPLES DE RECEBIMENTO DE FOTOS
+        let enviosAtivos = true;
+        function aplicarEstadoEnvios(ativo) {
+          enviosAtivos = ativo !== false;
+          const aviso = document.getElementById('avisoEnviosEncerrados');
+          if (aviso) aviso.classList.toggle('visivel', !enviosAtivos);
+          document.body.style.overflow = enviosAtivos ? '' : 'hidden';
+        }
+        async function consultarEnviosAtivos() {
+          const { data, error } = await supabaseClient.from('configuracao').select('recebendo_fotos').order('id', { ascending: false }).limit(1).single();
+          if (error) throw error;
+          const ativo = !data || data.recebendo_fotos !== false;
+          aplicarEstadoEnvios(ativo);
+          return ativo;
+        }
+        async function garantirEnviosAtivos() {
+          try {
+            const ativo = await consultarEnviosAtivos();
+            if (!ativo) {
+              mostrarModal('info', 'Envios encerrados', 'Este evento foi finalizado e não estamos recebendo novas fotos no momento.');
+              return false;
+            }
+            return true;
+          } catch (err) {
+            console.error('Não foi possível confirmar o recebimento de fotos:', err);
+            aplicarEstadoEnvios(false);
+            mostrarModal('erro', 'Não foi possível confirmar', 'Por segurança, não podemos enviar fotos neste momento. Verifique a conexão e tente novamente.');
+            return false;
+          }
+        }
+
+        // CARREGA CONFIGURAÇÃO
+        async function carregarConfiguracao() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('configuracao')
+                    .select('*')
+                    .order('id', { ascending: false })
+                    .limit(1)
+                    .single();
+
+                if (error) throw error;
+                if (!data)  throw new Error('Sem configuração cadastrada');
+
+                aplicarEstadoEnvios(data.recebendo_fotos !== false);
+                if (!data.moldura_url || !Number(data.janela_largura) || !Number(data.janela_altura)) {
+                    loadingInicial.style.display = 'none';
+                    bannerAviso.classList.add('hidden');
+                    mostrarModal('info', 'Evento em preparação',
+                        'A moldura deste evento ainda não foi configurada. Aguarde a liberação da equipe EntreClicks e atualize a página.');
+                    return false;
+                }
+                MOLDURA.janelaX       = data.janela_x;
+                MOLDURA.janelaY       = data.janela_y;
+                MOLDURA.janelaLargura = data.janela_largura;
+                MOLDURA.janelaAltura  = data.janela_altura;
+                MOLDURA.arquivo       = data.moldura_url;
+
+                molduraCamera.src = data.moldura_url;
+                molduraAjuste.src = data.moldura_url;
+                moldura.src       = data.moldura_url;
+
+                await new Promise((resolve, reject) => {
+                    if (moldura.complete && moldura.naturalWidth > 0) {
+                        MOLDURA.larguraTotal = moldura.naturalWidth;
+                        MOLDURA.alturaTotal  = moldura.naturalHeight;
+                        resolve();
+                    } else {
+                        moldura.onload = () => {
+                            MOLDURA.larguraTotal = moldura.naturalWidth;
+                            MOLDURA.alturaTotal  = moldura.naturalHeight;
+                            resolve();
+                        };
+                        moldura.onerror = () => reject(new Error('Falha ao carregar imagem da moldura'));
+                    }
+                });
+
+                aplicarProporcaoMoldura();
+                aplicarPosicoesJanela();
+                dimensionarContainers();
+
+                console.log('Configuração carregada');
+                return true;
+            } catch (err) {
+                console.error('Erro ao carregar configuração:', err);
+                mostrarModal('erro', 'Erro',
+                    'Não foi possível carregar a configuração. Recarregue a página.<br><br><small>' + err.message + '</small>');
+                return false;
+            }
+        }
+
+        function aplicarProporcaoMoldura() {
+            const proporcao = `${MOLDURA.larguraTotal} / ${MOLDURA.alturaTotal}`;
+            document.querySelectorAll('.container').forEach(c => c.style.aspectRatio = proporcao);
+            document.querySelectorAll('.item-lote, .item-lote-adicionar').forEach(el => {
+                el.style.aspectRatio = proporcao;
+            });
+        }
+
+        function aplicarPosicoesJanela() {
+            const topPct    = (MOLDURA.janelaY / MOLDURA.alturaTotal)   * 100;
+            const leftPct   = (MOLDURA.janelaX / MOLDURA.larguraTotal)  * 100;
+            const widthPct  = (MOLDURA.janelaLargura / MOLDURA.larguraTotal) * 100;
+            const heightPct = (MOLDURA.janelaAltura  / MOLDURA.alturaTotal)  * 100;
+
+            video.style.cssText = `
+                position: absolute;
+                top: ${topPct}%;
+                left: ${leftPct}%;
+                width: ${widthPct}%;
+                height: ${heightPct}%;
+                object-fit: cover;
+                display: block;
+                transform: ${cameraAtual === 'user' ? 'scaleX(-1)' : 'none'};
+            `;
+
+            areaFoto.style.cssText = `
+                position: absolute;
+                top: ${topPct}%;
+                left: ${leftPct}%;
+                width: ${widthPct}%;
+                height: ${heightPct}%;
+                overflow: hidden;
+                background: #2a2a2a;
+                touch-action: none;
+                cursor: grab;
+            `;
+        }
+
+        function dimensionarContainers() {
+            const prop = MOLDURA.larguraTotal / MOLDURA.alturaTotal;
+            if (!prop) return;
+
+            const larguraMax  = Math.min(window.innerWidth - 24, 380);
+            const marcaEl     = document.querySelector('.marca');
+            const botoesVisiveis =
+                (!botoesCamera.classList.contains('hidden')    ? botoesCamera.offsetHeight    : 0) +
+                (!botoesAjuste.classList.contains('hidden')    ? botoesAjuste.offsetHeight    : 0) +
+                (!botoesResultado.classList.contains('hidden') ? botoesResultado.offsetHeight : 0);
+
+            const chromeH =
+                16 + 60 +
+                (marcaEl ? marcaEl.offsetHeight : 0) +
+                mensagem.offsetHeight +
+                (!dicaAjuste.classList.contains('hidden') ? dicaAjuste.offsetHeight : 0) +
+                botoesVisiveis + 40;
+
+            const alturaMax = window.innerHeight - chromeH;
+            const largura   = Math.max(200, Math.min(larguraMax, alturaMax * prop));
+
+            document.querySelectorAll('.container').forEach(c => {
+                c.style.width = largura + 'px';
+            });
+        }
+
+        function mostrarTela(tela) {
+            document.body.classList.toggle('ajustando-foto', tela === 'ajuste');
+            telaEscolha.classList.add('hidden');
+            telaLote.classList.add('hidden');
+            areaCamera.classList.add('hidden');
+            areaAjuste.classList.add('hidden');
+            areaResultado.classList.add('hidden');
+            botoesCamera.classList.add('hidden');
+            botoesAjuste.classList.add('hidden');
+            botoesResultado.classList.add('hidden');
+            botoesLote.classList.add('hidden');
+            dicaAjuste.classList.add('hidden');
+
+            if (tela === 'escolha') {
+                telaEscolha.classList.remove('hidden');
+                pararCamera();
+                fotoJaEnviada      = false;
+                indiceEditandoLote = -1;
+            } else if (tela === 'camera') {
+                areaCamera.classList.remove('hidden');
+                botoesCamera.classList.remove('hidden');
+            } else if (tela === 'ajuste') {
+                areaAjuste.classList.remove('hidden');
+                botoesAjuste.classList.remove('hidden');
+                dicaAjuste.classList.remove('hidden');
+                pararCamera();
+            } else if (tela === 'resultado') {
+                areaResultado.classList.remove('hidden');
+                botoesResultado.classList.remove('hidden');
+                pararCamera();
+                btnEnviarImpressao.disabled      = false;
+                btnEnviarImpressao.textContent   = 'Enviar para impressão';
+                btnEnviarImpressao.style.display = fotoJaEnviada ? 'none' : 'inline-flex';
+            } else if (tela === 'lote') {
+                telaLote.classList.remove('hidden');
+                botoesLote.classList.remove('hidden');
+                pararCamera();
+            }
+
+            requestAnimationFrame(dimensionarContainers);
+        }
+
+        // BOTÕES DA TELA INICIAL
+        btnAbrirCamera.addEventListener('click', () => {
+            mostrarTela('camera');
+            iniciarCamera();
+        });
+
+        btnAbrirGaleria.addEventListener('click', () => inputFoto.click());
+        btnAbrirGaleriaLote.addEventListener('click', () => inputFotoLote.click());
+
+        // INPUT FOTO ÚNICA
+        inputFoto.addEventListener('change', (e) => {
+            const arquivo = e.target.files[0];
+            if (!arquivo) return;
+
+            indiceEditandoLote   = -1;
+            mensagem.textContent = 'Carregando foto...';
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img  = new Image();
+                img.onload = () => {
+                    imagemOriginal = img;
+                    origemEnvio    = img;
+                    mostrarTela('ajuste');
+                    setTimeout(() => {
+                        iniciarAjuste();
+                        mensagem.textContent = '';
+                    }, 100);
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(arquivo);
+        });
+
+        // INPUT LOTE
+        inputFotoLote.addEventListener('change', async (e) => {
+            const arquivos = Array.from(e.target.files);
+            if (arquivos.length === 0) return;
+
+            const totalDepois = fotosLote.length + arquivos.length;
+            if (totalDepois > LIMITE_LOTE) {
+                const podeAdicionar = LIMITE_LOTE - fotosLote.length;
+                if (podeAdicionar <= 0) {
+                    mostrarModal('info', 'Limite atingido', `Você já atingiu o limite de ${LIMITE_LOTE} fotos por envio.`);
+                    inputFotoLote.value = '';
+                    return;
+                }
+                mostrarModal('info', 'Limite de fotos', `Você pode adicionar no máximo ${LIMITE_LOTE} fotos por vez. Vamos processar apenas as ${podeAdicionar} primeiras.`);
+                arquivos.splice(podeAdicionar);
+            }
+
+            mostrarTela('lote');
+            loteProcessando.classList.remove('hidden');
+            gradeLote.classList.add('hidden');
+            botoesLote.classList.add('hidden');
+
+            for (const arquivo of arquivos) {
+                try { await adicionarFotoAoLote(arquivo); }
+                catch (err) { console.error('Erro ao processar foto:', err); }
+            }
+
+            inputFotoLote.value = '';
+            loteProcessando.classList.add('hidden');
+            gradeLote.classList.remove('hidden');
+            botoesLote.classList.remove('hidden');
+            renderizarGradeLote();
+        });
+
+        async function adicionarFotoAoLote(arquivo) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = async () => {
+                        const canvasTemp   = document.createElement('canvas');
+                        canvasTemp.width   = MOLDURA.larguraTotal;
+                        canvasTemp.height  = MOLDURA.alturaTotal;
+                        const ctxTemp = canvasTemp.getContext('2d');
+                        ctxTemp.fillStyle = '#FFFFFF';
+                        ctxTemp.fillRect(0, 0, canvasTemp.width, canvasTemp.height);
+
+                        const propJanela = MOLDURA.janelaLargura / MOLDURA.janelaAltura;
+                        const propImg    = img.width / img.height;
+                        let sx, sy, sW, sH;
+
+                        if (propImg > propJanela) {
+                            sH = img.height;
+                            sW = img.height * propJanela;
+                            sx = (img.width - sW) / 2;
+                            sy = 0;
+                        } else {
+                            sW = img.width;
+                            sH = img.width / propJanela;
+                            sx = 0;
+                            sy = (img.height - sH) / 2;
+                        }
+
+                        const canvasLuz = document.createElement('canvas');
+                        canvasLuz.width = sW;
+                        canvasLuz.height = sH;
+                        const ctxLuz = canvasLuz.getContext('2d');
+                        ctxLuz.drawImage(img, sx, sy, sW, sH, 0, 0, sW, sH);
+
+                        const filtro = calcularFiltroDeLuzInteligente(ctxLuz, sW, sH);
+                        
+                        ctxTemp.save();
+                        ctxTemp.filter = filtro;
+                        ctxTemp.drawImage(img, sx, sy, sW, sH,
+                            MOLDURA.janelaX,      MOLDURA.janelaY,
+                            MOLDURA.janelaLargura, MOLDURA.janelaAltura);
+                        ctxTemp.restore();
+
+                        if (moldura.complete && moldura.naturalWidth > 0) {
+                            ctxTemp.drawImage(moldura, 0, 0, MOLDURA.larguraTotal, MOLDURA.alturaTotal);
+                        }
+
+                        const canvasPreview  = document.createElement('canvas');
+                        canvasPreview.width  = 300;
+                        canvasPreview.height = (300 * MOLDURA.alturaTotal) / MOLDURA.larguraTotal;
+                        const ctxPreview = canvasPreview.getContext('2d');
+                        ctxPreview.imageSmoothingQuality = 'high';
+                        ctxPreview.drawImage(canvasTemp, 0, 0, canvasPreview.width, canvasPreview.height);
+
+                        fotosLote.push({
+                            imagemOriginal:     img,
+                            canvasCompleto:     canvasTemp,
+                            previewUrl:         canvasPreview.toDataURL('image/jpeg', 0.7),
+                            editadaManualmente: false
+                        });
+
+                        resolve();
+                    };
+                    img.onerror = reject;
+                    img.src = event.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(arquivo);
+            });
+        }
+
+        function renderizarGradeLote() {
+            gradeLote.innerHTML = '';
+            const proporcao = `${MOLDURA.larguraTotal} / ${MOLDURA.alturaTotal}`;
+
+            fotosLote.forEach((foto, index) => {
+                const item        = document.createElement('div');
+                item.className    = 'item-lote';
+                item.style.aspectRatio = proporcao;
+                item.innerHTML = `
+                    <img src="${foto.previewUrl}" alt="Foto ${index + 1}">
+                    <div class="item-lote-numero">${index + 1}</div>
+                    <button class="item-lote-btn-remover" data-index="${index}">×</button>
+                    <div class="item-lote-editar">✎ Editar</div>
+                `;
+                item.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('item-lote-btn-remover')) {
+                        e.stopPropagation();
+                        removerFotoDoLote(index);
+                    } else {
+                        editarFotoDoLote(index);
+                    }
+                });
+                gradeLote.appendChild(item);
+            });
+
+            if (fotosLote.length < LIMITE_LOTE) {
+                const btnAdd = document.createElement('div');
+                btnAdd.className = 'item-lote-adicionar';
+                btnAdd.style.aspectRatio = proporcao;
+                btnAdd.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                    </svg>
+                    <span>Adicionar</span>
+                `;
+                btnAdd.addEventListener('click', () => inputFotoLote.click());
+                gradeLote.appendChild(btnAdd);
+            }
+
+            contadorLote.textContent = fotosLote.length;
+            qtdEnvio.textContent     = fotosLote.length;
+            btnEnviarLote.disabled   = fotosLote.length === 0;
+
+            if (fotosLote.length === 0) mostrarTela('escolha');
+        }
+
+        function removerFotoDoLote(index) {
+            fotosLote.splice(index, 1);
+            renderizarGradeLote();
+        }
+
+        function editarFotoDoLote(index) {
+            indiceEditandoLote = index;
+            imagemOriginal     = fotosLote[index].imagemOriginal;
+            mostrarTela('ajuste');
+            setTimeout(() => iniciarAjuste(), 100);
+        }
+
+        btnVoltarLote.addEventListener('click', () => {
+            if (fotosLote.length > 0) {
+                if (confirm('Voltar? Suas fotos do lote serão descartadas.')) {
+                    fotosLote = [];
+                    mostrarTela('escolha');
+                }
+            } else {
+                mostrarTela('escolha');
+            }
+        });
+
+        // AJUSTE DE FOTO
+        function iniciarAjuste() {
+            fotoAjuste.src          = imagemOriginal.src;
+            fotoAjuste.style.width  = imagemOriginal.width  + 'px';
+            fotoAjuste.style.height = imagemOriginal.height + 'px';
+
+            const rectArea = areaFoto.getBoundingClientRect();
+            if (rectArea.width === 0 || rectArea.height === 0) {
+                setTimeout(iniciarAjuste, 100);
+                return;
+            }
+
+            const scaleX     = rectArea.width  / imagemOriginal.width;
+            const scaleY     = rectArea.height / imagemOriginal.height;
+            const scaleCover = Math.max(scaleX, scaleY);
+
+            ajuste.scale        = scaleCover;
+            ajuste.initialScale = scaleCover;
+            ajuste.x = (rectArea.width  - imagemOriginal.width  * scaleCover) / 2;
+            ajuste.y = (rectArea.height - imagemOriginal.height * scaleCover) / 2;
+
+            aplicarTransform();
+        }
+
+        function aplicarTransform() {
+            fotoAjuste.style.transform = `translate(${ajuste.x}px, ${ajuste.y}px) scale(${ajuste.scale})`;
+        }
+
+        // GESTOS TOUCH
+        let toqueInicial     = null;
+        let distanciaInicial = 0;
+        let scaleInicial     = 1;
+        let ajusteInicial    = { x: 0, y: 0 };
+
+        function getDistancia(t) {
+            const dx = t[0].clientX - t[1].clientX;
+            const dy = t[0].clientY - t[1].clientY;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        function getCentro(t) {
+            return { x: (t[0].clientX + t[1].clientX) / 2, y: (t[0].clientY + t[1].clientY) / 2 };
+        }
+
+        areaFoto.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (e.touches.length === 1) {
+                toqueInicial  = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                ajusteInicial = { x: ajuste.x, y: ajuste.y };
+            } else if (e.touches.length === 2) {
+                distanciaInicial = getDistancia(e.touches);
+                scaleInicial     = ajuste.scale;
+                toqueInicial     = getCentro(e.touches);
+                ajusteInicial    = { x: ajuste.x, y: ajuste.y };
+            }
+        }, { passive: false });
+
+        areaFoto.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (e.touches.length === 1 && toqueInicial) {
+                const dx = e.touches[0].clientX - toqueInicial.x;
+                const dy = e.touches[0].clientY - toqueInicial.y;
+                ajuste.x = ajusteInicial.x + dx;
+                ajuste.y = ajusteInicial.y + dy;
+                aplicarTransform();
+            } else if (e.touches.length === 2 && distanciaInicial > 0) {
+                const novaDistancia = getDistancia(e.touches);
+                const escalaFator   = novaDistancia / distanciaInicial;
+                const novoScale     = Math.max(ajuste.initialScale * 0.5, Math.min(scaleInicial * escalaFator, ajuste.initialScale * 5));
+                const centroAtual = getCentro(e.touches);
+                const rectArea    = areaFoto.getBoundingClientRect();
+                const cx = centroAtual.x - rectArea.left;
+                const cy = centroAtual.y - rectArea.top;
+                const scaleDiff = novoScale / scaleInicial;
+                ajuste.x     = cx - (cx - ajusteInicial.x) * scaleDiff;
+                ajuste.y     = cy - (cy - ajusteInicial.y) * scaleDiff;
+                ajuste.scale = novoScale;
+                aplicarTransform();
+            }
+        }, { passive: false });
+
+        areaFoto.addEventListener('touchend', (e) => {
+            if (e.touches.length === 0) {
+                toqueInicial     = null;
+                distanciaInicial = 0;
+            }
+        });
+
+        let mouseDown = false;
+        areaFoto.addEventListener('mousedown', (e) => {
+            mouseDown     = true;
+            toqueInicial  = { x: e.clientX, y: e.clientY };
+            ajusteInicial = { x: ajuste.x,  y: ajuste.y  };
+        });
+        areaFoto.addEventListener('mousemove', (e) => {
+            if (!mouseDown) return;
+            ajuste.x = ajusteInicial.x + (e.clientX - toqueInicial.x);
+            ajuste.y = ajusteInicial.y + (e.clientY - toqueInicial.y);
+            aplicarTransform();
+        });
+        areaFoto.addEventListener('mouseup',    () => { mouseDown = false; });
+        areaFoto.addEventListener('mouseleave', () => { mouseDown = false; });
+        areaFoto.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta     = e.deltaY > 0 ? 0.9 : 1.1;
+            const novoScale = Math.max(ajuste.initialScale * 0.5, Math.min(ajuste.scale * delta, ajuste.initialScale * 5));
+            const rectArea  = areaFoto.getBoundingClientRect();
+            const cx        = e.clientX - rectArea.left;
+            const cy        = e.clientY - rectArea.top;
+            const scaleDiff = novoScale / ajuste.scale;
+            ajuste.x     = cx - (cx - ajuste.x) * scaleDiff;
+            ajuste.y     = cy - (cy - ajuste.y) * scaleDiff;
+            ajuste.scale = novoScale;
+            aplicarTransform();
+        }, { passive: false });
+
+        btnVoltarAjuste.addEventListener('click', () => {
+            if (indiceEditandoLote >= 0) {
+                mostrarTela('lote');
+                renderizarGradeLote();
+            } else {
+                inputFoto.value = '';
+                mostrarTela('escolha');
+            }
+        });
+
+        btnResetAjuste.addEventListener('click', iniciarAjuste);
+
+        btnConfirmarAjuste.addEventListener('click', () => {
+            canvas.width  = MOLDURA.larguraTotal;
+            canvas.height = MOLDURA.alturaTotal;
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const rectArea = areaFoto.getBoundingClientRect();
+            const prop     = MOLDURA.janelaLargura / rectArea.width;
+
+            const canvasLuz = document.createElement('canvas');
+            canvasLuz.width = imagemOriginal.width;
+            canvasLuz.height = imagemOriginal.height;
+            const ctxLuz = canvasLuz.getContext('2d');
+            ctxLuz.drawImage(imagemOriginal, 0, 0);
+
+            const filtroLuz = calcularFiltroDeLuzInteligente(ctxLuz, imagemOriginal.width, imagemOriginal.height);
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(MOLDURA.janelaX, MOLDURA.janelaY, MOLDURA.janelaLargura, MOLDURA.janelaAltura);
+            ctx.clip();
+            ctx.translate(MOLDURA.janelaX, MOLDURA.janelaY);
+            ctx.translate(ajuste.x * prop, ajuste.y * prop);
+            ctx.scale(ajuste.scale * prop, ajuste.scale * prop);
+
+            ctx.filter = filtroLuz;
+            ctx.drawImage(imagemOriginal, 0, 0);
+            ctx.restore();
+
+            if (moldura.complete && moldura.naturalWidth > 0) {
+                ctx.drawImage(moldura, 0, 0, MOLDURA.larguraTotal, MOLDURA.alturaTotal);
+            }
+
+            if (indiceEditandoLote >= 0) {
+                const canvasCopia  = document.createElement('canvas');
+                canvasCopia.width  = canvas.width;
+                canvasCopia.height = canvas.height;
+                canvasCopia.getContext('2d').drawImage(canvas, 0, 0);
+
+                const canvasPreview  = document.createElement('canvas');
+                canvasPreview.width  = 300;
+                canvasPreview.height = (300 * MOLDURA.alturaTotal) / MOLDURA.larguraTotal;
+                const ctxPreview = canvasPreview.getContext('2d');
+                ctxPreview.imageSmoothingQuality = 'high';
+                ctxPreview.drawImage(canvasCopia, 0, 0, canvasPreview.width, canvasPreview.height);
+
+                fotosLote[indiceEditandoLote].canvasCompleto     = canvasCopia;
+                fotosLote[indiceEditandoLote].previewUrl         = canvasPreview.toDataURL('image/jpeg', 0.7);
+                fotosLote[indiceEditandoLote].editadaManualmente = true;
+
+                indiceEditandoLote = -1;
+                mostrarTela('lote');
+                renderizarGradeLote();
+            } else {
+                fotoJaEnviada = false;
+                mostrarTela('resultado');
+            }
+        });
+
+        // CÂMERA
+        async function iniciarCamera() {
+            try {
+                mensagem.textContent = 'Iniciando câmera...';
+                if (streamAtual) {
+                    streamAtual.getTracks().forEach(t => t.stop());
+                    streamAtual = null;
+                }
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: cameraAtual, width: { ideal: 1920 }, height: { ideal: 2322 } },
+                    audio: false
+                });
+                streamAtual     = stream;
+                video.srcObject = stream;
+                video.style.transform = cameraAtual === 'user' ? 'scaleX(-1)' : 'none';
+                video.onloadedmetadata = () => { video.play(); mensagem.textContent = ''; };
+            } catch (err) {
+                mensagem.textContent = 'Erro: ' + err.message;
+            }
+        }
+
+        function pararCamera() {
+            if (streamAtual) {
+                streamAtual.getTracks().forEach(t => t.stop());
+                streamAtual = null;
+            }
+        }
+
+        btnVoltarCamera.addEventListener('click', () => mostrarTela('escolha'));
+
+        btnVirarCamera.addEventListener('click', () => {
+            cameraAtual = cameraAtual === 'environment' ? 'user' : 'environment';
+            iniciarCamera();
+        });
+
+        btnTirarFoto.addEventListener('click', () => {
+            if (!video.videoWidth) {
+                alert('Câmera ainda não está pronta.');
+                return;
+            }
+            canvas.width  = MOLDURA.larguraTotal;
+            canvas.height = MOLDURA.alturaTotal;
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const propJ = MOLDURA.janelaLargura / MOLDURA.janelaAltura;
+            const propC = video.videoWidth / video.videoHeight;
+            let sx, sy, sW, sH;
+
+            if (propC > propJ) {
+                sH = video.videoHeight;
+                sW = video.videoHeight * propJ;
+                sx = (video.videoWidth - sW) / 2;
+                sy = 0;
+            } else {
+                sW = video.videoWidth;
+                sH = video.videoWidth / propJ;
+                sx = 0;
+                sy = (video.videoHeight - sH) / 2;
+            }
+
+            const canvasLuz = document.createElement('canvas');
+            canvasLuz.width = sW;
+            canvasLuz.height = sH;
+            const ctxLuz = canvasLuz.getContext('2d');
+            ctxLuz.drawImage(video, sx, sy, sW, sH, 0, 0, sW, sH);
+
+            const filtroLuz = calcularFiltroDeLuzInteligente(ctxLuz, sW, sH);
+
+            ctx.save();
+            ctx.filter = filtroLuz;
+            ctx.drawImage(video, sx, sy, sW, sH,
+                MOLDURA.janelaX, MOLDURA.janelaY,
+                MOLDURA.janelaLargura, MOLDURA.janelaAltura);
+            ctx.restore();
+
+            if (moldura.complete && moldura.naturalWidth > 0) {
+                ctx.drawImage(moldura, 0, 0, MOLDURA.larguraTotal, MOLDURA.alturaTotal);
+            }
+
+            // Guarda o quadro original da câmera (sem moldura) para o painel admin
+            const canvasOrigem = document.createElement('canvas');
+            canvasOrigem.width  = video.videoWidth;
+            canvasOrigem.height = video.videoHeight;
+            canvasOrigem.getContext('2d').drawImage(video, 0, 0);
+            origemEnvio = canvasOrigem;
+
+            fotoJaEnviada = false;
+            mostrarTela('resultado');
+        });
+
+        btnRefazer.addEventListener('click', () => {
+            inputFoto.value = '';
+            mostrarTela('escolha');
+        });
+
+        window.addEventListener('resize', dimensionarContainers);
+        window.addEventListener('orientationchange', () => { setTimeout(dimensionarContainers, 300); });
+
+        btnBaixar.addEventListener('click', () => {
+            const link    = document.createElement('a');
+            link.download = 'entreclicks-' + Date.now() + '.jpg';
+            link.href     = canvas.toDataURL('image/jpeg', 0.95);
+            link.click();
+        });
+
+        // GERAR COMPARTILHAMENTO
+        async function gerarCanvasParaCompartilhamento() {
+            const LARGURA_SHARE = 1080;
+            const ALTURA_SHARE  = 1920;
+
+            const canvasShare  = document.createElement('canvas');
+            canvasShare.width  = LARGURA_SHARE;
+            canvasShare.height = ALTURA_SHARE;
+            const ctxShare = canvasShare.getContext('2d');
+            ctxShare.imageSmoothingEnabled = true;
+            ctxShare.imageSmoothingQuality = 'high';
+
+            const propCanvas = canvas.width / canvas.height;
+            const propShare  = LARGURA_SHARE / ALTURA_SHARE;
+
+            let bgW, bgH, bgX, bgY;
+            if (propCanvas > propShare) {
+                bgH = ALTURA_SHARE; bgW = ALTURA_SHARE * propCanvas; bgX = (LARGURA_SHARE - bgW) / 2; bgY = 0;
+            } else {
+                bgW = LARGURA_SHARE; bgH = LARGURA_SHARE / propCanvas; bgX = 0; bgY = (ALTURA_SHARE - bgH) / 2;
+            }
+
+            ctxShare.filter = 'blur(40px) brightness(0.55) saturate(1.3)';
+            ctxShare.drawImage(canvas, bgX, bgY, bgW, bgH);
+            ctxShare.filter = 'none';
+
+            ctxShare.fillStyle = 'rgba(10, 10, 10, 0.35)';
+            ctxShare.fillRect(0, 0, LARGURA_SHARE, ALTURA_SHARE);
+
+            let fgW, fgH, fgX, fgY;
+            const MARGEM = 60;
+            const larguraDisponivel = LARGURA_SHARE - (MARGEM * 2);
+            const alturaDisponivel  = ALTURA_SHARE  - (MARGEM * 2);
+
+            if (propCanvas > (larguraDisponivel / alturaDisponivel)) {
+                fgW = larguraDisponivel; fgH = larguraDisponivel / propCanvas;
+            } else {
+                fgH = alturaDisponivel; fgW = alturaDisponivel * propCanvas;
+            }
+
+            fgX = (LARGURA_SHARE - fgW) / 2;
+            fgY = (ALTURA_SHARE  - fgH) / 2;
+
+            ctxShare.shadowColor   = 'rgba(0, 0, 0, 0.5)';
+            ctxShare.shadowBlur    = 30;
+            ctxShare.shadowOffsetX = 0;
+            ctxShare.shadowOffsetY = 10;
+
+            ctxShare.drawImage(canvas, fgX, fgY, fgW, fgH);
+            ctxShare.shadowColor   = 'transparent';
+            ctxShare.shadowBlur    = 0;
+            ctxShare.shadowOffsetY = 0;
+
+            return canvasShare;
+        }
+
+        // COMPARTILHAR
+        btnCompartilhar.addEventListener('click', async () => {
+            try {
+                const textoOriginal = btnCompartilhar.innerHTML;
+                btnCompartilhar.disabled  = true;
+                btnCompartilhar.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
+                    </svg>
+                    Preparando...
+                `;
+
+                const canvasCompartilhar = await gerarCanvasParaCompartilhamento();
+
+                canvasCompartilhar.toBlob(async (blob) => {
+                    btnCompartilhar.disabled  = false;
+                    btnCompartilhar.innerHTML = textoOriginal;
+
+                    if (!blob) { alert('Erro ao gerar imagem.'); return; }
+
+                    const arquivo = new File([blob], 'entreclicks-' + Date.now() + '.jpg', { type: 'image/jpeg' });
+
+                    if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+                        try { await navigator.share({ files: [arquivo], title: 'Entre Clicks', text:  'Eternize esse momento' }); }
+                        catch (err) { if (err.name !== 'AbortError') throw err; }
+                    } else {
+                        alert('Baixando a foto para compartilhamento...');
+                        const link    = document.createElement('a');
+                        link.download = 'entreclicks-share-' + Date.now() + '.jpg';
+                        link.href     = canvasCompartilhar.toDataURL('image/jpeg', 0.95);
+                        link.click();
+                    }
+                }, 'image/jpeg', 0.95);
+
+            } catch (err) {
+                btnCompartilhar.disabled = false;
+                console.error(err);
+                alert('Tente baixar a foto para compartilhar.');
+            }
+        });
+
+        // Helper pra converter Blob para Base64 (para enviar original)
+        function blobToBase64(blob) {
+            return new Promise((resolve, _) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        // Helper pra extrair Blob da imagem original enviada (sem moldura)
+        async function obterBlobOriginal(fonte) {
+            if (!fonte) return null;
+
+            const larguraOrig = fonte.naturalWidth  || fonte.width;
+            const alturaOrig  = fonte.naturalHeight || fonte.height;
+            if (!larguraOrig || !alturaOrig) return null;
+
+            const fator = Math.min(1, LADO_MAX_ORIGINAL / Math.max(larguraOrig, alturaOrig));
+
+            const canvasOrig = document.createElement('canvas');
+            canvasOrig.width  = Math.max(1, Math.round(larguraOrig * fator));
+            canvasOrig.height = Math.max(1, Math.round(alturaOrig  * fator));
+
+            const ctxOrig = canvasOrig.getContext('2d');
+            ctxOrig.imageSmoothingEnabled = true;
+            ctxOrig.imageSmoothingQuality = 'high';
+            ctxOrig.drawImage(fonte, 0, 0, canvasOrig.width, canvasOrig.height);
+
+            return new Promise(res => canvasOrig.toBlob(res, 'image/jpeg', 0.88));
+        }
+
+        // Envia a foto original (sem moldura) junto da foto emoldurada.
+        // Ex.: foto-123-abc.jpg  ->  originais/orig-123-abc.jpg
+        // A pasta mantém as originais fora da galeria do painel.
+
+        // ENVIAR FOTO ÚNICA
+        btnEnviarImpressao.addEventListener('click', async () => {
+            if (!(await garantirEnviosAtivos())) return;
+            if (fotoJaEnviada) {
+                mostrarModal('info', 'Foto já enviada', 'Essa foto já foi enviada para impressão!');
+                return;
+            }
+
+            const overlay      = document.getElementById('overlayEnvio');
+            const barraFill    = document.getElementById('barraFill');
+            const percentualEl = document.getElementById('envioPercentual');
+            const mensagemEl   = document.getElementById('envioMensagem');
+            const contadorEl   = document.getElementById('envioContador');
+            contadorEl.classList.add('hidden');
+
+            const mensagens = [
+                { pct:  0, texto: 'Preparando sua foto...'     },
+                { pct: 20, texto: 'Otimizando qualidade...'    },
+                { pct: 50, texto: 'Enviando para impressão...' },
+                { pct: 80, texto: 'Quase lá...'                },
+                { pct: 95, texto: 'Finalizando...'             }
+            ];
+
+            function atualizarProgresso(pct) {
+                barraFill.style.width    = pct + '%';
+                percentualEl.textContent = Math.round(pct) + '%';
+                for (let i = mensagens.length - 1; i >= 0; i--) {
+                    if (pct >= mensagens[i].pct) {
+                        if (mensagemEl.textContent !== mensagens[i].texto) {
+                            mensagemEl.style.opacity = '0';
+                            setTimeout(() => {
+                                mensagemEl.textContent   = mensagens[i].texto;
+                                mensagemEl.style.opacity = '1';
+                            }, 200);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            overlay.classList.add('ativo');
+            atualizarProgresso(0);
+            btnEnviarImpressao.disabled = true;
+
+            let progressoSimulado = 0;
+            const intervalSimulado = setInterval(() => {
+                progressoSimulado += Math.random() * 3;
+                if (progressoSimulado >= 30) {
+                    progressoSimulado = 30;
+                    clearInterval(intervalSimulado);
+                }
+                atualizarProgresso(progressoSimulado);
+            }, 100);
+
+            try {
+                const blob = await redimensionarCanvasComQualidade(canvas, LARGURA_IMPRESSAO, ALTURA_IMPRESSAO, QUALIDADE_JPEG);
+                if (!blob) throw new Error('Erro ao gerar foto');
+
+                clearInterval(intervalSimulado);
+                atualizarProgresso(35);
+
+                const timestamp   = Date.now();
+                const random      = Math.random().toString(36).substring(2, 8);
+                const nomeArquivo = `foto-${timestamp}-${random}.jpg`;
+               
+                let progressoUpload = 35;
+                const intervalUpload = setInterval(() => {
+                    progressoUpload += Math.random() * 4;
+                    if (progressoUpload >= 90) {
+                        progressoUpload = 90;
+                        clearInterval(intervalUpload);
+                    }
+                    atualizarProgresso(progressoUpload);
+                }, 150);
+
+                // Envio exclusivo do Evento A, foto final + original no mesmo registro.
+                await enviarParaEvento(nomeArquivo, blob, origemEnvio);
+
+                           clearInterval(intervalUpload);
+
+                atualizarProgresso(100);
+                await new Promise(r => setTimeout(r, 600));
+
+                fotoJaEnviada = true;
+                btnEnviarImpressao.style.display = 'none';
+                overlay.classList.remove('ativo');
+
+                mostrarModal('sucesso', 'Foto enviada',
+                    'Sua foto será impressa e entregue durante o evento.',
+                    true);
+
+            } catch (err) {
+                console.error('Erro upload:', err);
+                clearInterval(intervalSimulado);
+                if (typeof intervalUpload !== 'undefined') clearInterval(intervalUpload);
+                overlay.classList.remove('ativo');
+                btnEnviarImpressao.disabled = false;
+                btnEnviarImpressao.textContent = 'Enviar para impressão';
+                // Mantém a foto e o resultado na tela para a pessoa poder tentar de novo.
+                const detalhe = (err && err.message) ? String(err.message) : 'Falha de conexão ou envio interrompido.';
+                mostrarModal('erro', 'Não conseguimos enviar ainda',
+                    'Sua foto continua aqui. Confira se a internet está funcionando e toque em “Enviar para impressão” para tentar novamente.<br><br><small>Detalhe: ' + detalhe.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) + '</small>');
+            }
+        });
+
+        // ENVIAR LOTE
+        btnEnviarLote.addEventListener('click', async () => {
+            if (!(await garantirEnviosAtivos())) return;
+            if (fotosLote.length === 0) return;
+
+            const overlay      = document.getElementById('overlayEnvio');
+            const barraFill    = document.getElementById('barraFill');
+            const percentualEl = document.getElementById('envioPercentual');
+            const mensagemEl   = document.getElementById('envioMensagem');
+            const contadorEl   = document.getElementById('envioContador');
+
+            contadorEl.classList.remove('hidden');
+            overlay.classList.add('ativo');
+            btnEnviarLote.disabled = true;
+
+            const total  = fotosLote.length;
+            let enviadas = 0;
+            let erros    = 0;
+
+            function atualizarProgresso(pct, msg, contador) {
+                barraFill.style.width    = pct + '%';
+                percentualEl.textContent = Math.round(pct) + '%';
+                if (msg) {
+                    mensagemEl.style.opacity = '0';
+                    setTimeout(() => {
+                        mensagemEl.textContent   = msg;
+                        mensagemEl.style.opacity = '1';
+                    }, 200);
+                }
+                if (contador) contadorEl.textContent = contador;
+            }
+
+            for (let i = 0; i < fotosLote.length; i++) {
+                // Confere novamente antes de cada foto para respeitar uma pausa feita durante o envio em lote.
+                if (!(await garantirEnviosAtivos())) {
+                    erros += fotosLote.length - i;
+                    break;
+                }
+                const foto      = fotosLote[i];
+                const numero    = i + 1;
+                const pctInicio = (i / total) * 100;
+                const pctFim    = ((i + 1) / total) * 100;
+
+                try {
+                    atualizarProgresso(pctInicio, `Preparando foto ${numero}...`, `${numero} de ${total}`);
+
+                    await new Promise(r => setTimeout(r, 300)); 
+
+                    const blob = await redimensionarCanvasComQualidade(foto.canvasCompleto, LARGURA_IMPRESSAO, ALTURA_IMPRESSAO, QUALIDADE_JPEG);
+
+                    if (!blob) throw new Error('Erro ao gerar foto');
+
+                    atualizarProgresso(pctInicio + ((pctFim - pctInicio) / 2), `Enviando foto ${numero}...`, `${numero} de ${total}`);
+
+                    const timestamp   = Date.now();
+                    const random      = Math.random().toString(36).substring(2, 8);
+                    const nomeArquivo = `foto-${timestamp}-${random}.jpg`;
+                    
+                    await enviarParaEvento(nomeArquivo, blob, foto.imagemOriginal);
+
+                    enviadas++;
+                    atualizarProgresso(pctFim, `Foto ${numero} enviada!`, `${numero} de ${total}`);
+
+                } catch (err) {
+                    console.error(`Erro ao enviar foto ${numero}:`, err);
+                    erros++;
+                }
+            }
+
+            atualizarProgresso(100, 'Concluído!', `${enviadas} de ${total}`);
+            await new Promise(r => setTimeout(r, 800));
+
+            overlay.classList.remove('ativo');
+            contadorEl.classList.add('hidden');
+
+            if (erros === 0) {
+                fotosLote = [];
+                mostrarTela('escolha');
+                mostrarModal('sucesso', `${enviadas} fotos enviadas`,
+                    `Suas ${enviadas} fotos serão impressas e entregues durante o evento.`,
+                    true);
+            } else if (enviadas > 0) {
+                mostrarModal('info', 'Envio parcial',
+                    `${enviadas} foto(s) enviada(s) com sucesso.<br>${erros} não conseguiram ser enviadas. Tente enviar novamente.`);
+                btnEnviarLote.disabled = false;
+            } else {
+                mostrarModal('erro', 'Falha no envio',
+                    'Nenhuma foto foi enviada. Verifique sua internet e tente novamente.');
+                btnEnviarLote.disabled = false;
+            }
+        });
+
+        // MODAL
+        function mostrarModal(tipo, titulo, texto, mostrarCTA = false) {
+            const modalExistente = document.querySelector('.modal');
+            if (modalExistente) modalExistente.remove();
+
+            const icone = ICONES_MODAL[tipo] || ICONES_MODAL.info;
+
+            const ctaHTML = mostrarCTA ? `
+                <div class="modal-dica-qr">
+                    <strong>Não precisa ler o QR Code de novo!</strong>
+                    <span>Continue nesta página para enviar mais fotos.</span>
+                </div>
+                <button type="button" class="btn-outra-foto" id="btnOutraFotoModal">Enviar outra foto</button>
+                <a class="modal-instagram-link" href="https://instagram.com/entreclicks.oficial" target="_blank" rel="noopener noreferrer">${ICONE_INSTA}<span>Gostou? Siga @entreclicks.oficial</span></a>
+                <div class="modal-dica-fechar">Ou feche para baixar ou compartilhar sua foto.</div>` : '';
+
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-conteudo">
+                    <div class="modal-icone">${icone}</div>
+                    <div class="modal-titulo">${titulo}</div>
+                    <div class="modal-texto">${texto}</div>
+                    ${mostrarCTA ? '' : '<button class="btn-ok" type="button">OK</button>'}
+                    ${ctaHTML}
+                    ${mostrarCTA ? '<button type="button" class="modal-fechar-sucesso">Fechar</button>' : ''}
+                </div>
+            `;
+            document.body.appendChild(modal);
+            const botaoOk = modal.querySelector('.btn-ok');
+            if (botaoOk) botaoOk.addEventListener('click', () => modal.remove());
+            const botaoFechar = modal.querySelector('.modal-fechar-sucesso');
+            if (botaoFechar) botaoFechar.addEventListener('click', () => modal.remove());
+            const botaoOutra = modal.querySelector('#btnOutraFotoModal');
+            if (botaoOutra) botaoOutra.addEventListener('click', () => {
+                modal.remove();
+                mostrarTela('escolha');
+            });
+        }
+
+        // INICIALIZAÇÃO
+        (async function inicializar() {
+            const ok = await carregarConfiguracao();
+            if (ok) {
+                loadingInicial.style.display = 'none';
+                bannerAviso.classList.add('hidden');
+                mostrarTela('escolha');
+            }
+        })();
+    </script>
+
+</body>
+</html>
