@@ -4,21 +4,21 @@
 <header class="box header"><div><div class="brand">ENTRE CLICKS</div><div class="sub">painel do operador · homologação</div><div class="small event" id="evento">Validando acesso...</div></div><button class="btn" id="sair">Sair</button></header>
 <section class="box receive row"><div><div class="eyebrow" id="recebendo">Consultando recebimento...</div><div class="small">O QR Code do evento é exclusivo para seus convidados.</div></div><button class="btn danger" id="pausar" disabled>Consultando...</button></section>
 <section class="stats"><div class="box stat"><div class="ring">◎</div><div><div class="num" id="total">—</div><div class="small">FOTOS NO SERVIDOR</div></div></div><div class="box stat"><div class="ring">▱</div><div><div class="num" id="espaco">—</div><div class="small">ESPAÇO UTILIZADO</div></div></div></section>
-<section class="box moldura"><div class="ring">▧</div><div class="info"><div style="color:var(--gold);font-family:Georgia,serif;font-size:15px">Moldura Ativa</div><div class="small" id="moldura">Consultando moldura...</div></div><button class="btn" disabled title="Integração da galeria pendente">▤ Galeria de molduras</button><button class="btn gold" disabled title="Integração do ajuste de janela pendente">⚙ Ajustar janela</button></section>
+<section class="box moldura"><div class="ring" id="molduraPreview">▧</div><div class="info"><div style="color:var(--gold);font-family:Georgia,serif;font-size:15px">Moldura Ativa</div><div class="small" id="moldura">Consultando moldura...</div></div><button class="btn" disabled title="Integração da galeria pendente">▤ Galeria de molduras</button><button class="btn gold" disabled title="Integração do ajuste de janela pendente">⚙ Ajustar janela</button></section>
 <section class="actions"><button class="btn" id="atualizar">⟳ Atualizar lista</button><button class="btn" id="zip">⇩ Baixar pendentes em ZIP</button><button class="btn" disabled title="Exclusão em lote será habilitada após validação">♜ Apagar todas (em breve)</button></section>
 <h2 class="heading">FOTOS ENVIADAS</h2><section class="box tabs"><button class="tab active" data-tab="pendentes">PENDENTES <span class="count" id="qpendentes">0</span></button><button class="tab" data-tab="baixadas">BAIXADAS <span class="count" id="qbaixadas">0</span></button><button class="tab" data-tab="todas">TODAS <span class="count" id="qtodas">0</span></button></section>
 <section class="box photos" id="fotos"><div class="empty">Carregando fotos do evento...</div></section><div class="notice" id="aviso" role="status"></div>
 </main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.10/dist/umd/supabase.min.js"></script><script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script><script>
 'use strict';
 const sb=window.supabase.createClient('https://aukbkykkoeovouflijlz.supabase.co','sb_publishable_SZs299aBOzg9Xm_sKZXUiA_faIkIFXr',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
-const $=id=>document.getElementById(id);let eventoId=null,fotos=[],tab='pendentes',molduraUrl=null,recebendoFotos=null,atualizando=false,ultimaAssinatura=null;
+const $=id=>document.getElementById(id);let eventoId=null,fotos=[],tab='pendentes',molduraUrl=null,recebendoFotos=null,atualizando=false,ultimaAssinatura=null,ultimaAssinaturaEspaco=null;
 const aviso=t=>$('aviso').textContent=t;
 async function iniciar(){const {data:{user}}=await sb.auth.getUser();if(!user){location.replace('./operador-login.html');return}
 const {data,error}=await sb.from('operadores_evento').select('evento_id,perfil,eventos_operacao(nome,recebendo_fotos,moldura_url)').eq('usuario_id',user.id).order('evento_id').limit(2);
 if(error||!data?.length){aviso('Nenhum evento autorizado.');return}
 const membro=data.find(x=>x.perfil==='operador')||data[0];eventoId=membro.evento_id;$('evento').textContent=(membro.eventos_operacao?.nome||'Evento')+' · '+membro.perfil;
 recebendoFotos=!!membro.eventos_operacao?.recebendo_fotos;atualizarRecebimentoUI();
-molduraUrl=membro.eventos_operacao?.moldura_url;$('moldura').textContent=molduraUrl?'Moldura cadastrada para este evento':'Moldura ainda não configurada neste teste';
+molduraUrl=membro.eventos_operacao?.moldura_url;$('moldura').textContent=molduraUrl?'Moldura cadastrada para este evento':'Moldura ainda não configurada neste teste';if(molduraUrl&&/^https:\/\//.test(molduraUrl)){const img=document.createElement('img');img.src=molduraUrl;img.alt='Moldura do evento';img.style.cssText='width:43px;height:55px;object-fit:contain';$('molduraPreview').replaceWith(img)}
 await atualizar();}
 function atualizarRecebimentoUI(){
  $('recebendo').textContent=recebendoFotos?'Recebendo fotos dos convidados':'Recebimento de fotos pausado';
@@ -43,7 +43,21 @@ $('pausar').onclick=async()=>{
    aviso(recebendoFotos?'Recebimento retomado somente neste evento.':'Recebimento pausado somente neste evento. Fotos anteriores preservadas.');
  }catch(e){aviso(e.message||'Falha ao alterar recebimento.')}finally{$('pausar').disabled=false}
 };
-async function atualizar(silencioso=false){if(!eventoId||atualizando)return;atualizando=true;if(!silencioso)aviso('Atualizando fotos...');const {data,error}=await sb.from('fotos_evento').select('id,arquivo_path,baixada,created_at').eq('evento_id',eventoId).order('created_at',{ascending:false}).limit(500);if(error){aviso('Falha ao consultar fotos.');atualizando=false;return}const novas=data||[];const assinatura=novas.map(f=>f.id+':'+f.baixada).join('|');if(silencioso&&assinatura===ultimaAssinatura){atualizando=false;return}const recebidas=fotos.length?novas.filter(f=>!fotos.some(anterior=>anterior.id===f.id)).length:0;fotos=novas;ultimaAssinatura=assinatura;$('total').textContent=fotos.length+(fotos.length===500?'+':'');$('espaco').textContent='—';$('qpendentes').textContent=fotos.filter(f=>!f.baixada).length;$('qbaixadas').textContent=fotos.filter(f=>f.baixada).length;$('qtodas').textContent=fotos.length;await render();if(recebidas&&silencioso)aviso(recebidas+' nova(s) foto(s) recebida(s) neste evento.');else if(!silencioso)aviso(fotos.length===500?'Mostrando as 500 fotos mais recentes.':'Lista atualizada.');atualizando=false;}
+async function atualizar(silencioso=false){if(!eventoId||atualizando)return;atualizando=true;if(!silencioso)aviso('Atualizando fotos...');const {data,error}=await sb.from('fotos_evento').select('id,arquivo_path,baixada,created_at').eq('evento_id',eventoId).order('created_at',{ascending:false}).limit(500);if(error){aviso('Falha ao consultar fotos.');atualizando=false;return}const novas=data||[];const assinatura=novas.map(f=>f.id+':'+f.baixada).join('|');if(silencioso&&assinatura===ultimaAssinatura){atualizando=false;return}const recebidas=fotos.length?novas.filter(f=>!fotos.some(anterior=>anterior.id===f.id)).length:0;fotos=novas;ultimaAssinatura=assinatura;$('total').textContent=fotos.length+(fotos.length===500?'+':'');if(!silencioso||assinatura!==ultimaAssinaturaEspaco){atualizarEspaco();ultimaAssinaturaEspaco=assinatura;}$('qpendentes').textContent=fotos.filter(f=>!f.baixada).length;$('qbaixadas').textContent=fotos.filter(f=>f.baixada).length;$('qtodas').textContent=fotos.length;await render();if(recebidas&&silencioso)aviso(recebidas+' nova(s) foto(s) recebida(s) neste evento.');else if(!silencioso)aviso(fotos.length===500?'Mostrando as 500 fotos mais recentes.':'Lista atualizada.');atualizando=false;}
+async function atualizarEspaco(){
+ if(!eventoId)return;
+ try{
+   let totalBytes=0,offset=0,arquivos=0;
+   while(offset<2000){
+     const {data,error}=await sb.storage.from('fotos-eventos-teste').list(eventoId,{limit:1000,offset});
+     if(error)throw error;
+     for(const item of data||[]){totalBytes+=Number(item.metadata?.size||0);arquivos++}
+     if(!data||data.length<1000)break;
+     offset+=1000;
+   }
+   $('espaco').textContent=(totalBytes/(1024*1024)).toFixed(1)+' MB'+(arquivos>=2000?'+':'');
+ }catch(e){$('espaco').textContent='—';console.warn('Não foi possível consultar espaço do evento',e)}
+}
 async function baixarArquivo(f){const {data,error}=await sb.storage.from('fotos-eventos-teste').download(f.arquivo_path);if(error||!data)throw Error('Arquivo indisponível no armazenamento de testes.');return data}
 function salvar(blob,nome){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=nome;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000)}
 function nomeFoto(f){const ext=(f.arquivo_path.split('.').pop()||'jpg').toLowerCase();return 'EntreClicks-'+f.id+'.'+(['jpg','jpeg','png','webp'].includes(ext)?ext:'jpg')}
