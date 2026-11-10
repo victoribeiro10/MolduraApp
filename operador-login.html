@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>EntreClicks | Acesso do Operador (Homologação)</title>
+<style>:root{font-family:Inter,system-ui,sans-serif;color:#f4f0e9;background:#12161c}*{box-sizing:border-box}body{min-height:100vh;display:grid;place-items:center;margin:0;padding:20px}.painel{width:min(100%,420px);background:#1d232b;border:1px solid #45403a;border-radius:18px;padding:32px;box-shadow:0 18px 65px #0005}h1{font-size:24px;margin:0 0 6px}.sub{color:#b7a78c;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:28px}label{display:block;font-size:13px;margin:16px 0 7px}input{width:100%;padding:13px;background:#10151a;color:#fff;border:1px solid #4a5159;border-radius:9px;font:inherit}button{width:100%;margin-top:22px;padding:13px;background:#d6b47c;border:0;border-radius:9px;color:#171717;font-weight:700;cursor:pointer}button:disabled{opacity:.6;cursor:wait}.msg{min-height:22px;color:#f2aa9e;margin-top:14px;font-size:13px}.evento{padding:14px;border:1px solid #4a5159;border-radius:9px;margin-top:12px}.aviso{font-size:12px;color:#aab2ba;margin-top:22px}</style></head>
+<body><main class="painel"><h1>EntreClicks</h1><div class="sub">Central de Impressão · Homologação</div>
+<form id="login"><label for="usuario">Usuário</label><input id="usuario" autocomplete="username" required minlength="3" maxlength="32" pattern="[a-zA-Z0-9._-]+" placeholder="operador01">
+<label for="senha">Senha</label><input id="senha" type="password" autocomplete="current-password" required minlength="6"><button id="entrar" type="submit">Entrar</button></form>
+<section id="area" hidden><p id="boasvindas"></p><div id="eventos"></div><button id="sair" type="button">Sair</button></section>
+<p id="mensagem" class="msg" role="status" aria-live="polite"></p><p class="aviso">Ambiente de testes. O acesso à Central completa será liberado após a integração e os testes de segurança.</p></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.10/dist/umd/supabase.min.js"></script>
+<script>
+'use strict';
+const sb=window.supabase.createClient('https://aukbkykkoeovouflijlz.supabase.co','sb_publishable_SZs299aBOzg9Xm_sKZXUiA_faIkIFXr',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+const form=document.getElementById('login'),area=document.getElementById('area'),msg=document.getElementById('mensagem'),btn=document.getElementById('entrar');
+const emailInterno=usuario=>usuario.toLowerCase()+'@operadores.entreclicks.invalid';
+async function exibirSessao(){
+ const {data:{user},error:authError}=await sb.auth.getUser();
+ if(authError||!user){form.hidden=false;area.hidden=true;return}
+ const {data,error}=await sb.from('operadores_evento').select('evento_id,perfil,eventos_operacao(nome,status)').eq('usuario_id',user.id);
+ if(error){msg.textContent='Não foi possível consultar as permissões.';return}
+ form.hidden=true;area.hidden=false;msg.textContent='';
+ document.getElementById('boasvindas').textContent='Acesso autenticado.';
+ const container=document.getElementById('eventos');container.replaceChildren();
+ if(!data?.length){container.textContent='Nenhum evento atribuído. Solicite ao administrador.';return}
+ for(const item of data){const div=document.createElement('div');div.className='evento';div.textContent=(item.eventos_operacao?.nome||'Evento')+' · '+item.perfil;container.append(div)}
+}
+form.addEventListener('submit',async e=>{
+ e.preventDefault();msg.textContent='';btn.disabled=true;
+ try{
+ const usuario=document.getElementById('usuario').value.trim().toLowerCase();
+ if(!/^[a-z0-9._-]{3,32}$/.test(usuario))throw Error('Use de 3 a 32 caracteres: letras, números, ponto, hífen ou sublinhado.');
+ const {error}=await sb.auth.signInWithPassword({email:emailInterno(usuario),password:document.getElementById('senha').value});
+ if(error)throw Error('Usuário ou senha inválidos.');
+ document.getElementById('senha').value='';await exibirSessao();
+ }catch(err){msg.textContent=err.message||'Não foi possível entrar.'}finally{btn.disabled=false}
+});
+document.getElementById('sair').addEventListener('click',async()=>{await sb.auth.signOut();await exibirSessao()});
+exibirSessao();
+</script></body></html>
