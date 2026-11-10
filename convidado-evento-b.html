@@ -1083,6 +1083,13 @@
                 if (!data)  throw new Error('Sem configuração cadastrada');
 
                 aplicarEstadoEnvios(data.recebendo_fotos !== false);
+                if (!data.moldura_url || !Number(data.janela_largura) || !Number(data.janela_altura)) {
+                    loadingInicial.style.display = 'none';
+                    bannerAviso.classList.add('hidden');
+                    mostrarModal('info', 'Evento em preparação',
+                        'A moldura deste evento ainda não foi configurada. Aguarde a liberação da equipe EntreClicks e atualize a página.');
+                    return false;
+                }
                 MOLDURA.janelaX       = data.janela_x;
                 MOLDURA.janelaY       = data.janela_y;
                 MOLDURA.janelaLargura = data.janela_largura;
