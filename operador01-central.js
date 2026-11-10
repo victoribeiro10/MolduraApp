@@ -167,27 +167,37 @@ async function baixar(f){
  const blob=await arquivo(f);salvar(blob,'EntreClicks-'+f.id+'.jpg');
  if(!f.baixada){const {error}=await sb.from('fotos_evento').update({baixada:true,data_baixada:new Date().toISOString()}).eq('id',f.id).eq('evento_id',EVENTO_A);if(error)throw error;await carregarFotos(true)}
 }
+async function baixarOriginal(f){
+ const base=f.arquivo_path.replace(/\.[^.]+$/,'');
+ for(const ext of ['jpg','png','webp']){
+  const p=base.replace(/\/([^/]+)$/,'/originais/$1')+'.'+ext;
+  const {data,error}=await sb.storage.from('fotos-eventos-teste').download(p);
+  if(!error&&data){salvar(data,'Original-'+f.id+'.'+ext);return}
+ }
+ throw Error('Original indisponível para esta foto');
+}
 function renderFotos(){
  const el=$('galeria');el.replaceChildren();
  const filtered=fotos.filter(f=>aba==='todas'||(aba==='pendentes'?!f.baixada:f.baixada));
  $('vazio').style.display=filtered.length?'none':'block';
  for(const f of filtered){
-  const card=document.createElement('div');card.className='foto-card';card.style.cssText='width:170px;display:inline-block;margin:7px;vertical-align:top;background:#1b1b1b;border:1px solid #393127;padding:8px';
-  const img=new Image();img.alt='Foto do evento';img.style.cssText='width:100%;aspect-ratio:3/4;object-fit:contain;cursor:zoom-in';
-  arquivo(f).then(blob=>{const u=URL.createObjectURL(blob);img.src=u;img.onload=()=>URL.revokeObjectURL(u)}).catch(()=>{img.alt='Imagem indisponível'});
+  const card=document.createElement('div');card.className='foto-item'+(f.baixada?' baixada':'');
+  const img=new Image();img.alt='Foto do evento';
+  arquivo(f).then(blob=>{
+   const u=URL.createObjectURL(blob);img.src=u;img.onload=()=>URL.revokeObjectURL(u);
+  }).catch(()=>{img.alt='Imagem indisponível'});
   img.onclick=()=>{if(img.src)window.open(img.src,'_blank')};
-  const meta=document.createElement('div');meta.style.cssText='font-size:10px;color:#888';meta.textContent=new Date(f.created_at).toLocaleString('pt-BR');
-  const buttons=document.createElement('div');buttons.style.cssText='display:flex;gap:5px;flex-wrap:wrap;margin-top:8px';
-  const btn=document.createElement('button');btn.textContent='Baixar';btn.className='btn-galeria-molduras';btn.onclick=()=>baixar(f).catch(e=>mensagem(e.message));buttons.append(btn);
-  const orig=document.createElement('button');orig.textContent='Original';orig.className='btn-galeria-molduras';orig.onclick=async()=>{
-   const base=f.arquivo_path.replace(/\.[^.]+$/,'');for(const ext of ['jpg','png','webp']){
-    const p=base.replace(/\/([^/]+)$/,'/originais/$1')+'.'+ext;
-    const {data,error}=await sb.storage.from('fotos-eventos-teste').download(p);
-    if(!error&&data){salvar(data,'Original-'+f.id+'.'+ext);return}
-   }mensagem('Original indisponível')
-  };buttons.append(orig);
-  const del=document.createElement('button');del.textContent='Apagar';del.className='btn-apagar';del.onclick=()=>apagarFoto(f);
-  buttons.append(del);card.append(img,meta,buttons);el.append(card);
+  const info=document.createElement('div');info.className='foto-info';
+  const tamanho=document.createElement('span');tamanho.className='foto-tamanho';tamanho.textContent=f.tamanho_bytes?(f.tamanho_bytes/1048576).toFixed(1)+' MB':'— MB';
+  const data=document.createElement('span');data.className='foto-data';data.textContent=new Date(f.created_at).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+  info.append(tamanho,data);
+  const buttons=document.createElement('div');buttons.className='foto-acoes';
+  const btn=document.createElement('button');btn.className='btn-download-item';btn.textContent='BAIXAR';
+  btn.onclick=()=>baixar(f).catch(e=>mensagem(e.message));buttons.append(btn);
+  const orig=document.createElement('button');orig.className='btn-download-item';orig.textContent='ORIGINAL';orig.title='Baixar arquivo original sem moldura';
+  orig.onclick=()=>baixarOriginal(f).catch(e=>mensagem(e.message));buttons.append(orig);
+  const del=document.createElement('button');del.className='btn-apagar-item';del.textContent='APAGAR';del.onclick=()=>apagarFoto(f);buttons.append(del);
+  card.append(img,info,buttons);el.append(card);
  }
 }
 async function apagarFoto(f){
