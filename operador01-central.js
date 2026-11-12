@@ -3,7 +3,7 @@
 const URL_SUPA='https://aukbkykkoeovouflijlz.supabase.co';
 const ANON='sb_publishable_SZs299aBOzg9Xm_sKZXUiA_faIkIFXr';
 const sb=window.supabase.createClient(URL_SUPA,ANON);
-const EVENTO_B='d64a9d07-92da-4561-bc75-90e58a8b886b';
+const EVENTO_B='6c7220dd-6b84-47ac-a6c8-bddfd10f2079';
 const $=id=>document.getElementById(id);
 let evento=null,fotos=[],molduras=[],aba='pendentes',janela=null,editorFrame=null,imgW=0,imgH=0,drag=null,refreshing=false;
 const frameAPI=URL_SUPA+'/functions/v1/molduras-operador-homologacao';
